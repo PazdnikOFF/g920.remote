@@ -807,6 +807,16 @@ static volatile uint8_t s_tunnel_tail;
 static volatile uint32_t s_tunnel_dropped;
 static volatile uint32_t s_tunnel_sent;
 static uint16_t s_tunnel_seq;
+/*
+ * Просьба переподнять руль по USB. Ставится из колбэка линка (задача Wi-Fi),
+ * исполняется главным циклом: трогать стек хоста из чужой задачи нельзя, а
+ * передёргивание порта к тому же спит 300 мс.
+ */
+static volatile bool s_relaunch_wheel;
+/* Когда переподнимали в последний раз: второе передёргивание подряд не
+ * успевает и оставляет порт погашенным. */
+static uint32_t s_relaunch_at_ms;
+#define RELAUNCH_COOLDOWN_MS 3000
 /* Свой счёт кадров ввода: GIP-овский номер руля для этого не годится, см.
  * место отправки. */
 static uint16_t s_input_seq;
@@ -1154,6 +1164,24 @@ static void link_frame(void *ctx, const g920_frame_t *frame,
 
         queue_bytes(reset, sizeof(reset), "set device state: reset");
         try_send_next();
+        /*
+         * ⚠ И **переподнять руль по USB**, а не ограничиться командой GIP.
+         *
+         * Измерено 03.08.2026: команда доходит (RX просит дважды — TX
+         * исполняет дважды), но руль из состояния «между Arrival и Idle» по
+         * ней не выбирается: за двадцать минут от него пришло 451 сообщение
+         * вместо тысяч, из них 132 отчёта ввода, и на security он не отвечал
+         * ни разу. Каждый раз помогал только сброс передатчика, то есть
+         * свежая энумерация.
+         *
+         * Спека даёт `Set Device State: Reset` как способ вернуть устройство
+         * в Arrival, и мы его шлём — но конкретный руль на него не
+         * отзывается. Поэтому следом идёт то, что заведомо работает:
+         * передёргивание корневого порта. Обе меры вместе, а не вместо друг
+         * друга: команда протокола дешевле и, если руль её однажды послушает,
+         * переподнятие просто не понадобится.
+         */
+        s_relaunch_wheel = true;
         return;
     }
 
@@ -1881,6 +1909,21 @@ static void kick_root_port(void)
     vTaskDelay(pdMS_TO_TICKS(300));
     on = usb_host_lib_set_root_port_power(true);
 
+    /*
+     * Включение проверяется и повторяется. Погасший и не вернувшийся порт —
+     * это обесточенный руль, то есть отказ всего моста; молча принять
+     * `ESP_ERR_INVALID_STATE` здесь нельзя.
+     */
+    for (int retry = 0; on != ESP_OK && retry < 5; retry++) {
+        vTaskDelay(pdMS_TO_TICKS(200));
+        on = usb_host_lib_set_root_port_power(true);
+        G920_LOGW(M1, "root port power on retry %d: %s", retry + 1,
+                  esp_err_to_name(on));
+    }
+    if (on != ESP_OK) {
+        G920_LOGE(M1, "root port stayed off (%s) — the wheel has no bus",
+                  esp_err_to_name(on));
+    }
     G920_LOGI(M1, "root port power: off %s, on %s", esp_err_to_name(off),
               esp_err_to_name(on));
 }
@@ -2278,6 +2321,46 @@ void app_main(void)
                 G920_LOGE(M1, "device open failed");
             }
         }
+        if (s_relaunch_wheel) {
+            uint32_t now_ms = (uint32_t)(g920_timestamp_us() / 1000u);
+
+            s_relaunch_wheel = false;
+            /*
+             * Не чаще раза в `RELAUNCH_COOLDOWN_MS`, и это не вежливость.
+             *
+             * Донгл просит вернуть руль дважды подряд — консоль настраивает
+             * устройство два раза за подключение. Второе передёргивание
+             * приходило, пока порт ещё поднимался, и **включить его обратно
+             * не удавалось**: в логе `off ESP_OK, on ESP_ERR_INVALID_STATE`.
+             * Это худший из возможных исходов — руль остаётся обесточенным,
+             * и снаружи это выглядит как «мост сдох».
+             */
+            if (s_relaunch_at_ms != 0
+                && (uint32_t)(now_ms - s_relaunch_at_ms) < RELAUNCH_COOLDOWN_MS) {
+                G920_LOGI(M1, "relaunch asked again %u ms after the last one "
+                              "— ignoring, the port is still coming up",
+                          (unsigned)(now_ms - s_relaunch_at_ms));
+                goto relaunch_done;
+            }
+            s_relaunch_at_ms = now_ms;
+            G920_LOGW(M1, "console started over — relaunching the wheel on usb");
+            /*
+             * Порядок обязателен: сначала отпустить интерфейс и закрыть
+             * устройство, потом гасить порт. Погасить под открытым
+             * устройством значит оставить стеку ссылки на то, чего уже нет.
+             */
+            release_interface();
+            if (s_device != NULL) {
+                (void)usb_host_device_close(s_client, s_device);
+                s_device = NULL;
+            }
+            /* Счётчик попыток — не про этот случай: он сторожит «стек
+             * поднялся, а устройства нет». Здесь устройство было. */
+            s_repower_attempts = 0;
+            kick_root_port();
+        relaunch_done:;
+        }
+
         if (s_pending_gone) {
             s_pending_gone = false;
             G920_LOGW(M1, "device gone after %u messages in, %u errors",

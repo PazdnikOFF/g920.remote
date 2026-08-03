@@ -96,6 +96,8 @@ static struct {
     bool open;
     volatile bool in_busy;
     volatile bool configured;
+    /* Шина усыплена хостом: молчим до resume. */
+    volatile bool suspended;
     volatile bool in_polled_seen;
 } s_gip;
 
@@ -314,15 +316,39 @@ void tud_umount_cb(void)
     note(G920_HOST_EV_BUS_RESET);
 }
 
+/*
+ * Suspend — это **приказ замолчать**, а не просто событие для журнала.
+ *
+ * Спека требует прямо (`H001419`, § «Enumeration»): «USB Reset and USB
+ * Suspend must be handled by all GIP states». До 03.08.2026 мы их только
+ * записывали: донгл продолжал слать Announce раз в 500 мс независимо от
+ * состояния шины — 24746 штук за один сеанс.
+ *
+ * Цена оказалась видна не в трассе, а в комнате: **бокс переставал
+ * выключаться и включался сам**. Уснувшая шина видит устройство, которое
+ * продолжает в неё говорить, и просыпается. На девките это ещё заметнее —
+ * донгл питается от отладочного порта, а не от шины, и переживает уход
+ * консоли целиком.
+ *
+ * Удалённого пробуждения мы не заявляли (`bmAttributes` = 0x80), то есть
+ * права будить хост у нас нет вовсе. Молчим до `resume`.
+ */
 void tud_suspend_cb(bool remote_wakeup_en)
 {
     (void)remote_wakeup_en;
+    s_gip.suspended = true;
     note(G920_HOST_EV_SUSPEND);
 }
 
 void tud_resume_cb(void)
 {
+    s_gip.suspended = false;
     note(G920_HOST_EV_RESUME);
+}
+
+bool g920_gip_device_suspended(void)
+{
+    return s_gip.suspended;
 }
 
 /* --- свой класс ----------------------------------------------------------- */
@@ -518,6 +544,15 @@ bool g920_gip_device_configured(void)
 
 bool g920_gip_device_send(const uint8_t *data, uint16_t length)
 {
+    /*
+     * Отказ на усыплённой шине — не оптимизация, а обязанность. Проверка
+     * стоит здесь, а не у каждого вызывающего: замолчать должны **все**
+     * источники разом, иначе достаточно забыть один.
+     */
+    if (s_gip.suspended) {
+        return false;
+    }
+
     if (!g920_gip_device_configured() || data == NULL || length == 0
         || length > sizeof(s_in_buf)) {
         return false;
