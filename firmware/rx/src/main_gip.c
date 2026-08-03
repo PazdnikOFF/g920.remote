@@ -294,6 +294,12 @@ static volatile uint32_t since_host_ms;
  * периодический сигнал из наблюдавшихся.
  */
 #define HOST_GONE_MS 1500
+/* Молчание настроенной консоли, после которого разговор начинается заново.
+ * Тридцать секунд: исправная в тишине лежит по пятнадцать, а больная —
+ * измеренные 6.6 минуты. */
+#define SESSION_STALE_MS 30000
+#define STALE_TRIES_MAX 3
+static uint8_t stale_tries;
 /*
  * Молчание хоста при состоявшейся сессии, после которого разговор
  * начинается заново. Наблюдалось 03.08.2026: консоль после цикла питания
@@ -630,6 +636,7 @@ static void on_host_message(void *ctx, const uint8_t *data, uint16_t length)
      */
     host_answered = true;
     since_host_ms = 0;
+    stale_tries = 0; /* хост заговорил — предохранитель перезаряжается */
     if (!have_identity
         || g920_gip_header_parse(&header, data, length) != G920_GIP_OK) {
         return;
@@ -1734,6 +1741,39 @@ void app_main(void)
                 host_answered = false;
                 g920_gip_device_restart_session();
             }
+        }
+
+        /*
+         * Консоль замолчала при настроенном устройстве — начинаем разговор
+         * заново.
+         *
+         * Замер 03.08.2026: после возвращения руля консоль ответила один
+         * раз и замолчала **на 6.6 минуты**, а донгл всё это время слал ей
+         * ввод в пустоту (`to console: 20=749` и ни одного security).
+         * Снаружи это «контроллер недоступен».
+         *
+         * Такой перезапуск уже стоял раньше и был снят: он тянул за собой
+         * лишний калибровочный проворот руля каждые пару минут. Теперь не
+         * тянет — передатчик пропускает переподнятие руля, если тот ещё не
+         * проходил security, а в этом состоянии он как раз девственный.
+         *
+         * Порог с запасом над наблюдавшимся молчанием исправной консоли
+         * (пятнадцать секунд), счётчик попыток — от петли в дежурном
+         * режиме, где консоль молчит неограниченно. Любое слово хоста
+         * перезаряжает и то, и другое.
+         */
+        if (g920_gip_device_configured() && !g920_gip_device_suspended()
+            && host_answered && since_host_ms >= SESSION_STALE_MS
+            && stale_tries < STALE_TRIES_MAX) {
+            stale_tries++;
+            since_host_ms = 0;
+            G920_LOGW(TAG, "console silent %u ms — restarting the session "
+                           "(try %u of %u)",
+                      (unsigned)SESSION_STALE_MS, (unsigned)stale_tries,
+                      (unsigned)STALE_TRIES_MAX);
+            auth_done = false;
+            host_answered = false;
+            g920_gip_device_restart_session();
         }
 
         since_host_ms += TICK_MS;
