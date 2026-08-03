@@ -173,6 +173,19 @@ static volatile bool host_answered;
  * Считать надо то, что подписано.
  */
 static volatile uint32_t hello_count;
+/*
+ * Сколько прошло с последнего слова хоста. Отдельно от `auth_alive`:
+ * тот про security, а этот про то, жив ли собеседник вообще.
+ */
+static volatile uint32_t since_host_ms;
+/*
+ * Хост молчит дольше этого — считаем, что его нет, и **не трогаем шину**.
+ *
+ * Полсекунды с запасом: работающая консоль шлёт `Set Device State` и запрос
+ * начальных отчётов раз в 500 мс без остановки, и это самый редкий её
+ * периодический сигнал из наблюдавшихся.
+ */
+#define HOST_GONE_MS 1500
 /* Свой счёт кадров для сил: тип кадра свой, значит и номера свои. */
 static uint16_t ffb_seq;
 /*
@@ -432,6 +445,7 @@ static void on_host_message(void *ctx, const uint8_t *data, uint16_t length)
      * и Off с Reset. Что именно он сказал, для прекращения Announce неважно.
      */
     host_answered = true;
+    since_host_ms = 0;
     if (!have_identity
         || g920_gip_header_parse(&header, data, length) != G920_GIP_OK) {
         return;
@@ -1224,7 +1238,24 @@ void app_main(void)
             auth_alive = false;
             since_auth_ms = 0;
         }
+        since_host_ms += TICK_MS;
+        /*
+         * ⚠ Перезапуск сессии **только пока хост жив**.
+         *
+         * Перезапуск делается через `g920_gip_device_set_identity`, а это
+         * переподключение по USB — для консоли ровно тот сигнал, которым
+         * её будит подключаемый геймпад. Пока бокс выключен, security не
+         * проходит никогда, таймер срабатывает каждые 30 секунд и объявляет
+         * устройство заново — и бокс включается сам. Проверено человеком
+         * 03.08.2026 самым прямым способом: **без донгла бокс выключается
+         * полностью и включается штатно**.
+         *
+         * Смысла в перезапуске при мёртвом хосте нет и по существу:
+         * предохранитель заведён для случая «хост жив, но обмен встал», а
+         * не «хоста нет». Молчащему переподключаться незачем.
+         */
         if (g920_gip_device_configured() && g920_link_has_peer() && !auth_done
+            && since_host_ms < HOST_GONE_MS
             && since_auth_ms >= AUTH_RETRY_MS) {
             since_auth_ms = 0;
             G920_LOGW(TAG, "auth did not complete in %u s — restarting the "
