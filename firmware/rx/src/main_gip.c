@@ -1687,8 +1687,10 @@ void app_main(void)
                 g920_link_rx_counters_t rx_c;
 
                 g920_link_rx_counters(&rx_c, false);
-                G920_LOGI(M2, "link rx: delivered %u, dup %u, stale %u, "
-                              "foreign %u, sessions %u, gaps %u",
+                G920_LOGI(M2, "link rx: radio %u (%u unparsed) | delivered %u, "
+                              "dup %u, stale %u, foreign %u, sessions %u, "
+                              "gaps %u",
+                          (unsigned)rx_c.raw, (unsigned)rx_c.unparsed,
                           (unsigned)rx_c.delivered, (unsigned)rx_c.duplicates,
                           (unsigned)rx_c.stale, (unsigned)rx_c.foreign,
                           (unsigned)rx_c.sessions, (unsigned)rx_c.gaps);

@@ -53,6 +53,10 @@ static uint64_t s_last_call_us;
  */
 static g920_link_rx_t s_rx_state;
 /* Отброшенных по MAC кадров: сколько видели и о скольких уже сказали. */
+/* Сколько раз радио позвало приёмник и сколько из этого не разобралось —
+ * см. комментарий на входе `on_recv`. */
+static volatile uint32_t s_recv_raw;
+static volatile uint32_t s_recv_unparsed;
 static volatile uint32_t s_rejected_seen;
 static uint32_t s_rejected_reported;
 /*
@@ -284,10 +288,23 @@ G920_HOT static void on_recv(const esp_now_recv_info_t *info,
     g920_frame_t frame;
     g920_link_rx_outcome_t out;
 
+    /*
+     * Счёт **на самом входе**, до любой проверки.
+     *
+     * Заведён 03.08.2026, когда связка встала намертво: передатчик отдавал
+     * кадры в радио без ошибок, а у донгла все счётчики отсева стояли на
+     * нуле — и отсеянных тоже ноль. По ним нельзя было отличить «в эфире
+     * тишина» от «слышим и выбрасываем молча», потому что все они считают
+     * уже **после** разбора кадра. Этот счёт различает: если он нулевой,
+     * радио не приносит ничего, и искать надо в антенне и канале, а не в
+     * протоколе.
+     */
+    s_recv_raw++;
     if (info == NULL || data == NULL || len <= 0) {
         return;
     }
     if (g920_frame_parse(&frame, data, (size_t)len) != G920_PROTO_OK) {
+        s_recv_unparsed++;
         return;
     }
 
@@ -700,7 +717,11 @@ void g920_link_rx_counters(g920_link_rx_counters_t *out, bool reset)
     out->foreign = s_rx_state.rx.foreign;
     out->sessions = s_rx_state.rx.sessions;
     out->gaps = s_rx_state.rx.gaps;
+    out->raw = s_recv_raw;
+    out->unparsed = s_recv_unparsed;
     if (reset) {
+        s_recv_raw = 0;
+        s_recv_unparsed = 0;
         /* Обнуляем только счётчики: эпоха и номера — это состояние сессии,
          * и сбросить их значило бы отдать наверх повтор. */
         s_rx_state.rx.delivered = 0;
