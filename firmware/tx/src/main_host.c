@@ -1031,6 +1031,11 @@ static bool s_wheel_ready;
 #define CONTROL_NEED_IDENTITY 0x01u
 /* Те же коды, что у донгла: см. `main_gip.c`. */
 #define CONTROL_RESET_WHEEL 0x02u
+/*
+ * Руль поднялся и стоит в Arrival — донгл может звать консоль.
+ * Передатчик шлёт это по Announce руля, один раз на его сессию.
+ */
+#define CONTROL_WHEEL_READY 0x03u
 
 #define IDENTITY_SEND_RETRY_MS 200
 #define IDENTITY_LINK_CHUNK 508
@@ -1504,6 +1509,30 @@ static void on_in_done(usb_transfer_t *transfer)
             uint8_t number = g920_gip_message_number(&msg);
 
             s_wheel_msgs[number & 0x1Fu]++;
+
+            /*
+             * Руль представился (`0x02` Announce) — значит он поднялся и
+             * стоит в Arrival, то есть готов начать знакомство с нуля.
+             * Сообщаем это донглу **явно**.
+             *
+             * Явно, а не признаком, и это исправление собственной ошибки.
+             * Донгл ждал возвращения руля по «пришёл любой кадр из радио»,
+             * но кадры всё это время шли от **старого**, ещё не
+             * перезапущенного руля, и ожидание снималось мгновенно. Консоль
+             * начинала security с рулём из прошлой сессии — отсюда «кнопки
+             * не работают, кроме Xbox» сразу после включения бокса.
+             *
+             * Announce у руля один на сессию, поэтому и сообщение уходит
+             * один раз — лишнего трафика это не создаёт.
+             */
+            if (number == 0x02u) {
+                const uint8_t ready = CONTROL_WHEEL_READY;
+
+                G920_LOGI(M1, "wheel announced itself — telling the dongle "
+                              "it may call the console");
+                (void)g920_link_send_reliable(G920_FRAME_CONTROL, &ready,
+                                              sizeof(ready));
+            }
 
             /*
              * Отчёты ввода уходят консоли всегда, а не только «после
@@ -2362,6 +2391,25 @@ void app_main(void)
             if (now_ms < RELAUNCH_COOLDOWN_MS) {
                 G920_LOGI(M1, "relaunch asked %u ms after boot — ignoring",
                           (unsigned)now_ms);
+                goto relaunch_done;
+            }
+            /*
+             * Руль ещё **ни разу не проходил security** в этой своей сессии
+             * — значит он уже там, куда его просят вернуть, и трогать его
+             * незачем.
+             *
+             * Смысл переподнятия ровно один: вытащить руль из **чужой,
+             * состоявшейся** сессии, где он security прошёл и заново её не
+             * начнёт. Девственный руль этой болезнью не болен.
+             *
+             * Цена лишнего переподнятия видна человеку напрямую: руль делает
+             * второй калибровочный проворот при каждом включении. Ровно на
+             * это и была жалоба 03.08.2026 — «после включения руль
+             * калибруется 2 раза».
+             */
+            if (s_wheel_msgs[0x06] == 0u) {
+                G920_LOGI(M1, "relaunch asked, but the wheel has not done "
+                              "security yet — it is already fresh, skipping");
                 goto relaunch_done;
             }
             if (s_relaunch_at_ms != 0
