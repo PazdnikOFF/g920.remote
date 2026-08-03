@@ -716,6 +716,10 @@ static volatile uint8_t s_out_head;
 static volatile uint8_t s_out_tail;
 static volatile uint32_t s_out_dropped;
 
+/* Свой счёт номеров для типов, которые шлём рулю и мы, и консоль. */
+static uint8_t s_seq_set_state;
+static uint8_t s_seq_initial_reports;
+
 static void queue_bytes(const uint8_t *data, size_t len, const char *what)
 {
     uint8_t next = (uint8_t)((s_out_head + 1) % OUT_QUEUE_LEN);
@@ -733,6 +737,45 @@ static void queue_bytes(const uint8_t *data, size_t len, const char *what)
     memcpy(s_out_queue[s_out_head].data, data, len);
     s_out_queue[s_out_head].length = (uint8_t)len;
     s_out_queue[s_out_head].what = what;
+    /*
+     * ⚠ Номера сообщений, которые шлём рулю **и мы, и консоль**, ставим
+     * здесь — иначе в один пул пишут два источника.
+     *
+     * Эта болезнь за 03.08.2026 оказывалась причиной дважды, и оба раза
+     * симптом был один: сообщение доезжает, а собеседник его не исполняет,
+     * потому что видит откат номера назад и вправе считать это повтором.
+     *
+     * Здесь она проявляется так. Во время своей загрузки передатчик сам
+     * спрашивает у руля начальные отчёты, и руль отвечает — в одном окне
+     * тринадцать раз (`21=13`). Потом ту же просьбу шлёт консоль, со своим
+     * счётом, начинающимся с малых номеров. Для руля это откат в том же
+     * пуле, и он молчит. Итог измерен: до консоли не дошло **ни одной**
+     * статической конфигурации, а без неё (`H001861`) ей нечем читать
+     * отчёт состояния `0x20` — отсюда «работает только кнопка Xbox», ведь
+     * `0x07` системное и метаданных не требует.
+     *
+     * Перенумеровываются только те типы, которые передатчик генерирует
+     * сам: `0x05` Set Device State и `0x0A` Initial Reports Request.
+     * Security (`0x06`) он только возит, источник у неё один — и номер в
+     * ней связан с подтверждениями, которые консоль сверяет по нему же.
+     *
+     * Байт 2 — GIP Sequence ID (`H001419`, GIP Message Header). 0x00
+     * зарезервирован.
+     */
+    if (len > 2) {
+        uint8_t *out = s_out_queue[s_out_head].data;
+
+        if (out[0] == 0x05u || out[0] == 0x0Au) {
+            uint8_t *seq = (out[0] == 0x05u) ? &s_seq_set_state
+                                             : &s_seq_initial_reports;
+
+            (*seq)++;
+            if (*seq == 0u) {
+                *seq = 1u;
+            }
+            out[2] = *seq;
+        }
+    }
     s_out_head = next;
 }
 

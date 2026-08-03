@@ -162,6 +162,29 @@ static volatile bool metadata_send_now;
 static volatile uint32_t auth_sent;
 static volatile uint32_t auth_dropped;
 static volatile uint32_t auth_back;
+/* Что уходит консоли, по типам сообщений GIP. */
+static volatile uint32_t to_host_msgs[64];
+
+/*
+ * Последняя статическая конфигурация руля (`0x21`) и признак, что её пора
+ * отдать консоли.
+ *
+ * Заведена по замеру 03.08.2026. Руль отвечает `0x21` на Initial Reports
+ * Request, и все свои ответы он отдаёт **в первые секунды собственной
+ * загрузки**, когда сессии с консолью ещё нет: в одном окне руль отдал
+ * передатчику 13 таких отчётов, а до консоли не дошло **ни одного**.
+ * Когда консоль наконец спрашивает, руль уже отчитался и повторять не
+ * станет — а по спеке руля (`H001861`) именно `0x21` описывает поля отчёта
+ * состояния `0x20`: разрядность осей, пределы угла, маску сил. Без неё
+ * консоли нечем читать ввод, и она его молча игнорирует.
+ *
+ * Это **не сочинение личности** (И2): отдаются те самые байты, что пришли
+ * от руля, без единого изменения. Донгл здесь не автор, а память.
+ */
+static uint8_t last_static_cfg[64];
+static volatile uint8_t last_static_cfg_len;
+static volatile bool static_cfg_due;
+static volatile uint32_t static_cfg_sent;
 /*
  * Отдельно от `auth_back` — **судьба отчётов ввода**, и именно она была
  * слепым пятном: отдача консоли делается через `(void)g920_gip_device_send`,
@@ -1128,6 +1151,26 @@ static void on_link_frame(void *ctx, const g920_frame_t *frame,
         wheel_ready_seen++;
         return;
     }
+    /*
+     * Счёт по типам того, что уходит консоли.
+     *
+     * Заведён потому, что в журнале печаталась только security, и «что
+     * донгл на самом деле отдаёт консоли» весь вечер оставалось невидимым.
+     * Из-за этого я дважды объявлял найденной причиной то, что вытекало не
+     * из данных, а из фильтра журнала. Тип сообщения — первый байт, он же
+     * MessageType заголовка GIP.
+     */
+    if (frame->length > 0 && (frame->type == G920_FRAME_AUTH
+                              || frame->type == G920_FRAME_INPUT)) {
+        to_host_msgs[frame->payload[0] & 0x3Fu]++;
+        /* Статическая конфигурация — запоминается целиком: консоль
+         * спросит её позже, когда руль уже отвечать не будет. */
+        if (frame->payload[0] == 0x21u
+            && frame->length <= sizeof(last_static_cfg)) {
+            memcpy(last_static_cfg, frame->payload, frame->length);
+            last_static_cfg_len = (uint8_t)frame->length;
+        }
+    }
     /* Ответ руля на security: отдаём хосту как есть, ничего не толкуя. */
     if (frame->type == G920_FRAME_AUTH || frame->type == G920_FRAME_INPUT) {
         auth_back++;
@@ -1950,6 +1993,23 @@ void app_main(void)
                           "idle repeat %u ok / %u lost",
                       (unsigned)input_fwd, (unsigned)input_lost,
                       (unsigned)idle_fwd, (unsigned)idle_lost);
+            {
+                char list[96];
+                int off = 0;
+
+                for (unsigned i = 0; i < 64u; i++) {
+                    if (to_host_msgs[i] != 0
+                        && off < (int)sizeof(list) - 16) {
+                        off += snprintf(list + off, sizeof(list) - (size_t)off,
+                                        "%02x=%u ", i,
+                                        (unsigned)to_host_msgs[i]);
+                    }
+                }
+                list[(off > 0) ? off : 0] = '\0';
+                G920_LOGI(M2, "to console: %s| static cfg from cache %u, "
+                          "have %u bytes", list, (unsigned)static_cfg_sent,
+                      (unsigned)last_static_cfg_len);
+            }
             G920_LOGI(M2, "wheel answers to host: %u ok / %u lost | "
                           "queue peak %u of %u, overflow %u",
                       (unsigned)auth_host_ok, (unsigned)auth_host_lost,
