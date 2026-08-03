@@ -102,6 +102,7 @@ G920_HOT g920_delivery_t g920_frame_delivery(g920_frame_type_t type)
     switch (type) {
     case G920_FRAME_INPUT:
     case G920_FRAME_FFB:
+    case G920_FRAME_ALIVE:
         return G920_DELIVERY_FRESH;
     case G920_FRAME_ACK:
     case G920_FRAME_DISCOVER:
@@ -141,6 +142,8 @@ G920_HOT uint8_t g920_frame_priority(g920_frame_type_t type)
         return 5;
     case G920_FRAME_DISCOVER:
         return 6; /* хозяйственный кадр, вперёд данных не лезет */
+    case G920_FRAME_ALIVE:
+        return 7; /* пульс уступает всему: он не данные, а признак жизни */
     default:
         return 0xFF;
     }
@@ -149,7 +152,7 @@ G920_HOT uint8_t g920_frame_priority(g920_frame_type_t type)
 bool g920_frame_type_valid(uint8_t type)
 {
     return type >= (uint8_t)G920_FRAME_ACK
-           && type <= (uint8_t)G920_FRAME_DISCOVER;
+           && type <= (uint8_t)G920_FRAME_ALIVE;
 }
 
 const char *g920_frame_type_name(g920_frame_type_t type)
@@ -169,6 +172,8 @@ const char *g920_frame_type_name(g920_frame_type_t type)
         return "FFB";
     case G920_FRAME_DISCOVER:
         return "DISCOVER";
+    case G920_FRAME_ALIVE:
+        return "ALIVE";
     case G920_FRAME_NONE:
     default:
         return "?";

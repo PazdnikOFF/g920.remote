@@ -39,7 +39,7 @@ extern "C" {
  *     отвечала бы подтверждением на подтверждение, поэтому версия поднята.
  *     Нагрузка DISCOVER выросла до двух байт: вид и роль.
  */
-#define G920_LINK_PROTO_VERSION 4u
+#define G920_LINK_PROTO_VERSION 5u
 
 /* Максимум байт, которые g920_version_format пишет вместе с '\0'. */
 #define G920_VERSION_STR_MAX 12

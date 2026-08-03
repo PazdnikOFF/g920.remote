@@ -586,6 +586,66 @@ static void test_rx_streams_do_not_interfere(void)
                           g920_peer_rx_accept(&rx, 1, G920_FRAME_FFB, 6));
 }
 
+/*
+ * Ловушка, стоившая живого управления 03.08.2026.
+ *
+ * У надёжной дисциплины **один** трекер номеров на все её типы и окно в один
+ * кадр. Пульс, посланный типом `CONTROL` (а он надёжный) со своим счётом,
+ * убегал вперёд, и следующее законное security-сообщение выглядело повтором.
+ * На стенде до руля дошло 1 сообщение из 38, консоль объявила отказ,
+ * управление пропало.
+ *
+ * Тест держит этот вывод: пока он красный — правка неверна.
+ */
+static void test_own_count_on_reliable_type_eats_auth(void)
+{
+    g920_peer_rx_t rx;
+
+    g920_peer_rx_init(&rx);
+    TEST_ASSERT_EQUAL_INT(G920_RX_NEW_SESSION,
+                          g920_peer_rx_accept(&rx, 1, G920_FRAME_AUTH, 1));
+    TEST_ASSERT_EQUAL_INT(G920_RX_NEW,
+                          g920_peer_rx_accept(&rx, 1, G920_FRAME_AUTH, 2));
+    /* Пульс со своим счётом по надёжному типу — тот самый дефект. */
+    (void)g920_peer_rx_accept(&rx, 1, G920_FRAME_CONTROL, 50);
+    /*
+     * Законный следующий AUTH объявляется **повтором** и наверх не идёт.
+     * Пульс двигал общую метку вперёд, и всё, что шло за ним, оказывалось
+     * «позади». Обе стороны при этом уверены, что всё в порядке: отправитель
+     * получил подтверждение, приёмник считает кадр дубликатом.
+     */
+    TEST_ASSERT_EQUAL_INT(G920_RX_DUPLICATE,
+                          g920_peer_rx_accept(&rx, 1, G920_FRAME_AUTH, 3));
+}
+
+/*
+ * И лечение: у пульса свой тип на свежей дисциплине, то есть свой трекер.
+ * Сколько бы он ни убежал вперёд, надёжная очередь его не замечает.
+ */
+static void test_alive_stream_does_not_touch_auth(void)
+{
+    g920_peer_rx_t rx;
+
+    g920_peer_rx_init(&rx);
+    TEST_ASSERT_EQUAL_INT(G920_RX_NEW_SESSION,
+                          g920_peer_rx_accept(&rx, 1, G920_FRAME_AUTH, 1));
+    for (uint16_t beat = 1; beat <= 500; beat++) {
+        TEST_ASSERT_EQUAL_INT(G920_RX_NEW,
+                              g920_peer_rx_accept(&rx, 1, G920_FRAME_ALIVE,
+                                                  beat));
+    }
+    /* Надёжный поток идёт своим чередом, пульса под собой не чувствуя. */
+    TEST_ASSERT_EQUAL_INT(G920_RX_NEW,
+                          g920_peer_rx_accept(&rx, 1, G920_FRAME_AUTH, 2));
+    TEST_ASSERT_EQUAL_INT(G920_RX_NEW,
+                          g920_peer_rx_accept(&rx, 1, G920_FRAME_AUTH, 3));
+    /* И потоки ввода с силами тоже не задеты. */
+    TEST_ASSERT_EQUAL_INT(G920_RX_NEW,
+                          g920_peer_rx_accept(&rx, 1, G920_FRAME_INPUT, 7));
+    TEST_ASSERT_EQUAL_INT(G920_RX_NEW,
+                          g920_peer_rx_accept(&rx, 1, G920_FRAME_FFB, 9));
+}
+
 static void test_rx_fresh_restart_is_not_a_flood_of_stale(void)
 {
     g920_peer_rx_t rx;
@@ -729,6 +789,8 @@ int main(void)
     RUN_TEST(test_rx_accepts_a_persistent_backward_epoch);
     RUN_TEST(test_rx_live_session_cancels_backward_candidate);
     RUN_TEST(test_rx_streams_do_not_interfere);
+    RUN_TEST(test_own_count_on_reliable_type_eats_auth);
+    RUN_TEST(test_alive_stream_does_not_touch_auth);
     RUN_TEST(test_rx_fresh_restart_is_not_a_flood_of_stale);
     RUN_TEST(test_rx_keeps_dropping_stale_within_a_session);
     RUN_TEST(test_rx_verdict_policy);

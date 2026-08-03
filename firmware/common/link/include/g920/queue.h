@@ -47,7 +47,7 @@ extern "C" {
  * По слоту на поток. Потоков два — INPUT и FFB, и смешивать их нельзя:
  * свежий отчёт руля не должен вытеснять свежие силы и наоборот.
  */
-#define G920_FRESH_STREAMS 2
+#define G920_FRESH_STREAMS 3
 #define G920_FRESH_PAYLOAD_MAX 128
 
 typedef struct {

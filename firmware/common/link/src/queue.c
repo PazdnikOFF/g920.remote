@@ -28,6 +28,8 @@ static int fresh_slot_of(g920_frame_type_t type)
         return 0;
     case G920_FRAME_FFB:
         return 1;
+    case G920_FRAME_ALIVE:
+        return 2;
     default:
         return -1;
     }

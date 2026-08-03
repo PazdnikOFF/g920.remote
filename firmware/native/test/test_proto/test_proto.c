@@ -290,12 +290,19 @@ static void test_type_names_and_validity(void)
     TEST_ASSERT_TRUE(g920_frame_type_valid(G920_FRAME_ACK));
     TEST_ASSERT_TRUE(g920_frame_type_valid(G920_FRAME_FFB));
     TEST_ASSERT_TRUE(g920_frame_type_valid(G920_FRAME_DISCOVER));
+    TEST_ASSERT_TRUE(g920_frame_type_valid(G920_FRAME_ALIVE));
     TEST_ASSERT_FALSE(g920_frame_type_valid(0));
-    TEST_ASSERT_FALSE(g920_frame_type_valid(8));
+    /* Верхняя граница держится за последним типом, а не за числом: 03.08.2026
+     * добавился `ALIVE`, и этот тест поймал расширение диапазона — ради чего
+     * и стоял. Следующий за ним по-прежнему обязан отвергаться. */
+    TEST_ASSERT_FALSE(g920_frame_type_valid((uint8_t)(G920_FRAME_ALIVE + 1)));
 
     TEST_ASSERT_EQUAL_STRING("AUTH", g920_frame_type_name(G920_FRAME_AUTH));
     TEST_ASSERT_EQUAL_STRING("DISCOVER",
                              g920_frame_type_name(G920_FRAME_DISCOVER));
+    /* Безымянный тип печатается как "?" и в трассе неотличим от мусора —
+     * поэтому имя заводится вместе с типом, а не потом. */
+    TEST_ASSERT_EQUAL_STRING("ALIVE", g920_frame_type_name(G920_FRAME_ALIVE));
     TEST_ASSERT_EQUAL_STRING("?", g920_frame_type_name((g920_frame_type_t)99));
     TEST_ASSERT_EQUAL_STRING("BAD_VERSION",
                              g920_proto_status_name(G920_PROTO_BAD_VERSION));

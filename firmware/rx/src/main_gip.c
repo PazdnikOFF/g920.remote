@@ -149,6 +149,25 @@ static volatile bool auth_alive;
 static volatile bool auth_done;
 /* Свой счёт кадров для сил: тип кадра свой, значит и номера свои. */
 static uint16_t ffb_seq;
+/*
+ * Пульс: «донгл жив», раз в 100 мс. По нему TX держит мёртвую руку.
+ *
+ * Свой тип кадра (`G920_FRAME_ALIVE`) и свой счёт — иначе никак. Судить о
+ * живости по прикладному трафику нельзя: замер 03.08.2026 по четырём
+ * прогонам дал медиану промежутка 4–132 мс, но **максимум нормального
+ * промежутка 1257 мс** (меню, стоянка, тишина в силах), то есть окно
+ * пришлось бы делать больше полутора секунд.
+ *
+ * ⚠ Первая попытка слала пульс типом `CONTROL` и стоила живого управления:
+ * `CONTROL` — надёжная дисциплина, у неё **один** трекер номеров на все
+ * типы, пульс обгонял security, и та объявлялась повтором. До руля дошло
+ * 1 сообщение из 38. Закреплено тестами
+ * `test_own_count_on_reliable_type_eats_auth` и
+ * `test_alive_stream_does_not_touch_auth`.
+ */
+#define HEARTBEAT_MS 100
+static uint16_t alive_seq;
+static uint32_t since_heartbeat_ms;
 static volatile uint32_t ffb_sent;
 static volatile uint32_t ffb_refused;
 /* Статус: разрешён только после START, дальше по расписанию спеки. */
@@ -1154,6 +1173,14 @@ void app_main(void)
             } else {
                 status_due_ms -= TICK_MS;
             }
+        }
+
+        /* Пульс мёртвой руки. Только при живом пире: звать отсутствующего
+         * — дело пиринга, а не наше. */
+        since_heartbeat_ms += TICK_MS;
+        if (since_heartbeat_ms >= HEARTBEAT_MS && g920_link_has_peer()) {
+            since_heartbeat_ms = 0;
+            (void)g920_link_send(G920_FRAME_ALIVE, alive_seq++, 0, NULL, 0);
         }
 
         /* Пауза в потоке ввода — повторяем последний отчёт руля. */
