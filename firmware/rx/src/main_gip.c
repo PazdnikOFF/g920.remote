@@ -193,6 +193,32 @@ static volatile uint32_t idle_lost;
  */
 static volatile bool wheel_ready;
 static uint32_t wheel_wait_ms;
+/*
+ * Кнопка Xbox зажата — по ней будим выключённую консоль.
+ *
+ * Раскладка снята с живой трассы 03.08.2026: `07 20 <seq> 02 01 5b` —
+ * нажата, `07 20 <seq> 02 00 5b` — отпущена. Признак нажатия ставит колбэк
+ * линка, а время удержания считает главный цикл: колбэк не знает, сколько
+ * прошло, и занимать его сном нельзя.
+ */
+static volatile bool guide_down;
+static uint32_t guide_held_ms;
+/* Пробуждение уже отправлено за это удержание. Снимается отпусканием —
+ * так «разово» означает разово, а не «раз в две секунды, пока держат». */
+static bool wake_sent;
+static volatile uint32_t wake_count;
+/* Нажатий кнопки Xbox по фронту — уровень между отчётами теряется. */
+static volatile uint32_t guide_presses;
+/*
+ * Мы только что разбудили консоль, а кнопку всё ещё держат: до первого
+ * отпускания нажатие консоли не показываем — требование спеки, см. место
+ * применения. Счётчик проглоченных нужен, чтобы это было видно, а не
+ * подразумевалось.
+ */
+static volatile bool guide_hold_over;
+static volatile uint32_t guide_suppressed;
+/* Сколько держать, чтобы это было намерением, а не задеванием. */
+#define GUIDE_HOLD_MS 2000
 /* Сколько ждём руля, прежде чем представиться консоли в одиночку. Подъём с
  * перезагрузкой передатчика укладывался в 2.6 с — берём с запасом. */
 #define WHEEL_WAIT_MAX_MS 8000
@@ -307,6 +333,30 @@ static volatile uint32_t auth_q_tail; /* читает главный цикл */
 /* Очередь переполнилась — это уже не заминка, а потеря ответа. */
 static volatile uint32_t auth_q_overflow;
 static volatile uint32_t auth_q_max;
+
+/*
+ * Смещение номера последовательности в заголовке GIP. Из спеки дословно
+ * (`H001419`, GIP Message Header): offset 0 — MessageType, 1 — Flags,
+ * **2 — GIP Sequence ID**, 3 — Payload Length.
+ */
+#define G920_GIP_SEQ_OFFSET 2
+
+/*
+ * Свой счёт номеров для потока ввода, уходящего консоли.
+ *
+ * 0x00 зарезервирован спекой («0x00 is reserved for both system and vendor
+ * messages»), поэтому пропускается при переполнении.
+ */
+static uint8_t input_seq_out;
+
+static uint8_t next_input_seq(void)
+{
+    input_seq_out++;
+    if (input_seq_out == 0u) {
+        input_seq_out = 1u;
+    }
+    return input_seq_out;
+}
 
 /* Последний отчёт ввода от руля и время с его отправки консоли. */
 static uint8_t last_input[64];
@@ -1058,6 +1108,47 @@ static void on_link_frame(void *ctx, const g920_frame_t *frame,
          * которого ждёт представление консоли. */
         wheel_ready = true;
         /*
+         * Состояние кнопки Xbox запоминается **всегда**, а не только при
+         * спящей консоли: решение о пробуждении принимает главный цикл, и
+         * ему нужна длительность удержания, а не факт нажатия. Здесь только
+         * признак — ни отправки, ни сна в колбэке линка быть не должно.
+         */
+        if (frame->length >= 5 && frame->payload[0] == 0x07u) {
+            const bool down = (frame->payload[4] == 0x01u);
+
+            /*
+             * Нажатия считаются **по фронту**, а не читаются уровнем из
+             * отчёта. Отчёт печатается раз в пять секунд, удержание длится
+             * две — уровень между замерами теряется гарантированно, и
+             * первая версия наблюдения не могла увидеть событие в принципе.
+             */
+            if (down && !guide_down) {
+                guide_presses++;
+            }
+            guide_down = down;
+            /*
+             * ⚠ После пробуждения нажатие консоли **не пересылается** — до
+             * первого отпускания. Это требование спеки, дословно
+             * (`H001419`, Guide Button Status): «If the Guide button remains
+             * held while the device powers on, the device must never send a
+             * button pressed event to the host until after the first
+             * release. The device can choose ... to send ONLY the button
+             * released event».
+             *
+             * Смысл прямой: человек будит консоль удержанием и держит
+             * кнопку дальше. Разбудить её и тут же сообщить «Guide нажат»
+             * значит открыть ей меню питания в момент загрузки — то есть
+             * подарить пользователю ровно то, чего он не просил.
+             */
+            if (guide_hold_over) {
+                if (down) {
+                    guide_suppressed++;
+                    return; /* нажатие проглочено, отпускание уйдёт */
+                }
+                guide_hold_over = false;
+            }
+        }
+        /*
          * ⚠ Здесь **не место** будить консоль кнопкой Xbox, и это измерено.
          *
          * 03.08.2026 тут стояло: нажата кнопка `07 …01`, а хоста нет —
@@ -1084,11 +1175,45 @@ static void on_link_frame(void *ctx, const g920_frame_t *frame,
          * повтора через 25 мс, и оно спокойно ждёт своей очереди.
          */
         if (frame->type == G920_FRAME_INPUT) {
-            /* Ввод — поток: не влез, значит его сменит следующий отчёт. */
-            if (g920_gip_device_send(frame->payload, frame->length)) {
-                input_fwd++;
-            } else {
-                input_lost++;
+            /*
+             * ⚠ Номер последовательности исходящему вводу ставит **донгл**,
+             * и это требование спеки, а не удобство.
+             *
+             * `H001419`, GIP Message Header: байт 2 — «GIP Sequence ID:
+             * Wrapping counter for MessageType… **incremented each time**
+             * Command packet is sent», и он же «allows for potential
+             * identification of missing messages via skips in the sequence».
+             * Для Wheel State (`0x20`) пул помечен Incrementing.
+             *
+             * Нарушали мы это повторителем: он раз в 25 мс слал консоли
+             * **побайтово то же самое сообщение**, включая номер. В покое
+             * это сорок одинаково пронумерованных пакетов в секунду — для
+             * хоста поток повторов одного и того же сообщения. Кнопка Xbox
+             * (`0x07`) через повторитель не идёт, поэтому она продолжала
+             * работать, когда остальное консоль игнорировала. Ровно эта
+             * картина и наблюдалась: ввод до консоли доезжает (`fresh 246
+             * ok`), руль исправен, а консоль молчит минуту и не реагирует.
+             *
+             * Владеть нумерацией должен тот, кто решает, что уходит в шину,
+             * то есть донгл: он шлёт и свежие отчёты, и повторы, и только
+             * он видит их общий порядок.
+             *
+             * Копия здесь же, а не после отдачи, как было: renumber требует
+             * записи, а кадр линка отдаётся только на чтение. Это 64 байта
+             * на критическом пути — десятки наносекунд.
+             */
+            if (frame->length > 0 && frame->length <= sizeof(last_input)) {
+                memcpy(last_input, frame->payload, frame->length);
+                last_input_len = (uint8_t)frame->length;
+                if (frame->length > G920_GIP_SEQ_OFFSET) {
+                    last_input[G920_GIP_SEQ_OFFSET] = next_input_seq();
+                }
+                since_input_ms = 0; /* свежий отчёт отодвигает повтор */
+                if (g920_gip_device_send(last_input, last_input_len)) {
+                    input_fwd++;
+                } else {
+                    input_lost++;
+                }
             }
         } else {
             /*
@@ -1121,24 +1246,12 @@ static void on_link_frame(void *ctx, const g920_frame_t *frame,
             }
         }
         /*
-         * Последний отчёт запоминается — до вердикта судьи не запоминался
-         * нигде: `last_input` и `last_input_len` были объявлены и не
-         * присваивались, поэтому повтор раз в 25 мс не исполнился ни разу.
-         *
-         * Повтор закрывает ровно одну дыру — заминку в эфире, когда консоль
-         * иначе получает **ничего** вместо последнего известного состояния.
-         * Свежий отчёт всегда идёт вперёд него и никогда им не задерживается.
-         *
-         * ⚠ Строгую форму И6 («отдавать только по своему таймеру») это не
-         * закрывает намеренно: она переписала бы работающий путь ввода.
-         * Вердикт по И6 остаётся в силе.
+         * Запоминание последнего отчёта перенесено **выше**, в саму отдачу:
+         * теперь донгл перенумеровывает исходящий ввод, а для этого нужна
+         * своя копия — кадр линка отдаётся только на чтение. Держать здесь
+         * второе копирование значило бы копировать дважды и, хуже, иметь
+         * два места, где решается, что считается «последним отчётом».
          */
-        if (frame->type == G920_FRAME_INPUT && frame->length > 0
-            && frame->length <= sizeof(last_input)) {
-            memcpy(last_input, frame->payload, frame->length);
-            last_input_len = (uint8_t)frame->length;
-            since_input_ms = 0; /* свежий отчёт отодвигает повтор */
-        }
         /*
          * Печатается **всё, кроме отчётов ввода** (`0x20`): их поток
          * непрерывен и забил бы журнал, а вопрос сейчас в другом — доезжают
@@ -1457,6 +1570,42 @@ void app_main(void)
             auth_alive = false;
             since_auth_ms = 0;
         }
+        /*
+         * Пробуждение выключённой консоли по удержанию кнопки Xbox.
+         *
+         * Три условия, и каждое куплено сегодняшней поломкой.
+         *
+         * `suspended` — единственный признак «консоли нет», который **нельзя
+         * спутать с «консоль как раз включается»**. Утром здесь стояло «мы не
+         * настроены», и человек, державший кнопку при включающемся боксе,
+         * получал разрыв шины посреди энумерации: консоль доходила до
+         * `configured` и не опрашивала вход ни разу.
+         *
+         * Две секунды удержания — чтобы это было намерением. Кнопкой Xbox в
+         * игре открывают меню, и будить бокс на каждое касание нельзя.
+         *
+         * `wake_sent` до отпускания — чтобы «разово» значило разово.
+         * Переподключения подряд консоль не успевает обработать, а нажатие
+         * она видит одно.
+         */
+        if (guide_down && g920_gip_device_suspended()) {
+            if (guide_held_ms < GUIDE_HOLD_MS) {
+                guide_held_ms += TICK_MS;
+            } else if (!wake_sent) {
+                wake_sent = true;
+                wake_count++;
+                /* Кнопку держат прямо сейчас — значит нажатие консоли не
+                 * показываем до отпускания (требование спеки). */
+                guide_hold_over = true;
+                g920_gip_device_wake_console();
+            }
+        } else {
+            guide_held_ms = 0;
+            if (!guide_down) {
+                wake_sent = false;
+            }
+        }
+
         since_host_ms += TICK_MS;
         /*
          * ⚠ Перезапуск сессии **только пока хост жив**.
@@ -1541,6 +1690,13 @@ void app_main(void)
         if (last_input_len > 0 && since_input_ms >= IDLE_REPORT_MS
             && g920_gip_device_configured()) {
             since_input_ms = 0;
+            /* Повтор — это **новый пакет**, и номер у него обязан быть
+             * новым: спека требует инкремента на каждую отправку. Именно
+             * повторение номера делало наш поток для консоли чередой
+             * дубликатов. */
+            if (last_input_len > G920_GIP_SEQ_OFFSET) {
+                last_input[G920_GIP_SEQ_OFFSET] = next_input_seq();
+            }
             if (g920_gip_device_send(last_input, last_input_len)) {
                 idle_fwd++;
             } else {
@@ -1704,6 +1860,20 @@ void app_main(void)
                       (unsigned)auth_host_ok, (unsigned)auth_host_lost,
                       (unsigned)auth_q_max, (unsigned)AUTH_QUEUE_LEN,
                       (unsigned)auth_q_overflow);
+            /*
+             * `host silent` — кандидат в признак «консоль не работает».
+             *
+             * Признак усыпления для этого негоден, и это измерено: бокс в
+             * дежурном режиме держит шину под питанием и **продолжает
+             * опрашивать эндпоинт** (передачи завершаются, счётчик повторов
+             * растёт), поэтому `suspended` не наступает никогда. Нужен
+             * признак уровнем выше USB — на уровне разговора GIP.
+             */
+            G920_LOGI(M2, "guide %s, presses %u, wakes sent %u, "
+                          "presses swallowed after wake %u | host silent %u ms",
+                      guide_down ? "held" : "up", (unsigned)guide_presses,
+                      (unsigned)wake_count, (unsigned)guide_suppressed,
+                      (unsigned)since_host_ms);
             G920_LOGI(M2, "ffb: sent %u, refused %u | status: sent %u, start %s",
                       (unsigned)ffb_sent, (unsigned)ffb_refused,
                       (unsigned)status_count, start_seen ? "yes" : "no");

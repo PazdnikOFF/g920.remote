@@ -98,6 +98,8 @@ static struct {
     volatile bool configured;
     /* Шина усыплена хостом: молчим до resume. */
     volatile bool suspended;
+    /* Хост вооружил удалённое пробуждение (SET_FEATURE перед усыплением). */
+    volatile bool wakeup_allowed;
     volatile bool in_polled_seen;
 } s_gip;
 
@@ -338,7 +340,13 @@ void tud_umount_cb(void)
  */
 void tud_suspend_cb(bool remote_wakeup_en)
 {
-    (void)remote_wakeup_en;
+    /*
+     * Разрешение хоста **запоминается**, а не выбрасывается: от него зависит,
+     * вправе ли мы его будить. Хост вооружает пробуждение отдельно, посылая
+     * SET_FEATURE DEVICE_REMOTE_WAKEUP перед усыплением (USB 2.0 §9.4.5), и
+     * без этого сигнал незаконен — устройство хост не разбудит.
+     */
+    s_gip.wakeup_allowed = remote_wakeup_en;
     s_gip.suspended = true;
     note(G920_HOST_EV_SUSPEND);
 }
@@ -572,6 +580,54 @@ void g920_gip_device_set_identity(const g920_identity_t *identity)
  *
  * Звать только из главного цикла: между отключением и подключением спим.
  */
+/*
+ * Разбудить выключённую консоль — **разово**, по удержанию кнопки Xbox.
+ *
+ * Спека предписывает ровно это, и дословно (`H001419`, «USB Remote
+ * Wakeup»): «USB GIP devices should only wake the host when the Guide Button
+ * on the device is pressed». То есть повод у пробуждения ровно один, и он
+ * тот же, что просит человек.
+ *
+ * Способ — **законный сигнал remote wakeup**, и он нам доступен. Утром
+ * 03.08.2026 я утверждал обратное: будто руль удалённое пробуждение не
+ * объявляет, `bmAttributes` = 0x80, и потому остаётся только дёргать шину.
+ * Это была ошибка чтения — я смотрел дескриптор **заглушки донгла** из его
+ * собственного лога загрузки. В снятом с руля дескрипторе конфигурации
+ * стоит `bmAttributes` = **0xa0**, то есть бит 0x20 Remote Wakeup выставлен:
+ *
+ *   09 02 20 00 01 01 00 a0 32 09 04 00 00 02 ff 47 ...
+ *                        ^^
+ *
+ * Донгл представляется теми же байтами, значит право будить у нас есть по
+ * личности, а не вопреки ей.
+ *
+ * Одного объявления мало: хост вооружает пробуждение отдельно, посылая
+ * SET_FEATURE DEVICE_REMOTE_WAKEUP перед усыплением. Не вооружил — сигнал
+ * незаконен и хоста не разбудит, и тогда остаётся переподключение. Что
+ * консоль просыпается от него, известно дорогой ценой: именно так её будил
+ * наш сломанный предохранитель, и человек наблюдал это как «бокс включается
+ * сам».
+ *
+ * Условие вызывающего — `suspended`, и оно обязательно. Утром здесь стояло
+ * «устройство не настроено», и это оказалось неотличимо от «консоль как раз
+ * включается»: человек держал кнопку, консоль в этот момент энумерировала
+ * донгл, а мы рвали ей шину. Консоль дошла до `configured` и не опросила
+ * вход **ни разу**.
+ */
+void g920_gip_device_wake_console(void)
+{
+    if (s_gip.wakeup_allowed) {
+        G920_LOGW(TAG, "guide held on a sleeping bus — remote wakeup");
+        tud_remote_wakeup();
+        return;
+    }
+    G920_LOGW(TAG, "guide held on a sleeping bus, remote wakeup not armed "
+                   "— re-attaching instead");
+    tud_disconnect();
+    vTaskDelay(pdMS_TO_TICKS(150));
+    tud_connect();
+}
+
 void g920_gip_device_restart_session(void)
 {
     G920_LOGW(TAG, "wheel restarted — restarting the console session");
