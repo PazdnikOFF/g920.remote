@@ -147,6 +147,32 @@ static volatile uint32_t auth_back;
 static volatile bool auth_alive;
 /* Консоль объявила security принятой: тишина на 0x06 после этого — норма. */
 static volatile bool auth_done;
+/*
+ * Хост нам хоть раз ответил — значит Announce пора прекратить.
+ *
+ * Спека (`H001419`): «Anytime a GIP device is in the "Arrival" state it
+ * should only send GIP "Hellos" at 500 mS intervals **until the host
+ * responds**». Мы объявлялись вечно — 10500 Announce за сеанс, — и это не
+ * только нарушение буквы. Консоль в дежурном режиме шину **не усыпляет**
+ * (за всю перезагрузку `SUSPEND` не пришёл ни разу), её стек USB жив, и
+ * устройство, которое раз в полсекунды объявляет себя заново, она читает
+ * как подключаемый геймпад — то есть как повод проснуться. Отсюда «бокс
+ * выключается и сам включается обратно».
+ *
+ * Сбрасывается вместе с состоянием настройки: хост отвалился — мы снова в
+ * Arrival и снова обязаны представляться.
+ */
+static volatile bool host_answered;
+/*
+ * Announce считается **отдельно**.
+ *
+ * До 03.08.2026 в отчёте стояло `hello sent %u`, а подставлялся
+ * `g920_gip_device_sent()` — счётчик **всех** отправленных хосту сообщений,
+ * включая отчёты ввода и ретрансляцию ответов руля. Подпись врала, и я на
+ * ней построил диагноз: принял «10500 отправок» за «10500 объявлений».
+ * Считать надо то, что подписано.
+ */
+static volatile uint32_t hello_count;
 /* Свой счёт кадров для сил: тип кадра свой, значит и номера свои. */
 static uint16_t ffb_seq;
 /*
@@ -400,6 +426,12 @@ static void on_host_message(void *ctx, const uint8_t *data, uint16_t length)
     g920_gip_header_t header;
 
     (void)ctx;
+    /*
+     * Хост заговорил — считается **любое** его сообщение, ещё до разбора:
+     * ответом по спеке может быть и запрос метаданных, и Set Device State,
+     * и Off с Reset. Что именно он сказал, для прекращения Announce неважно.
+     */
+    host_answered = true;
     if (!have_identity
         || g920_gip_header_parse(&header, data, length) != G920_GIP_OK) {
         return;
@@ -788,10 +820,10 @@ static void report(void)
     uint32_t t2 = 0;
 
     g920_gip_device_lock();
-    G920_LOGI(M2, "events %u, dropped %u, hello sent %u, %s",
+    G920_LOGI(M2, "events %u, dropped %u, announce %u, sent %u, %s",
               (unsigned)g920_hostlog_count(&hostlog),
               (unsigned)g920_hostlog_dropped(&hostlog),
-              (unsigned)g920_gip_device_sent(),
+              (unsigned)hello_count, (unsigned)g920_gip_device_sent(),
               g920_gip_device_configured() ? "configured" : "not configured");
 
     /*
@@ -1276,6 +1308,7 @@ void app_main(void)
         if (g920_gip_device_configured() && !was_configured) {
             was_configured = true;
             since_hello_ms = 0;
+            hello_count++;
             (void)send_hello(&sequence);
             {
                 const uint8_t code = CONTROL_RESET_WHEEL;
@@ -1287,14 +1320,17 @@ void app_main(void)
             }
         } else if (!g920_gip_device_configured()) {
             was_configured = false;
+            /* Хост нас отпустил — мы снова в Arrival и снова представляемся. */
+            host_answered = false;
         }
 
         /* Announce шлётся **всегда**: донгл ведёт разговор с консолью сам,
          * и без представления она к нему не обратится. Условие «только без
          * пира» осталось от сквозного туннеля и было прямой ошибкой — с
          * включённым TX консоль не видела от нас ни одного Hello. */
-        if (since_hello_ms >= HELLO_EVERY_MS) {
+        if (since_hello_ms >= HELLO_EVERY_MS && !host_answered) {
             since_hello_ms = 0;
+            hello_count++;
             /* Пока хост не настроил устройство, слать некуда — это не
              * ошибка, а нормальное начало любой энумерации. */
             (void)send_hello(&sequence);
