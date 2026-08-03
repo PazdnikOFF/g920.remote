@@ -184,6 +184,18 @@ static volatile uint32_t auth_host_lost;
  * первый подозреваемый — этот поток. */
 static volatile uint32_t idle_fwd;
 static volatile uint32_t idle_lost;
+/*
+ * Руль вернулся после просьбы его переподнять — можно звать консоль.
+ *
+ * Признаком служит первый же кадр ввода из радио: он приходит только когда
+ * руль поднялся, представился передатчику и повёл поток. Ждать чего-то
+ * более явного незачем — этот признак и есть «руль способен отвечать».
+ */
+static volatile bool wheel_ready;
+static uint32_t wheel_wait_ms;
+/* Сколько ждём руля, прежде чем представиться консоли в одиночку. Подъём с
+ * перезагрузкой передатчика укладывался в 2.6 с — берём с запасом. */
+#define WHEEL_WAIT_MAX_MS 8000
 /* Признак живого обмена: сбрасывает таймер перезапуска сессии. */
 static volatile bool auth_alive;
 /* Консоль объявила security принятой: тишина на 0x06 после этого — норма. */
@@ -1042,6 +1054,9 @@ static void on_link_frame(void *ctx, const g920_frame_t *frame,
     if (frame->type == G920_FRAME_AUTH || frame->type == G920_FRAME_INPUT) {
         auth_back++;
         auth_alive = true;
+        /* Кадр из радио — руль поднялся и ведёт поток. Это и есть сигнал,
+         * которого ждёт представление консоли. */
+        wheel_ready = true;
         /*
          * ⚠ Здесь **не место** будить консоль кнопкой Xbox, и это измерено.
          *
@@ -1564,18 +1579,34 @@ void app_main(void)
          * хоста, а не нашей.
          */
         if (g920_gip_device_configured() && !was_configured) {
+            const uint8_t code = CONTROL_RESET_WHEEL;
+
             was_configured = true;
             since_hello_ms = 0;
-            hello_count++;
-            (void)send_hello(&sequence);
-            {
-                const uint8_t code = CONTROL_RESET_WHEEL;
-
-                /* Консоль настроила нас заново — руль должен начать
-                 * знакомство с начала, иначе он молчит, а она ждёт. */
-                G920_LOGI(TAG, "host configured us: asking tx to reset wheel");
-                send_control(code);
-            }
+            /*
+             * ⚠ **Сначала вернуть руль, и только потом звать консоль.**
+             *
+             * Здесь раньше первым делом уходило Hello — чтобы замер T2 не
+             * мерил наш собственный период. Порядок оказался прямо вредным,
+             * и это измерено 03.08.2026: донгл звал консоль и одновременно
+             * просил передатчик переподнять руль. Консоль отвечала через
+             * треть секунды и начинала security, а передатчик в этот момент
+             * ещё перезагружался — сообщения уходили в пустоту. В отчёте это
+             * выглядело так: `auth: to wheel 76` при `retries 273, gave up
+             * 13`, то есть **тринадцать сообщений консоли до руля не дошли
+             * вовсе**, при идеально чистом обратном направлении (`wheel
+             * answers to host: 110 ok / 0 lost`). Security на этом не
+             * сходится, а снаружи это «работает только кнопка Xbox».
+             *
+             * Теперь Hello ждёт руля — см. `wheel_ready` ниже. Замер T2 от
+             * этого становится грубее, и это осознанная плата: T2 — цифра
+             * для отчёта, а порядок — условие работоспособности.
+             */
+            wheel_ready = false;
+            wheel_wait_ms = 0;
+            G920_LOGI(TAG, "host configured us: asking tx to reset wheel, "
+                           "holding hello until it is back");
+            send_control(code);
         } else if (!g920_gip_device_configured()) {
             was_configured = false;
             /* Хост нас отпустил — мы снова в Arrival и снова представляемся. */
@@ -1586,7 +1617,22 @@ void app_main(void)
          * и без представления она к нему не обратится. Условие «только без
          * пира» осталось от сквозного туннеля и было прямой ошибкой — с
          * включённым TX консоль не видела от нас ни одного Hello. */
-        if (since_hello_ms >= HELLO_EVERY_MS && !host_answered) {
+        /*
+         * Ждём руля, но не вечно. Если передатчика нет вовсе, донгл обязан
+         * представиться сам и вести себя как заглушка — иначе консоль не
+         * увидит ничего и мы потеряем даже диагностику. Порог взят с
+         * запасом над измеренным подъёмом: перезагрузка передатчика плюс
+         * энумерация плюс калибровочный проворот укладывались в 2.6 с.
+         */
+        wheel_wait_ms += TICK_MS;
+        if (!wheel_ready && wheel_wait_ms >= WHEEL_WAIT_MAX_MS) {
+            wheel_ready = true;
+            G920_LOGW(TAG, "wheel did not come back in %u ms — announcing "
+                           "ourselves anyway",
+                      (unsigned)WHEEL_WAIT_MAX_MS);
+        }
+
+        if (since_hello_ms >= HELLO_EVERY_MS && !host_answered && wheel_ready) {
             since_hello_ms = 0;
             hello_count++;
             /* Пока хост не настроил устройство, слать некуда — это не
