@@ -1,0 +1,219 @@
+I 256.981578 RX m2: events 75, dropped 0, announce 295, sent 4430, configured
+I 256.981714 RX m2: T1 145078533 us
+I 256.981757 RX m2: T2 7752 us
+I 256.983482 RX m2: host GIP in: yes, IN polled: yes
+I 256.988088 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 256.994434 RX m2: auth: to wheel 20, dropped 0, back 278 | link: retries 26, gave up 0, pending 0
+I 257.003180 RX m2: ffb: sent 0, refused 0 | status: sent 15, start yes
+I 262.009579 RX m2: events 75, dropped 0, announce 295, sent 4623, configured
+I 262.009712 RX m2: T1 145078533 us
+I 262.009754 RX m2: T2 7752 us
+I 262.011384 RX m2: host GIP in: yes, IN polled: yes
+I 262.016088 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 262.022432 RX m2: auth: to wheel 20, dropped 0, back 278 | link: retries 26, gave up 0, pending 0
+I 262.031177 RX m2: ffb: sent 0, refused 0 | status: sent 16, start yes
+I 262.450185 RX m2: wheel->host [6] 00000000  07 20 01 02 01 5b                                 |. ...[|
+I 262.622135 RX m2: wheel->host [6] 00000000  07 20 02 02 00 5b                                 |. ...[|
+I 263.930225 RX m2: wheel->host [6] 00000000  07 20 03 02 01 5b                                 |. ...[|
+I 264.090200 RX m2: wheel->host [6] 00000000  07 20 04 02 00 5b                                 |. ...[|
+I 265.206273 RX m2: wheel->host [6] 00000000  07 20 05 02 01 5b                                 |. ...[|
+I 265.366253 RX m2: wheel->host [6] 00000000  07 20 06 02 00 5b                                 |. ...[|
+I 266.946327 RX m2: wheel->host [6] 00000000  07 20 07 02 01 5b                                 |. ...[|
+I 267.037640 RX m2: events 78, dropped 0, announce 295, sent 4822, configured
+I 267.037768 RX m2: T1 145078533 us
+I 267.037811 RX m2: T2 7752 us
+I 267.039443 RX m2: host GIP in: yes, IN polled: yes
+I 267.044141 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 267.050490 RX m2: auth: to wheel 23, dropped 0, back 291 | link: retries 26, gave up 0, pending 0
+I 267.059234 RX m2: ffb: sent 0, refused 0 | status: sent 16, start yes
+I 267.065589 RX m2: 262.441087 GIP_IN type 05 len 5
+I 267.070160 RX m2: 263.905125 GIP_IN type 05 len 5
+I 267.074760 RX m2: 265.181154 GIP_IN type 05 len 5
+I 267.090377 RX m2: wheel->host [6] 00000000  07 20 08 02 00 5b                                 |. ...[|
+I 268.610406 RX m2: wheel->host [6] 00000000  07 20 09 02 01 5b                                 |. ...[|
+I 268.814351 RX m2: wheel->host [6] 00000000  07 20 0a 02 00 5b                                 |. ...[|
+I 270.262434 RX m2: wheel->host [6] 00000000  07 20 0b 02 01 5b                                 |. ...[|
+I 270.434418 RX m2: wheel->host [6] 00000000  07 20 0c 02 00 5b                                 |. ...[|
+I 271.910496 RX m2: wheel->host [6] 00000000  07 20 0d 02 01 5b                                 |. ...[|
+I 272.079599 RX m2: events 81, dropped 0, announce 295, sent 5022, configured
+I 272.079729 RX m2: T1 145078533 us
+I 272.079772 RX m2: T2 7752 us
+I 272.081509 RX m2: host GIP in: yes, IN polled: yes
+I 272.086103 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 272.092447 RX m2: auth: to wheel 26, dropped 0, back 303 | link: retries 26, gave up 0, pending 0
+I 272.098517 RX m2: wheel->host [6] 00000000  07 20 0e 02 00 5b                                 |. ...[|
+I 272.110608 RX m2: ffb: sent 0, refused 0 | status: sent 16, start yes
+I 272.116776 RX m2: 266.905188 GIP_IN type 05 len 5
+I 272.121324 RX m2: 268.629223 GIP_IN type 05 len 5
+I 272.125924 RX m2: 270.249261 GIP_IN type 05 len 5
+I 272.130524 RX m2: 271.913296 GIP_IN type 05 len 5
+I 273.506579 RX m2: wheel->host [6] 00000000  07 20 0f 02 01 5b                                 |. ...[|
+I 273.694521 RX m2: wheel->host [6] 00000000  07 20 10 02 00 5b                                 |. ...[|
+I 275.154613 RX m2: wheel->host [6] 00000000  07 20 11 02 01 5b                                 |. ...[|
+I 275.330579 RX m2: wheel->host [6] 00000000  07 20 12 02 00 5b                                 |. ...[|
+I 276.554672 RX m2: wheel->host [6] 00000000  07 20 13 02 01 5b                                 |. ...[|
+I 276.730611 RX m2: wheel->host [6] 00000000  07 20 14 02 00 5b                                 |. ...[|
+I 277.135630 RX m2: events 85, dropped 0, announce 295, sent 5222, configured
+I 277.135766 RX m2: T1 145078533 us
+I 277.135809 RX m2: T2 7752 us
+I 277.137543 RX m2: host GIP in: yes, IN polled: yes
+I 277.142139 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 277.148484 RX m2: auth: to wheel 30, dropped 0, back 318 | link: retries 26, gave up 0, pending 0
+I 277.157232 RX m2: ffb: sent 0, refused 0 | status: sent 16, start yes
+I 277.163581 RX m2: 273.509332 GIP_IN type 05 len 5
+I 277.168166 RX m2: 275.145385 GIP_IN type 05 len 5
+I 277.172759 RX m2: 276.545415 GIP_IN type 05 len 5
+I 277.950708 RX m2: wheel->host [6] 00000000  07 20 15 02 01 5b                                 |. ...[|
+I 278.126710 RX m2: wheel->host [6] 00000000  07 20 16 02 00 5b                                 |. ...[|
+I 279.870793 RX m2: wheel->host [6] 00000000  07 20 17 02 01 5b                                 |. ...[|
+I 280.026784 RX m2: wheel->host [6] 00000000  07 20 18 02 00 5b                                 |. ...[|
+I 282.177611 RX m2: events 87, dropped 0, announce 295, sent 5420, configured
+I 282.177744 RX m2: T1 145078533 us
+I 282.177787 RX m2: T2 7752 us
+I 282.179482 RX m2: host GIP in: yes, IN polled: yes
+I 282.184122 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 282.190464 RX m2: auth: to wheel 32, dropped 0, back 326 | link: retries 26, gave up 0, pending 0
+I 282.199210 RX m2: ffb: sent 0, refused 0 | status: sent 17, start yes
+I 282.205562 RX m2: 277.941428 GIP_IN type 05 len 5
+I 282.210139 RX m2: 279.841470 GIP_IN type 05 len 5
+I 282.742899 RX m2: wheel->host [6] 00000000  07 20 19 02 01 5b                                 |. ...[|
+I 282.914831 RX m2: wheel->host [6] 00000000  07 20 1a 02 00 5b                                 |. ...[|
+I 283.782906 RX m2: wheel->host [6] 00000000  07 20 1b 02 01 5b                                 |. ...[|
+I 283.954876 RX m2: wheel->host [6] 00000000  07 20 1c 02 00 5b                                 |. ...[|
+I 284.518951 RX m2: wheel->host [6] 00000000  07 20 1d 02 01 5b                                 |. ...[|
+I 285.674975 RX m2: wheel->host [6] 00000000  07 20 1e 02 00 5b                                 |. ...[|
+I 287.214640 RX m2: events 90, dropped 0, announce 295, sent 5619, configured
+I 287.214775 RX m2: T1 145078533 us
+I 287.214818 RX m2: T2 7752 us
+I 287.216548 RX m2: host GIP in: yes, IN polled: yes
+I 287.221149 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 287.227494 RX m2: auth: to wheel 35, dropped 0, back 339 | link: retries 26, gave up 0, pending 0
+I 287.236242 RX m2: ffb: sent 0, refused 0 | status: sent 17, start yes
+I 287.242592 RX m2: 282.729537 GIP_IN type 05 len 5
+I 287.247168 RX m2: 283.769557 GIP_IN type 05 len 5
+I 287.251769 RX m2: 284.933580 GIP_IN type 05 len 5
+I 292.256608 RX m2: events 91, dropped 0, announce 295, sent 5814, configured
+I 292.256747 RX m2: T1 145078533 us
+I 292.256790 RX m2: T2 7752 us
+I 292.258511 RX m2: host GIP in: yes, IN polled: yes
+I 292.263118 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 292.269461 RX m2: auth: to wheel 36, dropped 0, back 344 | link: retries 27, gave up 0, pending 0
+I 292.278211 RX m2: ffb: sent 0, refused 0 | status: sent 17, start yes
+I 292.284560 RX m2: 289.917690 GIP_IN type 05 len 5
+I 297.289581 RX m2: events 91, dropped 0, announce 295, sent 6007, configured
+I 297.289716 RX m2: T1 145078533 us
+I 297.289758 RX m2: T2 7752 us
+I 297.291390 RX m2: host GIP in: yes, IN polled: yes
+I 297.296101 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 297.302433 RX m2: auth: to wheel 36, dropped 0, back 344 | link: retries 27, gave up 0, pending 0
+I 297.311182 RX m2: ffb: sent 0, refused 0 | status: sent 17, start yes
+I 302.317590 RX m2: events 95, dropped 0, announce 295, sent 6200, configured
+I 302.317724 RX m2: T1 145078533 us
+I 302.317767 RX m2: T2 7752 us
+I 302.319487 RX m2: host GIP in: yes, IN polled: yes
+I 302.324099 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 302.330442 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 302.339189 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 302.345540 RX m2: 300.341945 GIP_IN type 05 len 5
+I 302.350118 RX m2: 300.441928 GIP_IN type 05 len 5
+I 302.354718 RX m2: 300.545917 GIP_IN type 05 len 5
+I 302.359318 RX m2: 300.553938 GIP_IN type 05 len 5
+I 307.363525 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 307.363664 RX m2: T1 145078533 us
+I 307.363706 RX m2: T2 7752 us
+I 307.365396 RX m2: host GIP in: yes, IN polled: yes
+I 307.370034 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 307.376378 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 307.385125 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 307.391468 RX m2: 302.720073 SUSPEND
+I 312.394519 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 312.394656 RX m2: T1 145078533 us
+I 312.394699 RX m2: T2 7752 us
+I 312.396413 RX m2: host GIP in: yes, IN polled: yes
+I 312.401028 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 312.407370 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 312.416118 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 317.422521 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 317.422657 RX m2: T1 145078533 us
+I 317.422700 RX m2: T2 7752 us
+I 317.424328 RX m2: host GIP in: yes, IN polled: yes
+I 317.429029 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 317.435371 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 317.444119 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 322.450521 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 322.450656 RX m2: T1 145078533 us
+I 322.450699 RX m2: T2 7752 us
+I 322.452413 RX m2: host GIP in: yes, IN polled: yes
+I 322.457028 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 322.463370 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 322.472119 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 327.478512 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 327.478649 RX m2: T1 145078533 us
+I 327.478691 RX m2: T2 7752 us
+I 327.480403 RX m2: host GIP in: yes, IN polled: yes
+I 327.485020 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 327.491363 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 327.500111 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 332.506521 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 332.506657 RX m2: T1 145078533 us
+I 332.506699 RX m2: T2 7752 us
+I 332.508414 RX m2: host GIP in: yes, IN polled: yes
+I 332.513029 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 332.519371 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 332.528119 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 337.534521 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 337.534657 RX m2: T1 145078533 us
+I 337.534699 RX m2: T2 7752 us
+I 337.536408 RX m2: host GIP in: yes, IN polled: yes
+I 337.541027 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 337.547370 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 337.556118 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 342.562519 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 342.562656 RX m2: T1 145078533 us
+I 342.562699 RX m2: T2 7752 us
+I 342.564415 RX m2: host GIP in: yes, IN polled: yes
+I 342.569028 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 342.575371 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 342.584119 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 347.590518 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 347.590651 RX m2: T1 145078533 us
+I 347.590694 RX m2: T2 7752 us
+I 347.592412 RX m2: host GIP in: yes, IN polled: yes
+I 347.597024 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 347.603399 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 347.612115 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 352.618519 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 352.618655 RX m2: T1 145078533 us
+I 352.618698 RX m2: T2 7752 us
+I 352.620410 RX m2: host GIP in: yes, IN polled: yes
+I 352.625027 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 352.631369 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 352.640117 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 357.646522 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 357.646658 RX m2: T1 145078533 us
+I 357.646701 RX m2: T2 7752 us
+I 357.648416 RX m2: host GIP in: yes, IN polled: yes
+I 357.653030 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 357.659372 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 357.668121 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 362.674514 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 362.674647 RX m2: T1 145078533 us
+I 362.674690 RX m2: T2 7752 us
+I 362.676392 RX m2: host GIP in: yes, IN polled: yes
+I 362.681020 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 362.687363 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 362.696111 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 367.702521 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 367.702657 RX m2: T1 145078533 us
+I 367.702699 RX m2: T2 7752 us
+I 367.704327 RX m2: host GIP in: yes, IN polled: yes
+I 367.709027 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 367.715370 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 367.724118 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
+I 372.730521 RX m2: events 96, dropped 0, announce 295, sent 6221, configured
+I 372.730657 RX m2: T1 145078533 us
+I 372.730700 RX m2: T2 7752 us
+I 372.732416 RX m2: host GIP in: yes, IN polled: yes
+I 372.737030 RX m2: GET_DESCRIPTOR 14, stalls 3, device qualifier asked
+I 372.743372 RX m2: auth: to wheel 40, dropped 0, back 344 | link: retries 28, gave up 0, pending 0
+I 372.752121 RX m2: ffb: sent 0, refused 0 | status: sent 18, start yes
