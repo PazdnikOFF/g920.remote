@@ -716,6 +716,9 @@ static volatile uint8_t s_out_head;
 static volatile uint8_t s_out_tail;
 static volatile uint32_t s_out_dropped;
 
+/* Был ли пир на прошлом такте — ловим появление, а не наличие. */
+static bool s_peer_seen;
+
 /* Свой счёт номеров для типов, которые шлём рулю и мы, и консоль. */
 static uint8_t s_seq_set_state;
 static uint8_t s_seq_initial_reports;
@@ -2536,6 +2539,38 @@ void app_main(void)
             g920_link_tick(g920_timestamp_us());
         }
         tunnel_drain();
+
+        /*
+         * Донгл появился — а руль уже в чужой, состоявшейся сессии.
+         * Перезагружаемся, чтобы он поднялся заново вместе со связкой.
+         *
+         * Повод такой же, как у донгла с обратной стороны: сессия, в
+         * которой руль прошёл security с прежним собеседником, для нового
+         * бесполезна, и сам он из неё не выйдет. Раньше это выправлялось
+         * минутами — после снятия питания с руля консоль успевала прислать
+         * **500** запросов начальных отчётов, прежде чем что-то сдвигалось.
+         *
+         * Условие «руль уже проходил security» обязательно и исключает
+         * петлю: после перезагрузки руль девственный (`06 == 0`), и на
+         * следующее появление пира мы не среагируем. Оно же не даёт
+         * перезагружаться при обычном первом знакомстве.
+         *
+         * Время загрузки тоже проверяется: пир появляется сразу после
+         * старта, и без этого мы бы перезагружались по кругу.
+         */
+        {
+            const bool peer = g920_link_has_peer();
+            const uint32_t now_ms = (uint32_t)(g920_timestamp_us() / 1000u);
+
+            if (peer && !s_peer_seen && now_ms >= RELAUNCH_COOLDOWN_MS
+                && s_wheel_msgs[0x06] != 0u) {
+                G920_LOGW(M1, "dongle showed up while the wheel is in a stale "
+                              "session — restarting to bring both up together");
+                vTaskDelay(pdMS_TO_TICKS(50));
+                esp_restart();
+            }
+            s_peer_seen = peer;
+        }
 
         /*
          * Мёртвая рука. Проверяется каждым тактом и только по факту смены
