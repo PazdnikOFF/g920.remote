@@ -915,11 +915,19 @@ static void report(void)
     uint32_t t2 = 0;
 
     g920_gip_device_lock();
-    G920_LOGI(M2, "events %u, dropped %u, announce %u, sent %u, %s",
+    /*
+     * `suspended` печатается рядом с `configured` не для полноты: он стоит
+     * первым барьером в отправке, и пока его не было видно, намертво
+     * замолчавший донгл выглядел как загадка — «настроен, но ничего не
+     * уходит». Состояние, которое решает, поедет ли хоть один кадр, должно
+     * быть в отчёте.
+     */
+    G920_LOGI(M2, "events %u, dropped %u, announce %u, sent %u, %s%s",
               (unsigned)g920_hostlog_count(&hostlog),
               (unsigned)g920_hostlog_dropped(&hostlog),
               (unsigned)hello_count, (unsigned)g920_gip_device_sent(),
-              g920_gip_device_configured() ? "configured" : "not configured");
+              g920_gip_device_configured() ? "configured" : "not configured",
+              g920_gip_device_suspended() ? ", SUSPENDED" : "");
 
     /*
      * T1 и T2 — не назначенные пороги, а **посчитанные из журнала**
