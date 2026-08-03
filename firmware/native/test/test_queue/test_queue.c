@@ -646,6 +646,36 @@ static void test_alive_stream_does_not_touch_auth(void)
                           g920_peer_rx_accept(&rx, 1, G920_FRAME_FFB, 9));
 }
 
+/*
+ * Третий случай той же болезни, найденный 03.08.2026 перезагрузкой консоли.
+ *
+ * Служебные кадры слались с **постоянным** номером 0. В живой сессии номера
+ * надёжной дисциплины уходят далеко вперёд, и такой кадр объявляется
+ * повтором — то есть просьба вернуть руль в начало разговора не доходила
+ * никогда (`set device state: reset` в логе TX — ноль за всю перезагрузку),
+ * и связка после возврата консоли не поднималась.
+ *
+ * Лечение — брать номер из общего счёта надёжной дисциплины, а не заводить
+ * свой. Тест держит саму ловушку: постоянный номер в живой сессии не
+ * проходит.
+ */
+static void test_control_with_constant_sequence_never_arrives(void)
+{
+    g920_peer_rx_t rx;
+
+    g920_peer_rx_init(&rx);
+    for (uint16_t seq = 1; seq <= 200; seq++) {
+        (void)g920_peer_rx_accept(&rx, 1, G920_FRAME_AUTH, seq);
+    }
+    TEST_ASSERT_EQUAL_INT(G920_RX_DUPLICATE,
+                          g920_peer_rx_accept(&rx, 1, G920_FRAME_CONTROL, 0));
+    TEST_ASSERT_EQUAL_INT(G920_RX_DUPLICATE,
+                          g920_peer_rx_accept(&rx, 1, G920_FRAME_CONTROL, 0));
+    /* А из общего счёта — доходит. */
+    TEST_ASSERT_EQUAL_INT(G920_RX_NEW,
+                          g920_peer_rx_accept(&rx, 1, G920_FRAME_CONTROL, 201));
+}
+
 static void test_rx_fresh_restart_is_not_a_flood_of_stale(void)
 {
     g920_peer_rx_t rx;
@@ -791,6 +821,7 @@ int main(void)
     RUN_TEST(test_rx_streams_do_not_interfere);
     RUN_TEST(test_own_count_on_reliable_type_eats_auth);
     RUN_TEST(test_alive_stream_does_not_touch_auth);
+    RUN_TEST(test_control_with_constant_sequence_never_arrives);
     RUN_TEST(test_rx_fresh_restart_is_not_a_flood_of_stale);
     RUN_TEST(test_rx_keeps_dropping_stale_within_a_session);
     RUN_TEST(test_rx_verdict_policy);
