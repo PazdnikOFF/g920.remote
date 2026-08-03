@@ -1,0 +1,16 @@
+{
+  "name": "g920-trace",
+  "version": "0.1.0",
+  "description": "Запись трасс: кольцевой буфер записей переменной длины",
+  "keywords": ["g920", "trace"],
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*",
+  "dependencies": {
+    "g920-util": "*"
+  },
+  "build": {
+    "srcDir": "src",
+    "includeDir": "include"
+  }
+}

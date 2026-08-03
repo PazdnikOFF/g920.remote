@@ -1,0 +1,403 @@
+
+I (80) boot: End of partition table
+I (84) esp_image: segment 0: paddr=00010020 vaddr=3c090020 size=19a2ch (105004) map
+I (106) esp_image: segment 1: paddr=00029a54 vaddr=3fc9ae00 size=04c1ch ( 19484) load
+I (110) esp_image: segment 2: paddr=0002e678 vaddr=40374000 size=019a0h (  6560) load
+I (112) esp_image: segment 3: paddr=00030020 vaddr=42000020 size=87274h (553588) map
+I (200) esp_image: segment 4: paddr=000b729c vaddr=403759a0 size=15424h ( 87076) load
+I (217) esp_image: segment 5: paddr=000cc6c8 vaddr=600fe000 size=00020h (    32) load
+I (231) boot: Loaded app from partition at offset 0x10000
+I (231) boot: Disabling RNG early entropy source...
+I (241) cpu_start: Multicore app
+I (250) cpu_start: Pro cpu start user code
+I (250) cpu_start: cpu freq: 240000000 Hz
+I (250) app_init: Application information:
+I (250) app_init: Project name:     g920-rx
+I (254) app_init: App version:      0.1.0
+I (258) app_init: Compile time:     Aug  3 2026 11:01:38
+I (263) app_init: ELF file SHA256:  7c2080a0f...
+I (267) app_init: ESP-IDF:          5.5.0
+I (271) efuse_init: Min chip rev:     v0.0
+I (275) efuse_init: Max chip rev:     v0.99 
+I (279) efuse_init: Chip rev:         v0.2
+I (283) heap_init: Initializing. RAM available for dynamic allocation:
+I (289) heap_init: At 3FCA80B8 len 00041658 (261 KiB): RAM
+I (294) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM
+I (299) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM
+I (304) heap_init: At 600FE020 len 00001FC8 (7 KiB): RTCRAM
+I (310) spi_flash: detected chip: boya
+I (313) spi_flash: flash io: qio
+I (316) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (322) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (329) main_task: Started on CPU0
+I (332) main_task: Calling app_main()
+I 0.025863 RX boot: fw 0.1.0, role RX, mode gip-device (stub)
+I 0.038165 RX boot: led ws2812 ok
+I (348) pp: pp rom version: e7ae62f
+I (349) net80211: net80211 rom version: e7ae62f
+I (352) wifi:wifi driver task: 3fced4a8, prio:23, stack:6656, core=0
+I (360) wifi:wifi firmware version: f3dbad7
+I (361) wifi:wifi certification version: v7.0
+I (365) wifi:config NVS flash: enabled
+I (369) wifi:config nano formatting: disabled
+I (373) wifi:Init data frame dynamic rx buffer num: 32
+I (378) wifi:Init static rx mgmt buffer num: 5
+I (382) wifi:Init management short buffer num: 32
+I (386) wifi:Init dynamic tx buffer num: 32
+I (390) wifi:Init static tx FG buffer num: 2
+I (394) wifi:Init static rx buffer size: 1600
+I (398) wifi:Init static rx buffer num: 10
+I (402) wifi:Init dynamic rx buffer num: 32
+I (406) wifi_init: rx ba win: 6
+I (409) wifi_init: accept mbox: 6
+I (412) wifi_init: tcpip mbox: 32
+I (415) wifi_init: udp mbox: 6
+I (418) wifi_init: tcp mbox: 6
+I (420) wifi_init: tcp tx win: 5760
+I (424) wifi_init: tcp rx win: 5760
+I (427) wifi_init: tcp mss: 1440
+I (430) wifi_init: WiFi IRAM OP enabled
+I (433) wifi_init: WiFi RX IRAM OP enabled
+I (437) phy_init: phy_version 701,f4f1da3a,Mar  3 2025,15:50:10
+I (477) wifi:mode : sta (ac:a7:04:12:68:50)
+I (477) wifi:enable tsf
+I (478) wifi:Set ps type: 0, coexist: 0
+
+I (479) ESPNOW: espnow [version: 2.0] init
+I 0.174701 RX link: peer from nvs ac:a7:04:ee:5f:d0
+I 0.174970 RX link: up on ch 11, mac ac:a7:04:12:68:50, epoch 202, tx power 20.00 dBm
+I 0.182319 RX boot: link up
+I 0.186812 RX boot: identity from nvs: 046d:c261 rev 9604, 7 sections, 655 bytes
+I 0.191966 RX usbdev: identity installed before enumeration
+I 0.197673 RX usbdev: device desc, 18 bytes:
+I 0.201261 RX usbdev: 00000000  12 01 00 02 ff 47 d0 40  09 12 01 00 00 01 00 00  |.....G.@........|
+I 0.210094 RX usbdev: 00000010  00 01                                             |..|
+I 0.217736 RX usbdev: config desc, 32 bytes:
+I 0.221727 RX usbdev: 00000000  09 02 20 00 01 01 00 80  fa 09 04 00 00 02 ff 47  |.. ............G|
+I 0.230580 RX usbdev: 00000010  d0 00 07 05 81 03 40 00  04 07 05 01 03 40 00 04  |......@......@..|
+I 0.239459 RX usbdev: gip stub up: vid 1209 pid 0001, class ff/47/d0
+I 0.483289 RX usbdev: open: itf 0, in 81, out 01, claimed 23
+I 0.483656 RX boot: host configured us: asking tx to reset wheel
+I 0.643291 RX usbdev: open: itf 0, in 81, out 01, claimed 23
+I 0.643648 RX boot: host configured us: asking tx to reset wheel
+I 0.721263 RX boot: metadata: sent 389 bytes to host
+I 0.784368 RX m2: host->wheel [62] 00000000  06 30 01 3a 00 41 00 01                           |.0.:.A..|
+I 0.793736 RX m2: wheel->host [13] 00000000  01 20 01 09 00 06 30 00                           |. ....0.|
+I 0.845995 RX m2: wheel->host [10] 00000000  06 30 01 06 00 c1 00 01                           |.0......|
+I 0.872322 RX m2: host->wheel [18] 00000000  06 30 02 0e 00 42 00 02                           |.0...B..|
+I 0.881760 RX m2: wheel->host [13] 00000000  01 20 02 09 00 06 30 00                           |. ....0.|
+I 1.038539 RX m2: wheel->host [64] 00000000  06 f0 02 ba 00 5a 00 c2                           |.....Z..|
+I 1.042279 RX m2: wheel->host [38] 00000000  06 b0 02 a0 00 3a 00 1f                           |.....:..|
+I 1.046620 RX m2: wheel->host [6] 00000000  06 b0 02 80 00 5a                                 |.....Z|
+I 1.072350 RX m2: host->wheel [18] 00000000  06 30 03 0e 00 42 00 03                           |.0...B..|
+I 1.091179 RX m2: wheel->host [13] 00000000  01 20 03 09 00 06 30 00                           |. ....0.|
+I 1.638494 RX m2: wheel->host [64] 00000000  06 f0 03 3a b9 06 00 c2                           |...:....|
+I 1.642489 RX m2: wheel->host [64] 00000000  06 b0 03 ba 00 3a 45 31                           |.....:E1|
+I 1.646556 RX m2: wheel->host [64] 00000000  06 b0 03 ba 00 74 20 30                           |.....t 0|
+I 1.655896 RX m2: wheel->host [64] 00000000  06 b0 03 3a ae 01 31 39                           |...:..19|
+I 1.664912 RX m2: wheel->host [64] 00000000  06 b0 03 3a e8 01 30 ec                           |...:..0.|
+I 1.674597 RX m2: wheel->host [64] 00000000  06 b0 03 3a a2 02 00 d9                           |...:....|
+I 1.683508 RX m2: wheel->host [64] 00000000  06 b0 03 3a dc 02 d4 02                           |...:....|
+I 1.692774 RX m2: wheel->host [64] 00000000  06 b0 03 3a 96 03 8d 04                           |...:....|
+I 1.702057 RX m2: wheel->host [64] 00000000  06 b0 03 3a d0 03 36 cd                           |...:..6.|
+I 1.711349 RX m2: wheel->host [64] 00000000  06 b0 03 3a 8a 04 04 02                           |...:....|
+I 1.721010 RX m2: wheel->host [64] 00000000  06 b0 03 3a c4 04 1d 60                           |...:...`|
+I 1.729950 RX m2: wheel->host [64] 00000000  06 b0 03 3a fe 04 a0 fe                           |...:....|
+I 1.739209 RX m2: wheel->host [64] 00000000  06 b0 03 3a b8 05 64 4b                           |...:..dK|
+I 1.748493 RX m2: wheel->host [64] 00000000  06 b0 03 3a f2 05 26 24                           |...:..&$|
+I 1.757777 RX m2: wheel->host [19] 00000000  06 b0 03 0d ac 06 9b fd                           |........|
+I 1.767068 RX m2: wheel->host [6] 00000000  06 b0 03 00 b9 06                                 |......|
+I 1.792418 RX m2: host->wheel [64] 00000000  06 f0 04 3a 92 02 00 41                           |...:...A|
+I 1.847510 RX m2: wheel->host [13] 00000000  01 20 04 09 00 06 f0 3a                           |. .....:|
+I 1.856333 RX m2: host->wheel [64] 00000000  06 a0 04 ba 00 3a 04 a8                           |.....:..|
+I 1.860368 RX m2: host->wheel [64] 00000000  06 a0 04 ba 00 74 0a a6                           |.....t..|
+I 1.868411 RX m2: host->wheel [64] 00000000  06 a0 04 3a ae 01 70 c7                           |...:..p.|
+I 1.876390 RX m2: host->wheel [48] 00000000  06 b0 04 2a e8 01 44 fd                           |...*..D.|
+I 1.909636 RX m2: wheel->host [13] 00000000  01 20 04 09 00 06 b0 12                           |. ......|
+I 1.920271 RX m2: host->wheel [6] 00000000  06 a0 04 00 92 02                                 |......|
+I 2.714000 RX m2: wheel->host [10] 00000000  06 30 04 06 00 c1 00 01                           |.0......|
+I 2.736386 RX m2: host->wheel [54] 00000000  06 30 05 32 00 41 00 07                           |.0.2.A..|
+I 2.749756 RX m2: wheel->host [13] 00000000  01 20 05 09 00 06 30 00                           |. ....0.|
+I 2.990089 RX m2: wheel->host [10] 00000000  06 30 05 06 00 c1 00 01                           |.0......|
+I 3.016370 RX m2: host->wheel [18] 00000000  06 30 06 0e 00 42 00 08                           |.0...B..|
+I 3.029767 RX m2: wheel->host [13] 00000000  01 20 06 09 00 06 30 00                           |. ....0.|
+I 3.298530 RX m2: wheel->host [64] 00000000  06 f0 06 ba 00 4a 00 c2                           |.....J..|
+I 3.302200 RX m2: wheel->host [22] 00000000  06 b0 06 90 00 3a d3 e5                           |.....:..|
+I 3.306545 RX m2: wheel->host [6] 00000000  06 b0 06 80 00 4a                                 |.....J|
+I 5.411368 RX m2: events 64, dropped 0, hello sent 50, configured
+I 5.411496 RX m2: T1 169865 us
+I 5.411538 RX m2: T2 8731 us
+I 5.411581 RX m2: host GIP in: yes, IN polled: yes
+I 5.416047 RX m2: GET_DESCRIPTOR 13, stalls 2, device qualifier asked
+I 5.422216 RX m2: auth: to wheel 14, dropped 0, back 32 | link: retries 19, gave up 0, pending 0
+I 5.430709 RX m2: 0.000000 VBUS
+I 5.433576 RX m2: 0.169865 SETUP 80 06 0100 0000 len 0
+I 5.438422 RX m2: 0.249830 SETUP 80 06 0100 0000 len 0
+I 5.443283 RX m2: 0.253832 SETUP 80 06 0200 0000 len 0
+I 5.448143 RX m2: 0.257832 SETUP 80 06 0303 0000 len 0
+I 5.453004 RX m2: 0.261834 SETUP c0 90 0000 0004 len 16
+I 5.457952 RX m2: 0.265828 SETUP c0 90 0000 0004 len 40
+I 5.462900 RX m2: 0.269830 SETUP 80 06 0300 0000 len 0 STALL
+I 5.470214 RX m2: 0.271830 SETUP 80 06 0600 0000 len 0 STALL
+I 5.473663 RX m2: 0.273829 SETUP 80 06 0100 0000 len 0
+I 5.478522 RX m2: 0.277829 SETUP 80 06 0200 0000 len 0
+I 5.483383 RX m2: 0.281829 SETUP 80 06 0200 0000 len 0
+I 5.488244 RX m2: 0.285832 SETUP 80 06 0200 0000 len 0
+I 5.493105 RX m2: 0.286147 SET_CFG 00 00 0000 0000 len 0
+I 5.498144 RX m2: 0.286354 GIP_OUT type 02 len 32
+I 5.502565 RX m2: 0.361862 SETUP 80 06 0100 0000 len 0
+I 5.509165 RX m2: 0.441832 SETUP 80 06 0100 0000 len 0
+I 5.512286 RX m2: 0.445839 SETUP 80 06 0200 0000 len 0
+I 5.517147 RX m2: 0.446147 SET_CFG 00 00 0000 0000 len 0
+I 5.522181 RX m2: 0.446347 GIP_OUT type 02 len 32
+I 5.526606 RX m2: 0.454878 IN_POLL
+I 5.529732 RX m2: 0.466862 GIP_IN type 04 len 4
+I 5.533986 RX m2: 0.467931 GIP_OUT type 04 len 64
+I 5.538412 RX m2: 0.474849 GIP_IN type 01 len 13
+I 5.544161 RX m2: 0.482849 GIP_IN type 01 len 13
+I 5.547093 RX m2: 0.490849 GIP_IN type 01 len 13
+I 5.551432 RX m2: 0.498849 GIP_IN type 01 len 13
+I 5.555771 RX m2: 0.506850 GIP_IN type 01 len 13
+I 5.560111 RX m2: 0.514850 GIP_IN type 01 len 13
+I 5.564451 RX m2: 0.522850 GIP_IN type 01 len 13
+I 5.568791 RX m2: 0.538859 GIP_IN type 05 len 19
+I 5.573131 RX m2: 0.542876 GIP_IN type 05 len 5
+I 5.579157 RX m2: 0.546876 GIP_IN type 0a len 7
+I 5.581637 RX m2: 0.586928 GIP_IN type 06 len 62
+I 5.585977 RX m2: 0.654878 GIP_IN type 01 len 13
+I 5.590317 RX m2: 0.674889 GIP_IN type 06 len 18
+I 5.594656 RX m2: 0.846925 GIP_IN type 01 len 13
+I 5.598996 RX m2: 0.850894 GIP_IN type 01 len 13
+I 5.603336 RX m2: 0.874914 GIP_IN type 06 len 18
+I 5.607676 RX m2: 1.446956 GIP_IN type 01 len 13
+I 5.613161 RX m2: 1.450945 GIP_IN type 01 len 13
+I 5.616357 RX m2: 1.454872 GIP_IN type 01 len 13
+I 5.620695 RX m2: 1.462886 GIP_IN type 01 len 13
+I 5.625035 RX m2: 1.474883 GIP_IN type 01 len 13
+I 5.629375 RX m2: 1.482884 GIP_IN type 01 len 13
+I 5.633715 RX m2: 1.490881 GIP_IN type 01 len 13
+I 5.638061 RX m2: 1.502880 GIP_IN type 01 len 13
+I 5.642395 RX m2: 1.510880 GIP_IN type 01 len 13
+I 5.648158 RX m2: 1.518880 GIP_IN type 01 len 13
+I 5.651074 RX m2: 1.530885 GIP_IN type 01 len 13
+I 5.655414 RX m2: 1.538885 GIP_IN type 01 len 13
+I 5.659754 RX m2: 1.546881 GIP_IN type 01 len 13
+I 5.664094 RX m2: 1.558881 GIP_IN type 01 len 13
+I 5.668434 RX m2: 1.566881 GIP_IN type 01 len 13
+I 5.672774 RX m2: 1.594950 GIP_IN type 06 len 64
+I 5.677114 RX m2: 1.658941 GIP_IN type 06 len 64
+I 5.683161 RX m2: 1.662957 GIP_IN type 06 len 64
+I 5.685795 RX m2: 1.670973 GIP_IN type 06 len 64
+I 5.690133 RX m2: 1.678964 GIP_IN type 06 len 48
+I 5.694473 RX m2: 1.722891 GIP_IN type 06 len 6
+I 5.698726 RX m2: 2.522914 GIP_IN type 01 len 13
+I 5.703069 RX m2: 2.538954 GIP_IN type 06 len 54
+I 5.707406 RX m2: 2.798920 GIP_IN type 01 len 13
+I 5.711745 RX m2: 2.818932 GIP_IN type 06 len 18
+I 6.016360 RX m2: host->wheel [6] 00000000  06 20 07 02 01 01                                 |. ....|
+I 6.064499 RX m2: host->wheel [62] 00000000  06 30 08 3a 00 41 00 01                           |.0.:.A..|
+I 6.074766 RX m2: wheel->host [13] 00000000  01 20 08 09 00 06 30 00                           |. ....0.|
+I 6.126157 RX m2: wheel->host [10] 00000000  06 30 08 06 00 c1 00 01                           |.0......|
+I 6.152430 RX m2: host->wheel [18] 00000000  06 30 09 0e 00 42 00 02                           |.0...B..|
+I 6.165893 RX m2: wheel->host [13] 00000000  01 20 09 09 00 06 30 00                           |. ....0.|
+I 6.322743 RX m2: wheel->host [64] 00000000  06 f0 09 ba 00 5a 00 c2                           |.....Z..|
+I 6.326415 RX m2: wheel->host [38] 00000000  06 b0 09 a0 00 3a 00 1f                           |.....:..|
+I 6.330809 RX m2: wheel->host [6] 00000000  06 b0 09 80 00 5a                                 |.....Z|
+I 6.352524 RX m2: host->wheel [18] 00000000  06 30 0a 0e 00 42 00 03                           |.0...B..|
+I 6.375213 RX m2: wheel->host [13] 00000000  01 20 0a 09 00 06 30 00                           |. ....0.|
+I 6.922739 RX m2: wheel->host [64] 00000000  06 f0 0a 3a b9 06 00 c2                           |...:....|
+I 6.926682 RX m2: wheel->host [64] 00000000  06 b0 0a ba 00 3a 45 31                           |.....:E1|
+I 6.930786 RX m2: wheel->host [64] 00000000  06 b0 0a ba 00 74 20 30                           |.....t 0|
+I 6.940092 RX m2: wheel->host [64] 00000000  06 b0 0a 3a ae 01 31 39                           |...:..19|
+I 6.949150 RX m2: wheel->host [64] 00000000  06 b0 0a 3a e8 01 30 ec                           |...:..0.|
+I 6.958799 RX m2: wheel->host [64] 00000000  06 b0 0a 3a a2 02 00 d9                           |...:....|
+I 6.967739 RX m2: wheel->host [64] 00000000  06 b0 0a 3a dc 02 d4 02                           |...:....|
+I 6.976980 RX m2: wheel->host [64] 00000000  06 b0 0a 3a 96 03 8d 04                           |...:....|
+I 6.986281 RX m2: wheel->host [64] 00000000  06 b0 0a 3a d0 03 36 cd                           |...:..6.|
+I 6.995555 RX m2: wheel->host [64] 00000000  06 b0 0a 3a 8a 04 04 02                           |...:....|
+I 7.005238 RX m2: wheel->host [64] 00000000  06 b0 0a 3a c4 04 1d 60                           |...:...`|
+I 7.014174 RX m2: wheel->host [64] 00000000  06 b0 0a 3a fe 04 a0 fe                           |...:....|
+I 7.023432 RX m2: wheel->host [64] 00000000  06 b0 0a 3a b8 05 64 4b                           |...:..dK|
+I 7.032710 RX m2: wheel->host [64] 00000000  06 b0 0a 3a f2 05 26 24                           |...:..&$|
+I 7.042069 RX m2: wheel->host [19] 00000000  06 b0 0a 0d ac 06 9b fd                           |........|
+I 7.051296 RX m2: wheel->host [6] 00000000  06 b0 0a 00 b9 06                                 |......|
+I 7.072487 RX m2: host->wheel [64] 00000000  06 f0 0b 3a 92 02 00 41                           |...:...A|
+W 7.074670 RX m2: auth: link refused 64 bytes (status 4)
+I 7.131784 RX m2: wheel->host [13] 00000000  01 20 0b 09 00 06 f0 3a                           |. .....:|
+I 7.136443 RX m2: host->wheel [64] 00000000  06 a0 0b ba 00 3a 04 bf                           |.....:..|
+I 7.140376 RX m2: host->wheel [64] 00000000  06 a0 0b ba 00 74 f2 8a                           |.....t..|
+I 7.152498 RX m2: host->wheel [64] 00000000  06 a0 0b 3a ae 01 b6 5e                           |...:...^|
+I 7.160507 RX m2: host->wheel [48] 00000000  06 b0 0b 2a e8 01 de 71                           |...*...q|
+I 7.197416 RX m2: wheel->host [13] 00000000  01 20 0b 09 00 06 b0 12                           |. ......|
+I 7.208390 RX m2: host->wheel [6] 00000000  06 a0 0b 00 92 02                                 |......|
+I 8.002171 RX m2: wheel->host [10] 00000000  06 30 0b 06 00 c1 00 01                           |.0......|
+I 8.024498 RX m2: host->wheel [54] 00000000  06 30 0c 32 00 41 00 07                           |.0.2.A..|
+I 8.037910 RX m2: wheel->host [13] 00000000  01 20 0c 09 00 06 30 00                           |. ....0.|
+I 8.278266 RX m2: wheel->host [10] 00000000  06 30 0c 06 00 c1 00 01                           |.0......|
+I 8.304479 RX m2: host->wheel [18] 00000000  06 30 0d 0e 00 42 00 08                           |.0...B..|
+I 8.317918 RX m2: wheel->host [13] 00000000  01 20 0d 09 00 06 30 00                           |. ....0.|
+I 8.586735 RX m2: wheel->host [64] 00000000  06 f0 0d ba 00 4a 00 c2                           |.....J..|
+I 8.590370 RX m2: wheel->host [22] 00000000  06 b0 0d 90 00 3a dd 4b                           |.....:.K|
+I 8.594780 RX m2: wheel->host [6] 00000000  06 b0 0d 80 00 4a                                 |.....J|
+W 8.600310 RX m2: security accepted by the host (control 01 00)
+I 8.609052 RX m2: host->wheel [6] 00000000  06 20 0e 02 01 00                                 |. ....|
+I 8.661321 RX m2: wheel->host [15] 00000000  21 00 01 0b 10 08 08 08                           |!.......|
+I 8.668448 RX m2: wheel->host [15] 00000000  21 00 02 0b 10 08 08 08                           |!.......|
+I 10.881368 RX m2: events 111, dropped 0, hello sent 94, configured
+I 10.881497 RX m2: T1 169865 us
+I 10.881539 RX m2: T2 8731 us
+I 10.881869 RX m2: host GIP in: yes, IN polled: yes
+I 10.886483 RX m2: GET_DESCRIPTOR 13, stalls 2, device qualifier asked
+I 10.892737 RX m2: auth: to wheel 39, dropped 0, back 68 | link: retries 50, gave up 0, pending 0
+I 10.901325 RX m2: 5.818995 GIP_IN type 06 len 6
+I 10.905644 RX m2: 5.867066 GIP_IN type 06 len 62
+I 10.910071 RX m2: 5.934987 GIP_IN type 01 len 13
+I 10.914498 RX m2: 5.954998 GIP_IN type 06 len 18
+I 10.918924 RX m2: 6.131031 GIP_IN type 01 len 13
+I 10.923351 RX m2: 6.135001 GIP_IN type 01 len 13
+I 10.927778 RX m2: 6.155094 GIP_IN type 06 len 18
+I 10.932204 RX m2: 6.731069 GIP_IN type 01 len 13
+I 10.938234 RX m2: 6.735056 GIP_IN type 01 len 13
+I 10.941066 RX m2: 6.738984 GIP_IN type 01 len 13
+I 10.945484 RX m2: 6.746999 GIP_IN type 01 len 13
+I 10.949911 RX m2: 6.758991 GIP_IN type 01 len 13
+I 10.954338 RX m2: 6.767000 GIP_IN type 01 len 13
+I 10.958764 RX m2: 6.774991 GIP_IN type 01 len 13
+I 10.963191 RX m2: 6.786991 GIP_IN type 01 len 13
+I 10.967617 RX m2: 6.794991 GIP_IN type 01 len 13
+I 10.973164 RX m2: 6.802991 GIP_IN type 01 len 13
+I 10.976472 RX m2: 6.815001 GIP_IN type 01 len 13
+I 10.980897 RX m2: 6.822992 GIP_IN type 01 len 13
+I 10.985324 RX m2: 6.830992 GIP_IN type 01 len 13
+I 10.989751 RX m2: 6.843007 GIP_IN type 01 len 13
+I 10.994177 RX m2: 6.850993 GIP_IN type 01 len 13
+I 10.998604 RX m2: 6.875064 GIP_IN type 06 len 64
+I 11.003031 RX m2: 6.939051 GIP_IN type 06 len 64
+I 11.009163 RX m2: 6.943041 GIP_IN type 06 len 64
+I 11.011885 RX m2: 6.955073 GIP_IN type 06 len 64
+I 11.016311 RX m2: 6.963074 GIP_IN type 06 len 48
+I 11.020737 RX m2: 7.011005 GIP_IN type 06 len 6
+I 11.025077 RX m2: 7.811031 GIP_IN type 01 len 13
+I 11.029504 RX m2: 7.827066 GIP_IN type 06 len 54
+I 11.033930 RX m2: 8.087034 GIP_IN type 01 len 13
+I 11.038368 RX m2: 8.107047 GIP_IN type 06 len 18
+I 11.044175 RX m2: 8.395074 GIP_IN type 01 len 13
+I 11.047212 RX m2: 8.399048 GIP_IN type 01 len 13
+I 11.051637 RX m2: 8.403014 GIP_IN type 06 len 6
+I 11.055977 RX m2: 8.423073 GIP_IN type 0a len 7
+I 11.060316 RX m2: 8.427068 GIP_IN type 0a len 7
+I 11.064656 RX m2: 8.587032 GIP_IN type 05 len 5
+I 11.068996 RX m2: 8.591045 GIP_IN type 0a len 7
+I 11.073336 RX m2: 9.091040 GIP_IN type 05 len 5
+I 11.079164 RX m2: 9.095052 GIP_IN type 0a len 7
+I 11.082017 RX m2: 9.587048 GIP_IN type 05 len 5
+I 11.086355 RX m2: 9.591053 GIP_IN type 0a len 7
+I 11.090696 RX m2: 10.091062 GIP_IN type 05 len 5
+I 11.095122 RX m2: 10.095068 GIP_IN type 0a len 7
+I 11.099549 RX m2: 10.587069 GIP_IN type 05 len 5
+I 11.103975 RX m2: 10.591074 GIP_IN type 0a len 7
+I 16.098377 RX m2: events 132, dropped 0, hello sent 110, configured
+I 16.098506 RX m2: T1 169865 us
+I 16.098549 RX m2: T2 8731 us
+I 16.098965 RX m2: host GIP in: yes, IN polled: yes
+I 16.103581 RX m2: GET_DESCRIPTOR 13, stalls 2, device qualifier asked
+I 16.109834 RX m2: auth: to wheel 60, dropped 0, back 74 | link: retries 69, gave up 0, pending 0
+I 16.118423 RX m2: 11.307088 GIP_IN type 05 len 5
+I 16.122829 RX m2: 11.311088 GIP_IN type 0a len 7
+I 16.127254 RX m2: 11.803095 GIP_IN type 05 len 5
+I 16.131681 RX m2: 11.807095 GIP_IN type 0a len 7
+I 16.136108 RX m2: 12.307108 GIP_IN type 05 len 5
+I 16.140534 RX m2: 12.311105 GIP_IN type 0a len 7
+I 16.144961 RX m2: 12.803116 GIP_IN type 05 len 5
+I 16.149388 RX m2: 12.807117 GIP_IN type 0a len 7
+I 16.155227 RX m2: 13.307129 GIP_IN type 05 len 5
+I 16.158243 RX m2: 13.311127 GIP_IN type 0a len 7
+I 16.162667 RX m2: 13.803137 GIP_IN type 05 len 5
+I 16.167094 RX m2: 13.807134 GIP_IN type 0a len 7
+I 16.171529 RX m2: 14.307150 GIP_IN type 05 len 5
+I 16.175947 RX m2: 14.311152 GIP_IN type 0a len 7
+I 16.180374 RX m2: 14.675156 GIP_IN type 05 len 5
+I 16.184801 RX m2: 14.803156 GIP_IN type 05 len 5
+I 16.191187 RX m2: 14.807171 GIP_IN type 0a len 7
+I 16.193655 RX m2: 15.307173 GIP_IN type 05 len 5
+I 16.198081 RX m2: 15.311182 GIP_IN type 0a len 7
+I 16.202507 RX m2: 15.803178 GIP_IN type 05 len 5
+I 16.206934 RX m2: 15.807183 GIP_IN type 0a len 7
+I 21.207378 RX m2: events 152, dropped 0, hello sent 120, configured
+I 21.207507 RX m2: T1 169865 us
+I 21.207550 RX m2: T2 8731 us
+I 21.207966 RX m2: host GIP in: yes, IN polled: yes
+I 21.212583 RX m2: GET_DESCRIPTOR 13, stalls 2, device qualifier asked
+I 21.218835 RX m2: auth: to wheel 80, dropped 0, back 74 | link: retries 86, gave up 0, pending 0
+I 21.227424 RX m2: 16.419195 GIP_IN type 05 len 5
+I 21.231829 RX m2: 16.423209 GIP_IN type 0a len 7
+I 21.236255 RX m2: 16.915207 GIP_IN type 05 len 5
+I 21.240682 RX m2: 16.919220 GIP_IN type 0a len 7
+I 21.245108 RX m2: 17.419214 GIP_IN type 05 len 5
+I 21.249535 RX m2: 17.423230 GIP_IN type 0a len 7
+I 21.253962 RX m2: 17.915228 GIP_IN type 05 len 5
+I 21.258388 RX m2: 17.919236 GIP_IN type 0a len 7
+I 21.264237 RX m2: 18.419235 GIP_IN type 05 len 5
+I 21.267244 RX m2: 18.423239 GIP_IN type 0a len 7
+I 21.271668 RX m2: 18.915248 GIP_IN type 05 len 5
+I 21.276095 RX m2: 18.919253 GIP_IN type 0a len 7
+I 21.280522 RX m2: 19.419257 GIP_IN type 05 len 5
+I 21.284948 RX m2: 19.423264 GIP_IN type 0a len 7
+I 21.289375 RX m2: 19.915269 GIP_IN type 05 len 5
+I 21.293802 RX m2: 19.919271 GIP_IN type 0a len 7
+I 21.300158 RX m2: 20.419277 GIP_IN type 05 len 5
+I 21.302655 RX m2: 20.423283 GIP_IN type 0a len 7
+I 21.307081 RX m2: 20.915291 GIP_IN type 05 len 5
+I 21.311508 RX m2: 20.919294 GIP_IN type 0a len 7
+I 26.311378 RX m2: events 172, dropped 0, hello sent 130, configured
+I 26.311506 RX m2: T1 169865 us
+I 26.311549 RX m2: T2 8731 us
+I 26.311966 RX m2: host GIP in: yes, IN polled: yes
+I 26.316584 RX m2: GET_DESCRIPTOR 13, stalls 2, device qualifier asked
+I 26.322838 RX m2: auth: to wheel 100, dropped 0, back 74 | link: retries 101, gave up 0, pending 0
+I 26.331596 RX m2: 21.523303 GIP_IN type 05 len 5
+I 26.336002 RX m2: 21.527312 GIP_IN type 0a len 7
+I 26.340429 RX m2: 22.019314 GIP_IN type 05 len 5
+I 26.344855 RX m2: 22.023319 GIP_IN type 0a len 7
+I 26.349282 RX m2: 22.523322 GIP_IN type 05 len 5
+I 26.353709 RX m2: 22.527328 GIP_IN type 0a len 7
+I 26.358135 RX m2: 23.019335 GIP_IN type 05 len 5
+I 26.362562 RX m2: 23.023343 GIP_IN type 0a len 7
+I 26.368233 RX m2: 23.523343 GIP_IN type 05 len 5
+I 26.371417 RX m2: 23.527350 GIP_IN type 0a len 7
+I 26.375842 RX m2: 24.019356 GIP_IN type 05 len 5
+I 26.380268 RX m2: 24.023363 GIP_IN type 0a len 7
+I 26.384695 RX m2: 24.523364 GIP_IN type 05 len 5
+I 26.389122 RX m2: 24.527370 GIP_IN type 0a len 7
+I 26.393548 RX m2: 25.019377 GIP_IN type 05 len 5
+I 26.397975 RX m2: 25.023387 GIP_IN type 0a len 7
+I 26.404164 RX m2: 25.523385 GIP_IN type 05 len 5
+I 26.406829 RX m2: 25.527389 GIP_IN type 0a len 7
+I 26.411255 RX m2: 26.019399 GIP_IN type 05 len 5
+I 26.415682 RX m2: 26.023406 GIP_IN type 0a len 7
+I 31.416376 RX m2: events 192, dropped 0, hello sent 140, configured
+I 31.416505 RX m2: T1 169865 us
+I 31.416547 RX m2: T2 8731 us
+I 31.416963 RX m2: host GIP in: yes, IN polled: yes
+I 31.421583 RX m2: GET_DESCRIPTOR 13, stalls 2, device qualifier asked
+I 31.427834 RX m2: auth: to wheel 120, dropped 0, back 74 | link: retries 120, gave up 0, pending 0
+I 31.436595 RX m2: 26.627411 GIP_IN type 05 len 5
+I 31.441000 RX m2: 26.631419 GIP_IN type 0a len 7
+I 31.445426 RX m2: 27.123422 GIP_IN type 05 len 5
+I 31.449853 RX m2: 27.127425 GIP_IN type 0a len 7
+I 31.454280 RX m2: 27.627430 GIP_IN type 05 len 5
+I 31.458706 RX m2: 27.631433 GIP_IN type 0a len 7
+I 31.463133 RX m2: 28.123443 GIP_IN type 05 len 5
+I 31.467560 RX m2: 28.127447 GIP_IN type 0a len 7
+I 31.473229 RX m2: 28.627452 GIP_IN type 05 len 5
+I 31.476415 RX m2: 28.631454 GIP_IN type 0a len 7
+I 31.480840 RX m2: 29.123465 GIP_IN type 05 len 5
+I 31.485266 RX m2: 29.127466 GIP_IN type 0a len 7
+I 31.489693 RX m2: 29.627473 GIP_IN type 05 len 5
+I 31.494119 RX m2: 29.631475 GIP_IN type 0a len 7
+I 31.498546 RX m2: 30.123486 GIP_IN type 05 len 5
+I 31.502973 RX m2: 30.127489 GIP_IN type 0a len 7
+I 31.509158 RX m2: 30.627494 GIP_IN type 05 len 5
+I 31.511826 RX m2: 30.631497 GIP_IN type 0a len 7
+I 31.516253 RX m2: 31.123507 GIP_IN type 05 len 5
+I 31.520679 RX m2: 31.127508 GIP_IN type 0a len 7

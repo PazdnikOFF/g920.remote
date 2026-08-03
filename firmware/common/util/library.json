@@ -1,0 +1,13 @@
+{
+  "name": "g920-util",
+  "version": "0.1.0",
+  "description": "Общие утилиты обеих прошивок: версии, роли, форматирование",
+  "keywords": ["g920", "common"],
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "srcDir": "src",
+    "includeDir": "include"
+  }
+}

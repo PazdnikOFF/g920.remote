@@ -1,0 +1,16 @@
+{
+  "name": "g920-board",
+  "version": "0.1.0",
+  "description": "Привязка к плате: индикатор. Только для сборок под ESP-IDF",
+  "keywords": ["g920", "board"],
+  "license": "MIT",
+  "frameworks": "espidf",
+  "platforms": "espressif32",
+  "dependencies": {
+    "g920-util": "*"
+  },
+  "build": {
+    "srcDir": "src",
+    "includeDir": "include"
+  }
+}

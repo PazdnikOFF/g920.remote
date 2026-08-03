@@ -1,0 +1,1589 @@
+I 0.040186 TX boot: fw 0.1.0, role TX, mode usb-host (m1 probe)
+I 0.052053 TX boot: led ws2812 ok
+I 0.052211 TX trace: trace buffer 262144 B in psram
+I 0.053378 TX boot: trace: 256 KB in psram
+I 0.076633 TX m1: wire check: D- (gpio19) down=0 up=1 -> болтается — до провода никто не достаёт
+I 0.076987 TX m1: wire check: D+ (gpio20) down=1 up=1 -> подтянут снаружи вверх — устройство запитано
+I 0.089382 TX m1: wire check: full-speed device present, wiring looks ok
+I 0.099627 TX m1: probe D+: driven high -> 1, driven low -> 0, neighbour 0
+I 0.102404 TX m1: probe D+: line is free — nothing loads it
+I 0.111611 TX m1: probe D-: driven high -> 1, driven low -> 0, neighbour 1
+E 0.114473 TX m1: probe D-: the other data line follows it — D+ and D- are tied together somewhere (a charger does this)
+I 0.134598 TX m1: D+ pulled up after 0 ms — device is powered
+I 0.164766 TX m1: host up, waiting for a device on GPIO19/20
+I 0.164855 TX m1: vbus must come from an external 5V source, not the board
+I 0.546199 TX m1: device connected, addr 1
+I 0.546345 TX m1: speed full, addr 1, cfg 1, max ep0 64
+I 0.546440 TX m1: device: vid 046d pid c261, bcdDevice 9604, class ff/ff/ff, configs 1
+I 0.551543 TX m1: strings: iManufacturer 1, iProduct 2, iSerial 3
+I 0.557360 TX m1: device descriptor, 18 bytes:
+I 0.561533 TX m1: 00000000  12 01 00 02 ff ff ff 40  6d 04 61 c2 04 96 01 02  |.......@m.a.....|
+I 0.570028 TX m1: 00000010  03 01                                             |..|
+I 0.577332 TX m1: config: 1 interfaces, wTotalLength 32, 100 mA
+I 0.582961 TX m1: config descriptor, 32 bytes:
+I 0.587129 TX m1: 00000000  09 02 20 00 01 01 00 a0  32 09 04 00 00 02 ff 47  |.. .....2......G|
+I 0.595635 TX m1: 00000010  d0 00 07 05 01 03 40 00  04 07 05 81 03 40 00 04  |......@......@..|
+I 0.604162 TX m1: interface 0: class ff/47/d0, 2 endpoints
+I 0.609361 TX m1:   endpoint 01: type 3, mps 64, bInterval 4
+I 0.614735 TX m1:   endpoint 81: type 3, mps 64, bInterval 4
+I 0.620451 TX m1: claimed interface 0, listening on ep 81 (mps 64, bInterval 4), ep 01 ready for out
+I 0.628967 TX m1: wheel should announce itself every 500 ms on its own
+I 0.635361 TX m1: out: metadata request
+I 0.638793 TX m1: wheel speaks: first message 14 ms after claim
+I 0.644491 TX m1: out: ack
+I 0.647746 TX m1: out: ack
+I 0.651722 TX m1: out: ack
+I 0.655724 TX m1: out: ack
+I 0.659721 TX m1: out: ack
+I 0.663724 TX m1: out: ack
+I 0.667714 TX m1: out: ack
+I 0.667789 TX m1: metadata complete: 389 bytes
+I 0.667842 TX m1: metadata, 389 bytes:
+I 0.669072 TX m1: 00000000  10 00 01 00 00 00 00 00  00 00 00 00 00 00 85 01  |................|
+I 0.677572 TX m1: 00000010  bc 00 16 00 1b 00 1c 00  24 00 2b 00 8b 00 00 00  |........$.+.....|
+I 0.686077 TX m1: 00000020  00 00 00 00 00 00 01 01  00 00 00 00 07 01 02 03  |................|
+I 0.694589 TX m1: 00000030  04 06 07 1f 06 01 04 05  06 0a 1f 03 1a 00 4d 69  |..............Mi|
+I 0.703090 TX m1: 00000040  63 72 6f 73 6f 66 74 2e  58 62 6f 78 2e 49 6e 70  |crosoft.Xbox.Inp|
+I 0.711599 TX m1: 00000050  75 74 2e 57 68 65 65 6c  18 00 57 69 6e 64 6f 77  |ut.Wheel..Window|
+I 0.720102 TX m1: 00000060  73 2e 58 62 6f 78 2e 49  6e 70 75 74 2e 57 68 65  |s.Xbox.Input.Whe|
+I 0.728608 TX m1: 00000070  65 6c 27 00 57 69 6e 64  6f 77 73 2e 58 62 6f 78  |el'.Windows.Xbox|
+I 0.737114 TX m1: 00000080  2e 49 6e 70 75 74 2e 4e  61 76 69 67 61 74 69 6f  |.Input.Navigatio|
+I 0.745620 TX m1: 00000090  6e 43 6f 6e 74 72 6f 6c  6c 65 72 03 cf 79 69 64  |nController..yid|
+I 0.754126 TX m1: 000000a0  71 6b 96 4e 8d f9 59 e3  98 d7 42 0c e7 1f f3 b8  |qk.N..Y...B.....|
+I 0.762632 TX m1: 000000b0  86 73 e9 40 a9 f8 2f 21  26 3a cf b7 56 ff 76 97  |.s.@../!&:..V.v.|
+I 0.771138 TX m1: 000000c0  fd 9b 81 45 ad 45 b6 45  bb a5 26 d6 08 17 00 20  |...E.E.E..&.... |
+I 0.779644 TX m1: 000000d0  11 00 01 00 10 00 00 00  00 00 00 00 00 00 00 00  |................|
+I 0.788150 TX m1: 000000e0  00 00 00 00 17 00 21 0b  00 01 00 10 00 00 00 00  |......!.........|
+I 0.796656 TX m1: 000000f0  00 00 00 00 00 00 00 00  00 00 00 17 00 25 31 00  |.............%1.|
+I 0.805162 TX m1: 00000100  01 00 10 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+I 0.813669 TX m1: 00000110  00 00 17 00 0a 03 00 01  00 08 00 00 00 00 00 00  |................|
+I 0.822175 TX m1: 00000120  00 00 00 00 00 00 00 00  00 17 00 0b 3c 00 01 00  |............<...|
+I 0.830681 TX m1: 00000130  08 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+I 0.839187 TX m1: 00000140  17 00 0c 09 00 01 00 08  00 00 00 00 00 00 00 00  |................|
+I 0.847693 TX m1: 00000150  00 00 00 00 00 00 00 17  00 0d 35 00 01 00 08 00  |..........5.....|
+I 0.856199 TX m1: 00000160  00 00 00 00 00 00 00 00  00 00 00 00 00 00 17 00  |................|
+I 0.864705 TX m1: 00000170  0e 38 00 01 00 08 00 00  00 00 00 00 00 00 00 00  |.8..............|
+I 0.873210 TX m1: 00000180  00 00 00 00 00                                    |.....|
+I 0.880849 TX m1: out: ack
+I 0.883215 TX m1: out: set device state: start
+I 0.896618 TX m1: out: initial reports request
+I 1.413624 TX m1: --- trace: 22 records, 0 refused ---
+I 1.413739 TX m1:      0.635276 USB_IN 32 B
+I 1.413832 TX m1: in: msg 02 (class 0, number 2), flags 20 sys, seq 12, payload 28, header 4
+I 1.419441 TX m1: in, 32 bytes:
+I 1.422311 TX m1: 00000000  02 20 0c 1c 63 fa 28 46  1f 83 00 00 6d 04 61 c2  |. ..c.(F....m.a.|
+I 1.430814 TX m1: 00000010  01 00 00 00 50 00 04 00  01 00 01 00 01 00 01 00  |....P...........|
+I 1.439331 TX m1:      0.635327 USB_OUT 4 B
+I 1.443243 TX m1: out: msg 04 (class 0, number 4), flags 20 sys, seq 1, payload 0, header 4
+I 1.451295 TX m1: out, 4 bytes:
+I 1.454160 TX m1: 00000000  04 20 01 00                                       |. ..|
+I 1.461639 TX m1:      0.644424 USB_IN 64 B
+I 1.465554 TX m1: in: msg 04 (class 0, number 4), flags f0 frag init sys acme, seq 1, payload 58, header 6
+I 1.474903 TX m1: in, 64 bytes:
+I 1.477771 TX m1: 00000000  04 f0 01 3a 85 03 10 00  01 00 00 00 00 00 00 00  |...:............|
+I 1.486277 TX m1: 00000010  00 00 00 00 85 01 bc 00  16 00 1b 00 1c 00 24 00  |..............$.|
+I 1.494783 TX m1: 00000020  2b 00 8b 00 00 00 00 00  00 00 00 00 01 01 00 00  |+...............|
+I 1.503289 TX m1: 00000030  00 00 07 01 02 03 04 06  07 1f 06 01 04 05 06 0a  |................|
+I 1.511807 TX m1:      0.644469 USB_OUT 13 B
+I 1.515804 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 1.523857 TX m1: out, 13 bytes:
+I 1.526810 TX m1: 00000000  01 20 01 09 00 04 20 3a  00 00 00 4b 01           |. .... :...K.|
+I 1.535069 TX m1:      0.647685 USB_IN 64 B
+I 1.538982 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 1.547899 TX m1: in, 64 bytes:
+I 1.550767 TX m1: 00000000  04 b0 01 ba 00 3a 1f 03  1a 00 4d 69 63 72 6f 73  |.....:....Micros|
+I 1.559273 TX m1: 00000010  6f 66 74 2e 58 62 6f 78  2e 49 6e 70 75 74 2e 57  |oft.Xbox.Input.W|
+I 1.567779 TX m1: 00000020  68 65 65 6c 18 00 57 69  6e 64 6f 77 73 2e 58 62  |heel..Windows.Xb|
+I 1.576285 TX m1: 00000030  6f 78 2e 49 6e 70 75 74  2e 57 68 65 65 6c 27 00  |ox.Input.Wheel'.|
+I 1.584803 TX m1:      0.647718 USB_OUT 13 B
+I 1.588800 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 1.596853 TX m1: out, 13 bytes:
+I 1.599807 TX m1: 00000000  01 20 01 09 00 04 20 74  00 00 00 11 01           |. .... t.....|
+I 1.608065 TX m1:      0.651681 USB_IN 64 B
+I 1.611978 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 1.620895 TX m1: in, 64 bytes:
+I 1.623763 TX m1: 00000000  04 b0 01 ba 00 74 57 69  6e 64 6f 77 73 2e 58 62  |.....tWindows.Xb|
+I 1.632269 TX m1: 00000010  6f 78 2e 49 6e 70 75 74  2e 4e 61 76 69 67 61 74  |ox.Input.Navigat|
+I 1.640775 TX m1: 00000020  69 6f 6e 43 6f 6e 74 72  6f 6c 6c 65 72 03 cf 79  |ionController..y|
+I 1.649281 TX m1: 00000030  69 64 71 6b 96 4e 8d f9  59 e3 98 d7 42 0c e7 1f  |idqk.N..Y...B...|
+I 1.657799 TX m1:      0.651705 USB_OUT 13 B
+I 1.661797 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 1.669849 TX m1: out, 13 bytes:
+I 1.672803 TX m1: 00000000  01 20 01 09 00 04 20 ae  00 00 00 d7 00           |. .... ......|
+I 1.681061 TX m1:      0.655682 USB_IN 64 B
+I 1.684974 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 1.693892 TX m1: in, 64 bytes:
+I 1.696759 TX m1: 00000000  04 b0 01 3a ae 01 f3 b8  86 73 e9 40 a9 f8 2f 21  |...:.....s.@../!|
+I 1.705265 TX m1: 00000010  26 3a cf b7 56 ff 76 97  fd 9b 81 45 ad 45 b6 45  |&:..V.v....E.E.E|
+I 1.713771 TX m1: 00000020  bb a5 26 d6 08 17 00 20  11 00 01 00 10 00 00 00  |..&.... ........|
+I 1.722277 TX m1: 00000030  00 00 00 00 00 00 00 00  00 00 00 00 17 00 21 0b  |..............!.|
+I 1.730796 TX m1:      0.655709 USB_OUT 13 B
+I 1.734793 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 1.742845 TX m1: out, 13 bytes:
+I 1.745799 TX m1: 00000000  01 20 01 09 00 04 20 e8  00 00 00 9d 00           |. .... ......|
+I 1.754057 TX m1:      0.659681 USB_IN 64 B
+I 1.757970 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 1.766888 TX m1: in, 64 bytes:
+I 1.769755 TX m1: 00000000  04 b0 01 3a e8 01 00 01  00 10 00 00 00 00 00 00  |...:............|
+I 1.778261 TX m1: 00000010  00 00 00 00 00 00 00 00  00 17 00 25 31 00 01 00  |...........%1...|
+I 1.786768 TX m1: 00000020  10 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+I 1.795274 TX m1: 00000030  17 00 0a 03 00 01 00 08  00 00 00 00 00 00 00 00  |................|
+I 1.803792 TX m1:      0.659705 USB_OUT 13 B
+I 1.807789 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 1.815841 TX m1: out, 13 bytes:
+I 1.818795 TX m1: 00000000  01 20 01 09 00 04 20 22  01 00 00 63 00           |. .... "...c.|
+I 1.827053 TX m1:      0.663682 USB_IN 64 B
+I 1.830967 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 1.839884 TX m1: in, 64 bytes:
+I 1.842752 TX m1: 00000000  04 b0 01 3a a2 02 00 00  00 00 00 00 00 17 00 0b  |...:............|
+I 1.851258 TX m1: 00000010  3c 00 01 00 08 00 00 00  00 00 00 00 00 00 00 00  |<...............|
+I 1.859764 TX m1: 00000020  00 00 00 00 17 00 0c 09  00 01 00 08 00 00 00 00  |................|
+I 1.868270 TX m1: 00000030  00 00 00 00 00 00 00 00  00 00 00 17 00 0d 35 00  |..............5.|
+I 1.876788 TX m1:      0.663708 USB_OUT 13 B
+I 1.880785 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 1.888837 TX m1: out, 13 bytes:
+I 1.891791 TX m1: 00000000  01 20 01 09 00 04 20 5c  01 00 00 29 00           |. .... \...).|
+I 1.900049 TX m1:      0.667670 USB_IN 47 B
+I 1.903963 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 41, header 6
+I 1.912880 TX m1: in, 47 bytes:
+I 1.915748 TX m1: 00000000  04 b0 01 29 dc 02 01 00  08 00 00 00 00 00 00 00  |...)............|
+I 1.924254 TX m1: 00000010  00 00 00 00 00 00 00 00  17 00 0e 38 00 01 00 08  |...........8....|
+I 1.932760 TX m1: 00000020  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00     |...............|
+I 1.941191 TX m1:      0.667694 USB_OUT 13 B
+I 1.945188 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 1.953241 TX m1: out, 13 bytes:
+I 1.956195 TX m1: 00000000  01 20 01 09 00 04 20 85  01 00 00 00 00           |. .... ......|
+I 1.964451 TX m1:      0.880785 USB_IN 6 B
+I 1.968278 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 0, header 6
+I 1.977108 TX m1: in, 6 bytes:
+I 1.979889 TX m1: 00000000  04 b0 01 00 85 03                                 |......|
+I 1.987541 TX m1:      0.880821 USB_OUT 13 B
+I 1.991538 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 1.999596 TX m1: out, 13 bytes:
+I 2.002544 TX m1: 00000000  01 20 01 09 00 04 20 85  01 00 00 00 00           |. .... ......|
+I 2.010801 TX m1:      0.883208 USB_OUT 5 B
+I 2.014713 TX m1: out: msg 05 (class 0, number 5), flags 20 sys, seq 1, payload 1, header 4
+I 2.022764 TX m1: out, 5 bytes:
+I 2.025631 TX m1: 00000000  05 20 01 01 00                                    |. ...|
+I 2.033194 TX m1:      0.896601 USB_OUT 7 B
+I 2.037108 TX m1: out: msg 0a (class 0, number 10), flags 00, seq 2, payload 3, header 4
+I 2.044897 TX m1: out, 7 bytes:
+I 2.047765 TX m1: 00000000  0a 00 02 03 00 00 00                              |.......|
+I 2.055503 TX m1:      0.899652 USB_IN 15 B
+I 2.059414 TX m1: in: msg 21 (class 1, number 1), flags 00, seq 1, payload 11, header 4
+I 2.067118 TX m1: in, 15 bytes:
+I 2.069986 TX m1: 00000000  21 00 01 0b 10 08 08 08  00 0e 01 84 03 01 48     |!.............H|
+I 2.078417 TX m1:      0.903651 USB_IN 21 B
+I 2.082330 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 59, payload 17, header 4
+I 2.090119 TX m1: in, 21 bytes:
+I 2.092987 TX m1: 00000000  20 00 3b 11 00 00 59 80  00 00 00 00 00 00 00 06  | .;...Y.........|
+I 2.101492 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 2.109037 TX m1: --- trace end ---
+I 2.621621 TX m1: --- trace: 23 records, 0 refused ---
+I 2.621704 TX m1:      0.635276 USB_IN 32 B
+I 2.621770 TX m1: in: msg 02 (class 0, number 2), flags 20 sys, seq 12, payload 28, header 4
+I 2.627445 TX m1: in, 32 bytes:
+I 2.630313 TX m1: 00000000  02 20 0c 1c 63 fa 28 46  1f 83 00 00 6d 04 61 c2  |. ..c.(F....m.a.|
+I 2.638817 TX m1: 00000010  01 00 00 00 50 00 04 00  01 00 01 00 01 00 01 00  |....P...........|
+I 2.647334 TX m1:      0.635327 USB_OUT 4 B
+I 2.651246 TX m1: out: msg 04 (class 0, number 4), flags 20 sys, seq 1, payload 0, header 4
+I 2.659297 TX m1: out, 4 bytes:
+I 2.662164 TX m1: 00000000  04 20 01 00                                       |. ..|
+I 2.669642 TX m1:      0.644424 USB_IN 64 B
+I 2.673556 TX m1: in: msg 04 (class 0, number 4), flags f0 frag init sys acme, seq 1, payload 58, header 6
+I 2.682907 TX m1: in, 64 bytes:
+I 2.685775 TX m1: 00000000  04 f0 01 3a 85 03 10 00  01 00 00 00 00 00 00 00  |...:............|
+I 2.694281 TX m1: 00000010  00 00 00 00 85 01 bc 00  16 00 1b 00 1c 00 24 00  |..............$.|
+I 2.702787 TX m1: 00000020  2b 00 8b 00 00 00 00 00  00 00 00 00 01 01 00 00  |+...............|
+I 2.711293 TX m1: 00000030  00 00 07 01 02 03 04 06  07 1f 06 01 04 05 06 0a  |................|
+I 2.719811 TX m1:      0.644469 USB_OUT 13 B
+I 2.723808 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 2.731860 TX m1: out, 13 bytes:
+I 2.734814 TX m1: 00000000  01 20 01 09 00 04 20 3a  00 00 00 4b 01           |. .... :...K.|
+I 2.743073 TX m1:      0.647685 USB_IN 64 B
+I 2.746986 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 2.755903 TX m1: in, 64 bytes:
+I 2.758771 TX m1: 00000000  04 b0 01 ba 00 3a 1f 03  1a 00 4d 69 63 72 6f 73  |.....:....Micros|
+I 2.767277 TX m1: 00000010  6f 66 74 2e 58 62 6f 78  2e 49 6e 70 75 74 2e 57  |oft.Xbox.Input.W|
+I 2.775783 TX m1: 00000020  68 65 65 6c 18 00 57 69  6e 64 6f 77 73 2e 58 62  |heel..Windows.Xb|
+I 2.784289 TX m1: 00000030  6f 78 2e 49 6e 70 75 74  2e 57 68 65 65 6c 27 00  |ox.Input.Wheel'.|
+I 2.792807 TX m1:      0.647718 USB_OUT 13 B
+I 2.796804 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 2.804857 TX m1: out, 13 bytes:
+I 2.807811 TX m1: 00000000  01 20 01 09 00 04 20 74  00 00 00 11 01           |. .... t.....|
+I 2.816069 TX m1:      0.651681 USB_IN 64 B
+I 2.819982 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 2.828899 TX m1: in, 64 bytes:
+I 2.831767 TX m1: 00000000  04 b0 01 ba 00 74 57 69  6e 64 6f 77 73 2e 58 62  |.....tWindows.Xb|
+I 2.840273 TX m1: 00000010  6f 78 2e 49 6e 70 75 74  2e 4e 61 76 69 67 61 74  |ox.Input.Navigat|
+I 2.848779 TX m1: 00000020  69 6f 6e 43 6f 6e 74 72  6f 6c 6c 65 72 03 cf 79  |ionController..y|
+I 2.857285 TX m1: 00000030  69 64 71 6b 96 4e 8d f9  59 e3 98 d7 42 0c e7 1f  |idqk.N..Y...B...|
+I 2.865803 TX m1:      0.651705 USB_OUT 13 B
+I 2.869801 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 2.877853 TX m1: out, 13 bytes:
+I 2.880807 TX m1: 00000000  01 20 01 09 00 04 20 ae  00 00 00 d7 00           |. .... ......|
+I 2.889065 TX m1:      0.655682 USB_IN 64 B
+I 2.892978 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 2.901896 TX m1: in, 64 bytes:
+I 2.904763 TX m1: 00000000  04 b0 01 3a ae 01 f3 b8  86 73 e9 40 a9 f8 2f 21  |...:.....s.@../!|
+I 2.913269 TX m1: 00000010  26 3a cf b7 56 ff 76 97  fd 9b 81 45 ad 45 b6 45  |&:..V.v....E.E.E|
+I 2.921775 TX m1: 00000020  bb a5 26 d6 08 17 00 20  11 00 01 00 10 00 00 00  |..&.... ........|
+I 2.930281 TX m1: 00000030  00 00 00 00 00 00 00 00  00 00 00 00 17 00 21 0b  |..............!.|
+I 2.938799 TX m1:      0.655709 USB_OUT 13 B
+I 2.942797 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 2.950849 TX m1: out, 13 bytes:
+I 2.953803 TX m1: 00000000  01 20 01 09 00 04 20 e8  00 00 00 9d 00           |. .... ......|
+I 2.962061 TX m1:      0.659681 USB_IN 64 B
+I 2.965974 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 2.974892 TX m1: in, 64 bytes:
+I 2.977759 TX m1: 00000000  04 b0 01 3a e8 01 00 01  00 10 00 00 00 00 00 00  |...:............|
+I 2.986265 TX m1: 00000010  00 00 00 00 00 00 00 00  00 17 00 25 31 00 01 00  |...........%1...|
+I 2.994771 TX m1: 00000020  10 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+I 3.003278 TX m1: 00000030  17 00 0a 03 00 01 00 08  00 00 00 00 00 00 00 00  |................|
+I 3.011796 TX m1:      0.659705 USB_OUT 13 B
+I 3.015793 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 3.023845 TX m1: out, 13 bytes:
+I 3.026799 TX m1: 00000000  01 20 01 09 00 04 20 22  01 00 00 63 00           |. .... "...c.|
+I 3.035057 TX m1:      0.663682 USB_IN 64 B
+I 3.038971 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 3.047888 TX m1: in, 64 bytes:
+I 3.050755 TX m1: 00000000  04 b0 01 3a a2 02 00 00  00 00 00 00 00 17 00 0b  |...:............|
+I 3.059261 TX m1: 00000010  3c 00 01 00 08 00 00 00  00 00 00 00 00 00 00 00  |<...............|
+I 3.067768 TX m1: 00000020  00 00 00 00 17 00 0c 09  00 01 00 08 00 00 00 00  |................|
+I 3.076274 TX m1: 00000030  00 00 00 00 00 00 00 00  00 00 00 17 00 0d 35 00  |..............5.|
+I 3.084792 TX m1:      0.663708 USB_OUT 13 B
+I 3.088789 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 3.096841 TX m1: out, 13 bytes:
+I 3.099795 TX m1: 00000000  01 20 01 09 00 04 20 5c  01 00 00 29 00           |. .... \...).|
+I 3.108053 TX m1:      0.667670 USB_IN 47 B
+I 3.111967 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 41, header 6
+I 3.120884 TX m1: in, 47 bytes:
+I 3.123752 TX m1: 00000000  04 b0 01 29 dc 02 01 00  08 00 00 00 00 00 00 00  |...)............|
+I 3.132258 TX m1: 00000010  00 00 00 00 00 00 00 00  17 00 0e 38 00 01 00 08  |...........8....|
+I 3.140764 TX m1: 00000020  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00     |...............|
+I 3.149195 TX m1:      0.667694 USB_OUT 13 B
+I 3.153192 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 3.161245 TX m1: out, 13 bytes:
+I 3.164199 TX m1: 00000000  01 20 01 09 00 04 20 85  01 00 00 00 00           |. .... ......|
+I 3.172455 TX m1:      0.880785 USB_IN 6 B
+I 3.176282 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 0, header 6
+I 3.185112 TX m1: in, 6 bytes:
+I 3.187893 TX m1: 00000000  04 b0 01 00 85 03                                 |......|
+I 3.195545 TX m1:      0.880821 USB_OUT 13 B
+I 3.199542 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 3.207596 TX m1: out, 13 bytes:
+I 3.210548 TX m1: 00000000  01 20 01 09 00 04 20 85  01 00 00 00 00           |. .... ......|
+I 3.218805 TX m1:      0.883208 USB_OUT 5 B
+I 3.222717 TX m1: out: msg 05 (class 0, number 5), flags 20 sys, seq 1, payload 1, header 4
+I 3.230768 TX m1: out, 5 bytes:
+I 3.233635 TX m1: 00000000  05 20 01 01 00                                    |. ...|
+I 3.241198 TX m1:      0.896601 USB_OUT 7 B
+I 3.245113 TX m1: out: msg 0a (class 0, number 10), flags 00, seq 2, payload 3, header 4
+I 3.252901 TX m1: out, 7 bytes:
+I 3.255769 TX m1: 00000000  0a 00 02 03 00 00 00                              |.......|
+I 3.263507 TX m1:      0.899652 USB_IN 15 B
+I 3.267418 TX m1: in: msg 21 (class 1, number 1), flags 00, seq 1, payload 11, header 4
+I 3.275122 TX m1: in, 15 bytes:
+I 3.277989 TX m1: 00000000  21 00 01 0b 10 08 08 08  00 0e 01 84 03 01 48     |!.............H|
+I 3.286421 TX m1:      0.903651 USB_IN 21 B
+I 3.290334 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 59, payload 17, header 4
+I 3.298123 TX m1: in, 21 bytes:
+I 3.300991 TX m1: 00000000  20 00 3b 11 00 00 59 80  00 00 00 00 00 00 00 06  | .;...Y.........|
+I 3.309496 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 3.317060 TX m1:      2.112282 USB_IN 21 B
+I 3.320973 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 60, payload 17, header 4
+I 3.328763 TX m1: in, 21 bytes:
+I 3.331630 TX m1: 00000000  20 00 3c 11 00 00 00 80  00 00 00 00 00 00 00 06  | .<.............|
+I 3.340135 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 3.347680 TX m1: --- trace end ---
+I 6.131862 TX m1: in: 117 messages, 0 errors
+I 7.165621 TX m1: --- trace: 255 records, 0 refused ---
+I 7.165706 TX m1:      0.635276 USB_IN 32 B
+I 7.165779 TX m1: in: msg 02 (class 0, number 2), flags 20 sys, seq 12, payload 28, header 4
+I 7.171522 TX m1: in, 32 bytes:
+I 7.174395 TX m1: 00000000  02 20 0c 1c 63 fa 28 46  1f 83 00 00 6d 04 61 c2  |. ..c.(F....m.a.|
+I 7.182896 TX m1: 00000010  01 00 00 00 50 00 04 00  01 00 01 00 01 00 01 00  |....P...........|
+I 7.191413 TX m1:      0.635327 USB_OUT 4 B
+I 7.195325 TX m1: out: msg 04 (class 0, number 4), flags 20 sys, seq 1, payload 0, header 4
+I 7.203375 TX m1: out, 4 bytes:
+I 7.206243 TX m1: 00000000  04 20 01 00                                       |. ..|
+I 7.213721 TX m1:      0.644424 USB_IN 64 B
+I 7.217635 TX m1: in: msg 04 (class 0, number 4), flags f0 frag init sys acme, seq 1, payload 58, header 6
+I 7.226985 TX m1: in, 64 bytes:
+I 7.229853 TX m1: 00000000  04 f0 01 3a 85 03 10 00  01 00 00 00 00 00 00 00  |...:............|
+I 7.238359 TX m1: 00000010  00 00 00 00 85 01 bc 00  16 00 1b 00 1c 00 24 00  |..............$.|
+I 7.246865 TX m1: 00000020  2b 00 8b 00 00 00 00 00  00 00 00 00 01 01 00 00  |+...............|
+I 7.255371 TX m1: 00000030  00 00 07 01 02 03 04 06  07 1f 06 01 04 05 06 0a  |................|
+I 7.263889 TX m1:      0.644469 USB_OUT 13 B
+I 7.267887 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 7.275939 TX m1: out, 13 bytes:
+I 7.278893 TX m1: 00000000  01 20 01 09 00 04 20 3a  00 00 00 4b 01           |. .... :...K.|
+I 7.287151 TX m1:      0.647685 USB_IN 64 B
+I 7.291064 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 7.299982 TX m1: in, 64 bytes:
+I 7.302849 TX m1: 00000000  04 b0 01 ba 00 3a 1f 03  1a 00 4d 69 63 72 6f 73  |.....:....Micros|
+I 7.311355 TX m1: 00000010  6f 66 74 2e 58 62 6f 78  2e 49 6e 70 75 74 2e 57  |oft.Xbox.Input.W|
+I 7.319861 TX m1: 00000020  68 65 65 6c 18 00 57 69  6e 64 6f 77 73 2e 58 62  |heel..Windows.Xb|
+I 7.328367 TX m1: 00000030  6f 78 2e 49 6e 70 75 74  2e 57 68 65 65 6c 27 00  |ox.Input.Wheel'.|
+I 7.336886 TX m1:      0.647718 USB_OUT 13 B
+I 7.340883 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 7.348935 TX m1: out, 13 bytes:
+I 7.351889 TX m1: 00000000  01 20 01 09 00 04 20 74  00 00 00 11 01           |. .... t.....|
+I 7.360147 TX m1:      0.651681 USB_IN 64 B
+I 7.364060 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 7.372978 TX m1: in, 64 bytes:
+I 7.375845 TX m1: 00000000  04 b0 01 ba 00 74 57 69  6e 64 6f 77 73 2e 58 62  |.....tWindows.Xb|
+I 7.384351 TX m1: 00000010  6f 78 2e 49 6e 70 75 74  2e 4e 61 76 69 67 61 74  |ox.Input.Navigat|
+I 7.392857 TX m1: 00000020  69 6f 6e 43 6f 6e 74 72  6f 6c 6c 65 72 03 cf 79  |ionController..y|
+I 7.401364 TX m1: 00000030  69 64 71 6b 96 4e 8d f9  59 e3 98 d7 42 0c e7 1f  |idqk.N..Y...B...|
+I 7.409882 TX m1:      0.651705 USB_OUT 13 B
+I 7.413879 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 7.421931 TX m1: out, 13 bytes:
+I 7.424885 TX m1: 00000000  01 20 01 09 00 04 20 ae  00 00 00 d7 00           |. .... ......|
+I 7.433143 TX m1:      0.655682 USB_IN 64 B
+I 7.437057 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 7.445974 TX m1: in, 64 bytes:
+I 7.448841 TX m1: 00000000  04 b0 01 3a ae 01 f3 b8  86 73 e9 40 a9 f8 2f 21  |...:.....s.@../!|
+I 7.457348 TX m1: 00000010  26 3a cf b7 56 ff 76 97  fd 9b 81 45 ad 45 b6 45  |&:..V.v....E.E.E|
+I 7.465854 TX m1: 00000020  bb a5 26 d6 08 17 00 20  11 00 01 00 10 00 00 00  |..&.... ........|
+I 7.474360 TX m1: 00000030  00 00 00 00 00 00 00 00  00 00 00 00 17 00 21 0b  |..............!.|
+I 7.482878 TX m1:      0.655709 USB_OUT 13 B
+I 7.486875 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 7.494927 TX m1: out, 13 bytes:
+I 7.497881 TX m1: 00000000  01 20 01 09 00 04 20 e8  00 00 00 9d 00           |. .... ......|
+I 7.506139 TX m1:      0.659681 USB_IN 64 B
+I 7.510053 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 7.518970 TX m1: in, 64 bytes:
+I 7.521838 TX m1: 00000000  04 b0 01 3a e8 01 00 01  00 10 00 00 00 00 00 00  |...:............|
+I 7.530344 TX m1: 00000010  00 00 00 00 00 00 00 00  00 17 00 25 31 00 01 00  |...........%1...|
+I 7.538850 TX m1: 00000020  10 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+I 7.547356 TX m1: 00000030  17 00 0a 03 00 01 00 08  00 00 00 00 00 00 00 00  |................|
+I 7.555874 TX m1:      0.659705 USB_OUT 13 B
+I 7.559871 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 7.567924 TX m1: out, 13 bytes:
+I 7.570878 TX m1: 00000000  01 20 01 09 00 04 20 22  01 00 00 63 00           |. .... "...c.|
+I 7.579136 TX m1:      0.663682 USB_IN 64 B
+I 7.583049 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 58, header 6
+I 7.591966 TX m1: in, 64 bytes:
+I 7.594834 TX m1: 00000000  04 b0 01 3a a2 02 00 00  00 00 00 00 00 17 00 0b  |...:............|
+I 7.603340 TX m1: 00000010  3c 00 01 00 08 00 00 00  00 00 00 00 00 00 00 00  |<...............|
+I 7.611846 TX m1: 00000020  00 00 00 00 17 00 0c 09  00 01 00 08 00 00 00 00  |................|
+I 7.620352 TX m1: 00000030  00 00 00 00 00 00 00 00  00 00 00 17 00 0d 35 00  |..............5.|
+I 7.628870 TX m1:      0.663708 USB_OUT 13 B
+I 7.632867 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 7.640920 TX m1: out, 13 bytes:
+I 7.643874 TX m1: 00000000  01 20 01 09 00 04 20 5c  01 00 00 29 00           |. .... \...).|
+I 7.652132 TX m1:      0.667670 USB_IN 47 B
+I 7.656045 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 41, header 6
+I 7.664962 TX m1: in, 47 bytes:
+I 7.667830 TX m1: 00000000  04 b0 01 29 dc 02 01 00  08 00 00 00 00 00 00 00  |...)............|
+I 7.676336 TX m1: 00000010  00 00 00 00 00 00 00 00  17 00 0e 38 00 01 00 08  |...........8....|
+I 7.684842 TX m1: 00000020  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00     |...............|
+I 7.693274 TX m1:      0.667694 USB_OUT 13 B
+I 7.697271 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 7.705323 TX m1: out, 13 bytes:
+I 7.708277 TX m1: 00000000  01 20 01 09 00 04 20 85  01 00 00 00 00           |. .... ......|
+I 7.716534 TX m1:      0.880785 USB_IN 6 B
+I 7.720360 TX m1: in: msg 04 (class 0, number 4), flags b0 frag sys acme, seq 1, payload 0, header 6
+I 7.729191 TX m1: in, 6 bytes:
+I 7.731972 TX m1: 00000000  04 b0 01 00 85 03                                 |......|
+I 7.739623 TX m1:      0.880821 USB_OUT 13 B
+I 7.743620 TX m1: out: msg 01 (class 0, number 1), flags 20 sys, seq 1, payload 9, header 4
+I 7.751673 TX m1: out, 13 bytes:
+I 7.754627 TX m1: 00000000  01 20 01 09 00 04 20 85  01 00 00 00 00           |. .... ......|
+I 7.762883 TX m1:      0.883208 USB_OUT 5 B
+I 7.766795 TX m1: out: msg 05 (class 0, number 5), flags 20 sys, seq 1, payload 1, header 4
+I 7.774846 TX m1: out, 5 bytes:
+I 7.777714 TX m1: 00000000  05 20 01 01 00                                    |. ...|
+I 7.785277 TX m1:      0.896601 USB_OUT 7 B
+I 7.789190 TX m1: out: msg 0a (class 0, number 10), flags 00, seq 2, payload 3, header 4
+I 7.796979 TX m1: out, 7 bytes:
+I 7.799847 TX m1: 00000000  0a 00 02 03 00 00 00                              |.......|
+I 7.807591 TX m1:      0.899652 USB_IN 15 B
+I 7.811496 TX m1: in: msg 21 (class 1, number 1), flags 00, seq 1, payload 11, header 4
+I 7.819201 TX m1: in, 15 bytes:
+I 7.822068 TX m1: 00000000  21 00 01 0b 10 08 08 08  00 0e 01 84 03 01 48     |!.............H|
+I 7.830499 TX m1:      0.903651 USB_IN 21 B
+I 7.834412 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 59, payload 17, header 4
+I 7.842202 TX m1: in, 21 bytes:
+I 7.845069 TX m1: 00000000  20 00 3b 11 00 00 59 80  00 00 00 00 00 00 00 06  | .;...Y.........|
+I 7.853574 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 7.861139 TX m1:      2.112282 USB_IN 21 B
+I 7.865051 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 60, payload 17, header 4
+I 7.872841 TX m1: in, 21 bytes:
+I 7.875709 TX m1: 00000000  20 00 3c 11 00 00 00 80  00 00 00 00 00 00 00 06  | .<.............|
+I 7.884213 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 7.891778 TX m1:      5.683777 USB_IN 21 B
+I 7.895691 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 61, payload 17, header 4
+I 7.903480 TX m1: in, 21 bytes:
+I 7.906348 TX m1: 00000000  20 00 3d 11 00 00 ff ff  00 00 00 00 00 00 00 06  | .=.............|
+I 7.914852 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 7.922417 TX m1:      5.719750 USB_IN 21 B
+I 7.926330 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 62, payload 17, header 4
+I 7.934120 TX m1: in, 21 bytes:
+I 7.936987 TX m1: 00000000  20 00 3e 11 00 00 d6 ff  00 00 00 00 00 00 00 06  | .>.............|
+I 7.945492 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 7.953057 TX m1:      5.723750 USB_IN 21 B
+I 7.956969 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 63, payload 17, header 4
+I 7.964759 TX m1: in, 21 bytes:
+I 7.967626 TX m1: 00000000  20 00 3f 11 00 00 87 ff  00 00 00 00 00 00 00 06  | .?.............|
+I 7.976131 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 7.983696 TX m1:      5.727750 USB_IN 21 B
+I 7.987614 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 64, payload 17, header 4
+I 7.995398 TX m1: in, 21 bytes:
+I 7.998266 TX m1: 00000000  20 00 40 11 00 00 31 ff  00 00 00 00 00 00 00 06  | .@...1.........|
+I 8.006770 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.014335 TX m1:      5.731750 USB_IN 21 B
+I 8.018248 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 65, payload 17, header 4
+I 8.026037 TX m1: in, 21 bytes:
+I 8.028905 TX m1: 00000000  20 00 41 11 00 00 87 fe  00 00 00 00 00 00 00 06  | .A.............|
+I 8.037410 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.044974 TX m1:      5.735751 USB_IN 21 B
+I 8.048887 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 66, payload 17, header 4
+I 8.056677 TX m1: in, 21 bytes:
+I 8.059544 TX m1: 00000000  20 00 42 11 00 00 de fd  00 00 00 00 00 00 00 06  | .B.............|
+I 8.068049 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.075614 TX m1:      5.739751 USB_IN 21 B
+I 8.079526 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 67, payload 17, header 4
+I 8.087316 TX m1: in, 21 bytes:
+I 8.090184 TX m1: 00000000  20 00 43 11 00 00 34 fd  00 00 00 00 00 00 00 06  | .C...4.........|
+I 8.098688 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.106253 TX m1:      5.743751 USB_IN 21 B
+I 8.110166 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 68, payload 17, header 4
+I 8.117955 TX m1: in, 21 bytes:
+I 8.120823 TX m1: 00000000  20 00 44 11 00 00 8d fc  00 00 00 00 00 00 00 06  | .D.............|
+I 8.129328 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.136892 TX m1:      5.747751 USB_IN 21 B
+I 8.140805 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 69, payload 17, header 4
+I 8.148596 TX m1: in, 21 bytes:
+I 8.151462 TX m1: 00000000  20 00 45 11 00 00 da fb  00 00 00 00 00 00 00 06  | .E.............|
+I 8.159967 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.167532 TX m1:      5.751751 USB_IN 21 B
+I 8.171444 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 70, payload 17, header 4
+I 8.179234 TX m1: in, 21 bytes:
+I 8.182101 TX m1: 00000000  20 00 46 11 00 00 28 fb  00 00 00 00 00 00 00 06  | .F...(.........|
+I 8.190606 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.198171 TX m1:      5.755751 USB_IN 21 B
+I 8.202084 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 71, payload 17, header 4
+I 8.209873 TX m1: in, 21 bytes:
+I 8.212741 TX m1: 00000000  20 00 47 11 00 00 7b fa  00 00 00 00 00 00 00 06  | .G...{.........|
+I 8.221246 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.228810 TX m1:      5.759751 USB_IN 21 B
+I 8.232723 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 72, payload 17, header 4
+I 8.240513 TX m1: in, 21 bytes:
+I 8.243380 TX m1: 00000000  20 00 48 11 00 00 cb f9  00 00 00 00 00 00 00 06  | .H.............|
+I 8.251885 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.259450 TX m1:      5.763751 USB_IN 21 B
+I 8.263362 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 73, payload 17, header 4
+I 8.271152 TX m1: in, 21 bytes:
+I 8.274019 TX m1: 00000000  20 00 49 11 00 00 1a f9  00 00 00 00 00 00 00 06  | .I.............|
+I 8.282524 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.290089 TX m1:      5.767751 USB_IN 21 B
+I 8.294002 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 74, payload 17, header 4
+I 8.301791 TX m1: in, 21 bytes:
+I 8.304659 TX m1: 00000000  20 00 4a 11 00 00 66 f8  00 00 00 00 00 00 00 06  | .J...f.........|
+I 8.313163 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.320728 TX m1:      5.771751 USB_IN 21 B
+I 8.324641 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 75, payload 17, header 4
+I 8.332430 TX m1: in, 21 bytes:
+I 8.335298 TX m1: 00000000  20 00 4b 11 00 00 b9 f7  00 00 00 00 00 00 00 06  | .K.............|
+I 8.343803 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.351367 TX m1:      5.775751 USB_IN 21 B
+I 8.355280 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 76, payload 17, header 4
+I 8.363070 TX m1: in, 21 bytes:
+I 8.365937 TX m1: 00000000  20 00 4c 11 00 00 0f f7  00 00 00 00 00 00 00 06  | .L.............|
+I 8.374442 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.382007 TX m1:      5.779751 USB_IN 21 B
+I 8.385919 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 77, payload 17, header 4
+I 8.393709 TX m1: in, 21 bytes:
+I 8.396583 TX m1: 00000000  20 00 4d 11 00 00 61 f6  00 00 00 00 00 00 00 06  | .M...a.........|
+I 8.405081 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.412646 TX m1:      5.783751 USB_IN 21 B
+I 8.416559 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 78, payload 17, header 4
+I 8.424348 TX m1: in, 21 bytes:
+I 8.427216 TX m1: 00000000  20 00 4e 11 00 00 af f5  00 00 00 00 00 00 00 06  | .N.............|
+I 8.435721 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.443285 TX m1:      5.787752 USB_IN 21 B
+I 8.447198 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 79, payload 17, header 4
+I 8.454988 TX m1: in, 21 bytes:
+I 8.457855 TX m1: 00000000  20 00 4f 11 00 00 fc f4  00 00 00 00 00 00 00 06  | .O.............|
+I 8.466360 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.473925 TX m1:      5.791752 USB_IN 21 B
+I 8.477837 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 80, payload 17, header 4
+I 8.485627 TX m1: in, 21 bytes:
+I 8.488494 TX m1: 00000000  20 00 50 11 00 00 4e f4  00 00 00 00 00 00 00 06  | .P...N.........|
+I 8.496999 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.504564 TX m1:      5.795752 USB_IN 21 B
+I 8.508477 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 81, payload 17, header 4
+I 8.516266 TX m1: in, 21 bytes:
+I 8.519134 TX m1: 00000000  20 00 51 11 00 00 9f f3  00 00 00 00 00 00 00 06  | .Q.............|
+I 8.527638 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.535203 TX m1:      5.799752 USB_IN 21 B
+I 8.539118 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 82, payload 17, header 4
+I 8.546906 TX m1: in, 21 bytes:
+I 8.549773 TX m1: 00000000  20 00 52 11 00 00 ed f2  00 00 00 00 00 00 00 06  | .R.............|
+I 8.558278 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.565842 TX m1:      5.803752 USB_IN 21 B
+I 8.569755 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 83, payload 17, header 4
+I 8.577545 TX m1: in, 21 bytes:
+I 8.580412 TX m1: 00000000  20 00 53 11 00 00 39 f2  00 00 00 00 00 00 00 06  | .S...9.........|
+I 8.588917 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.596482 TX m1:      5.807752 USB_IN 21 B
+I 8.600395 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 84, payload 17, header 4
+I 8.608184 TX m1: in, 21 bytes:
+I 8.611052 TX m1: 00000000  20 00 54 11 00 00 87 f1  00 00 00 00 00 00 00 06  | .T.............|
+I 8.619556 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.627121 TX m1:      5.811752 USB_IN 21 B
+I 8.631034 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 85, payload 17, header 4
+I 8.638823 TX m1: in, 21 bytes:
+I 8.641691 TX m1: 00000000  20 00 55 11 00 00 df f0  00 00 00 00 00 00 00 06  | .U.............|
+I 8.650196 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.657760 TX m1:      5.815752 USB_IN 21 B
+I 8.661673 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 86, payload 17, header 4
+I 8.669463 TX m1: in, 21 bytes:
+I 8.672330 TX m1: 00000000  20 00 56 11 00 00 33 f0  00 00 00 00 00 00 00 06  | .V...3.........|
+I 8.680835 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.688400 TX m1:      5.819752 USB_IN 21 B
+I 8.692312 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 87, payload 17, header 4
+I 8.700102 TX m1: in, 21 bytes:
+I 8.702970 TX m1: 00000000  20 00 57 11 00 00 80 ef  00 00 00 00 00 00 00 06  | .W.............|
+I 8.711474 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.719039 TX m1:      5.823752 USB_IN 21 B
+I 8.722952 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 88, payload 17, header 4
+I 8.730741 TX m1: in, 21 bytes:
+I 8.733609 TX m1: 00000000  20 00 58 11 00 00 ca ee  00 00 00 00 00 00 00 06  | .X.............|
+I 8.742114 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.749678 TX m1:      5.827752 USB_IN 21 B
+I 8.753597 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 89, payload 17, header 4
+I 8.761381 TX m1: in, 21 bytes:
+I 8.764248 TX m1: 00000000  20 00 59 11 00 00 1f ee  00 00 00 00 00 00 00 06  | .Y.............|
+I 8.772753 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.780318 TX m1:      5.831752 USB_IN 21 B
+I 8.784230 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 90, payload 17, header 4
+I 8.792020 TX m1: in, 21 bytes:
+I 8.794887 TX m1: 00000000  20 00 5a 11 00 00 71 ed  00 00 00 00 00 00 00 06  | .Z...q.........|
+I 8.803392 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.810957 TX m1:      5.835752 USB_IN 21 B
+I 8.814870 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 91, payload 17, header 4
+I 8.822659 TX m1: in, 21 bytes:
+I 8.825527 TX m1: 00000000  20 00 5b 11 00 00 c0 ec  00 00 00 00 00 00 00 06  | .[.............|
+I 8.834031 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.841602 TX m1:      5.839753 USB_IN 21 B
+I 8.845509 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 92, payload 17, header 4
+I 8.853298 TX m1: in, 21 bytes:
+I 8.856166 TX m1: 00000000  20 00 5c 11 00 00 0e ec  00 00 00 00 00 00 00 06  | .\.............|
+I 8.864671 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.872235 TX m1:      5.843753 USB_IN 21 B
+I 8.876148 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 93, payload 17, header 4
+I 8.883938 TX m1: in, 21 bytes:
+I 8.886805 TX m1: 00000000  20 00 5d 11 00 00 5b eb  00 00 00 00 00 00 00 06  | .]...[.........|
+I 8.895310 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.902875 TX m1:      5.847753 USB_IN 21 B
+I 8.906787 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 94, payload 17, header 4
+I 8.914583 TX m1: in, 21 bytes:
+I 8.917445 TX m1: 00000000  20 00 5e 11 00 00 b0 ea  00 00 00 00 00 00 00 06  | .^.............|
+I 8.925949 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.933514 TX m1:      5.851753 USB_IN 21 B
+I 8.937427 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 95, payload 17, header 4
+I 8.945216 TX m1: in, 21 bytes:
+I 8.948084 TX m1: 00000000  20 00 5f 11 00 00 06 ea  00 00 00 00 00 00 00 06  | ._.............|
+I 8.956594 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.964153 TX m1:      5.855753 USB_IN 21 B
+I 8.968066 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 96, payload 17, header 4
+I 8.975856 TX m1: in, 21 bytes:
+I 8.978723 TX m1: 00000000  20 00 60 11 00 00 55 e9  00 00 00 00 00 00 00 06  | .`...U.........|
+I 8.987228 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 8.994793 TX m1:      5.859753 USB_IN 21 B
+I 8.998705 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 97, payload 17, header 4
+I 9.006495 TX m1: in, 21 bytes:
+I 9.009363 TX m1: 00000000  20 00 61 11 00 00 a1 e8  00 00 00 00 00 00 00 06  | .a.............|
+I 9.017867 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.025432 TX m1:      5.863753 USB_IN 21 B
+I 9.029345 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 98, payload 17, header 4
+I 9.037134 TX m1: in, 21 bytes:
+I 9.040002 TX m1: 00000000  20 00 62 11 00 00 ef e7  00 00 00 00 00 00 00 06  | .b.............|
+I 9.048507 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.056071 TX m1:      5.867753 USB_IN 21 B
+I 9.059984 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 99, payload 17, header 4
+I 9.067774 TX m1: in, 21 bytes:
+I 9.070641 TX m1: 00000000  20 00 63 11 00 00 42 e7  00 00 00 00 00 00 00 06  | .c...B.........|
+I 9.079146 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.086711 TX m1:      5.871753 USB_IN 21 B
+I 9.090624 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 100, payload 17, header 4
+I 9.098500 TX m1: in, 21 bytes:
+I 9.101367 TX m1: 00000000  20 00 64 11 00 00 92 e6  00 00 00 00 00 00 00 06  | .d.............|
+I 9.109872 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.117437 TX m1:      5.875753 USB_IN 21 B
+I 9.121350 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 101, payload 17, header 4
+I 9.129226 TX m1: in, 21 bytes:
+I 9.132095 TX m1: 00000000  20 00 65 11 00 00 df e5  00 00 00 00 00 00 00 06  | .e.............|
+I 9.140598 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.148163 TX m1:      5.879753 USB_IN 21 B
+I 9.152076 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 102, payload 17, header 4
+I 9.159952 TX m1: in, 21 bytes:
+I 9.162819 TX m1: 00000000  20 00 66 11 00 00 2d e5  00 00 00 00 00 00 00 06  | .f...-.........|
+I 9.171324 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.178889 TX m1:      5.883753 USB_IN 21 B
+I 9.182802 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 103, payload 17, header 4
+I 9.190678 TX m1: in, 21 bytes:
+I 9.193545 TX m1: 00000000  20 00 67 11 00 00 80 e4  00 00 00 00 00 00 00 06  | .g.............|
+I 9.202050 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.209615 TX m1:      5.887753 USB_IN 21 B
+I 9.213528 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 104, payload 17, header 4
+I 9.221404 TX m1: in, 21 bytes:
+I 9.224272 TX m1: 00000000  20 00 68 11 00 00 d5 e3  00 00 00 00 00 00 00 06  | .h.............|
+I 9.232776 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.240341 TX m1:      5.891754 USB_IN 21 B
+I 9.244254 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 105, payload 17, header 4
+I 9.252130 TX m1: in, 21 bytes:
+I 9.254998 TX m1: 00000000  20 00 69 11 00 00 27 e3  00 00 00 00 00 00 00 06  | .i...'.........|
+I 9.263502 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.271067 TX m1:      5.895754 USB_IN 21 B
+I 9.274981 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 106, payload 17, header 4
+I 9.282856 TX m1: in, 21 bytes:
+I 9.285724 TX m1: 00000000  20 00 6a 11 00 00 73 e2  00 00 00 00 00 00 00 06  | .j...s.........|
+I 9.294229 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.301793 TX m1:      5.899754 USB_IN 21 B
+I 9.305707 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 107, payload 17, header 4
+I 9.313588 TX m1: in, 21 bytes:
+I 9.316450 TX m1: 00000000  20 00 6b 11 00 00 c1 e1  00 00 00 00 00 00 00 06  | .k.............|
+I 9.324955 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.332519 TX m1:      5.903754 USB_IN 21 B
+I 9.336433 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 108, payload 17, header 4
+I 9.344308 TX m1: in, 21 bytes:
+I 9.347176 TX m1: 00000000  20 00 6c 11 00 00 10 e1  00 00 00 00 00 00 00 06  | .l.............|
+I 9.355681 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.363245 TX m1:      5.907754 USB_IN 21 B
+I 9.367159 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 109, payload 17, header 4
+I 9.375034 TX m1: in, 21 bytes:
+I 9.377902 TX m1: 00000000  20 00 6d 11 00 00 5f e0  00 00 00 00 00 00 00 06  | .m..._.........|
+I 9.386407 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.393971 TX m1:      5.911754 USB_IN 21 B
+I 9.397885 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 110, payload 17, header 4
+I 9.405761 TX m1: in, 21 bytes:
+I 9.408628 TX m1: 00000000  20 00 6e 11 00 00 b2 df  00 00 00 00 00 00 00 06  | .n.............|
+I 9.417133 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.424698 TX m1:      5.915754 USB_IN 21 B
+I 9.428617 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 111, payload 17, header 4
+I 9.436487 TX m1: in, 21 bytes:
+I 9.439354 TX m1: 00000000  20 00 6f 11 00 00 fd de  00 00 00 00 00 00 00 06  | .o.............|
+I 9.447859 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.455424 TX m1:      5.919754 USB_IN 21 B
+I 9.459337 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 112, payload 17, header 4
+I 9.467213 TX m1: in, 21 bytes:
+I 9.470080 TX m1: 00000000  20 00 70 11 00 00 4f de  00 00 00 00 00 00 00 06  | .p...O.........|
+I 9.478591 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.486150 TX m1:      5.923754 USB_IN 21 B
+I 9.490063 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 113, payload 17, header 4
+I 9.497939 TX m1: in, 21 bytes:
+I 9.500806 TX m1: 00000000  20 00 71 11 00 00 a5 dd  00 00 00 00 00 00 00 06  | .q.............|
+I 9.509311 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.516876 TX m1:      5.927754 USB_IN 21 B
+I 9.520789 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 114, payload 17, header 4
+I 9.528665 TX m1: in, 21 bytes:
+I 9.531532 TX m1: 00000000  20 00 72 11 00 00 f9 dc  00 00 00 00 00 00 00 06  | .r.............|
+I 9.540037 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.547608 TX m1:      5.931754 USB_IN 21 B
+I 9.551515 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 115, payload 17, header 4
+I 9.559391 TX m1: in, 21 bytes:
+I 9.562259 TX m1: 00000000  20 00 73 11 00 00 46 dc  00 00 00 00 00 00 00 06  | .s...F.........|
+I 9.570763 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.578328 TX m1:      5.935755 USB_IN 21 B
+I 9.582241 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 116, payload 17, header 4
+I 9.590117 TX m1: in, 21 bytes:
+I 9.592985 TX m1: 00000000  20 00 74 11 00 00 91 db  00 00 00 00 00 00 00 06  | .t.............|
+I 9.601489 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.609054 TX m1:      5.939755 USB_IN 21 B
+I 9.612968 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 117, payload 17, header 4
+I 9.620843 TX m1: in, 21 bytes:
+I 9.623711 TX m1: 00000000  20 00 75 11 00 00 e3 da  00 00 00 00 00 00 00 06  | .u.............|
+I 9.632216 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.639780 TX m1:      5.943755 USB_IN 21 B
+I 9.643694 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 118, payload 17, header 4
+I 9.651569 TX m1: in, 21 bytes:
+I 9.654437 TX m1: 00000000  20 00 76 11 00 00 35 da  00 00 00 00 00 00 00 06  | .v...5.........|
+I 9.662942 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.670506 TX m1:      5.947755 USB_IN 21 B
+I 9.674420 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 119, payload 17, header 4
+I 9.682295 TX m1: in, 21 bytes:
+I 9.685163 TX m1: 00000000  20 00 77 11 00 00 83 d9  00 00 00 00 00 00 00 06  | .w.............|
+I 9.693668 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.701232 TX m1:      5.951755 USB_IN 21 B
+I 9.705146 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 120, payload 17, header 4
+I 9.713022 TX m1: in, 21 bytes:
+I 9.715889 TX m1: 00000000  20 00 78 11 00 00 ce d8  00 00 00 00 00 00 00 06  | .x.............|
+I 9.724394 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.731958 TX m1:      5.955755 USB_IN 21 B
+I 9.735872 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 121, payload 17, header 4
+I 9.743748 TX m1: in, 21 bytes:
+I 9.746615 TX m1: 00000000  20 00 79 11 00 00 1e d8  00 00 00 00 00 00 00 06  | .y.............|
+I 9.755120 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.762685 TX m1:      5.959755 USB_IN 21 B
+I 9.766604 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 122, payload 17, header 4
+I 9.774474 TX m1: in, 21 bytes:
+I 9.777341 TX m1: 00000000  20 00 7a 11 00 00 73 d7  00 00 00 00 00 00 00 06  | .z...s.........|
+I 9.785846 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.793411 TX m1:      5.963755 USB_IN 21 B
+I 9.797324 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 123, payload 17, header 4
+I 9.805200 TX m1: in, 21 bytes:
+I 9.808067 TX m1: 00000000  20 00 7b 11 00 00 c8 d6  00 00 00 00 00 00 00 06  | .{.............|
+I 9.816572 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.824137 TX m1:      5.967755 USB_IN 21 B
+I 9.828050 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 124, payload 17, header 4
+I 9.835926 TX m1: in, 21 bytes:
+I 9.838793 TX m1: 00000000  20 00 7c 11 00 00 16 d6  00 00 00 00 00 00 00 06  | .|.............|
+I 9.847298 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.854863 TX m1:      5.971755 USB_IN 21 B
+I 9.858776 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 125, payload 17, header 4
+I 9.866652 TX m1: in, 21 bytes:
+I 9.869520 TX m1: 00000000  20 00 7d 11 00 00 62 d5  00 00 00 00 00 00 00 06  | .}...b.........|
+I 9.878024 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.885595 TX m1:      5.975755 USB_IN 21 B
+I 9.889502 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 126, payload 17, header 4
+I 9.897378 TX m1: in, 21 bytes:
+I 9.900246 TX m1: 00000000  20 00 7e 11 00 00 b2 d4  00 00 00 00 00 00 00 06  | .~.............|
+I 9.908750 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.916315 TX m1:      5.979755 USB_IN 21 B
+I 9.920228 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 127, payload 17, header 4
+I 9.928104 TX m1: in, 21 bytes:
+I 9.930972 TX m1: 00000000  20 00 7f 11 00 00 05 d4  00 00 00 00 00 00 00 06  | ...............|
+I 9.939476 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.947041 TX m1:      5.983756 USB_IN 21 B
+I 9.950955 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 128, payload 17, header 4
+I 9.958830 TX m1: in, 21 bytes:
+I 9.961698 TX m1: 00000000  20 00 80 11 00 00 54 d3  00 00 00 00 00 00 00 06  | .....T.........|
+I 9.970203 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 9.977767 TX m1:      5.987756 USB_IN 21 B
+I 9.981681 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 129, payload 17, header 4
+I 9.989556 TX m1: in, 21 bytes:
+I 9.992424 TX m1: 00000000  20 00 81 11 00 00 9e d2  00 00 00 00 00 00 00 06  | ...............|
+I 10.000929 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.008586 TX m1:      5.991756 USB_IN 21 B
+I 10.012587 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 130, payload 17, header 4
+I 10.020543 TX m1: in, 21 bytes:
+I 10.023497 TX m1: 00000000  20 00 82 11 00 00 ea d1  00 00 00 00 00 00 00 06  | ...............|
+I 10.032089 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.039740 TX m1:      5.995756 USB_IN 21 B
+I 10.043740 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 131, payload 17, header 4
+I 10.051703 TX m1: in, 21 bytes:
+I 10.054657 TX m1: 00000000  20 00 83 11 00 00 43 d1  00 00 00 00 00 00 00 06  | .....C.........|
+I 10.063249 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.070900 TX m1:      5.999756 USB_IN 21 B
+I 10.074901 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 132, payload 17, header 4
+I 10.082863 TX m1: in, 21 bytes:
+I 10.085817 TX m1: 00000000  20 00 84 11 00 00 98 d0  00 00 00 00 00 00 00 06  | ...............|
+I 10.094409 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.102059 TX m1:      6.003756 USB_IN 21 B
+I 10.106061 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 133, payload 17, header 4
+I 10.114023 TX m1: in, 21 bytes:
+I 10.116977 TX m1: 00000000  20 00 85 11 00 00 e8 cf  00 00 00 00 00 00 00 06  | ...............|
+I 10.125569 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.133219 TX m1:      6.007756 USB_IN 21 B
+I 10.137221 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 134, payload 17, header 4
+I 10.145183 TX m1: in, 21 bytes:
+I 10.148137 TX m1: 00000000  20 00 86 11 00 00 34 cf  00 00 00 00 00 00 00 06  | .....4.........|
+I 10.156729 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.164380 TX m1:      6.011756 USB_IN 21 B
+I 10.168381 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 135, payload 17, header 4
+I 10.176343 TX m1: in, 21 bytes:
+I 10.179298 TX m1: 00000000  20 00 87 11 00 00 82 ce  00 00 00 00 00 00 00 06  | ...............|
+I 10.187889 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.195540 TX m1:      6.015756 USB_IN 21 B
+I 10.199541 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 136, payload 17, header 4
+I 10.207503 TX m1: in, 21 bytes:
+I 10.210458 TX m1: 00000000  20 00 88 11 00 00 d4 cd  00 00 00 00 00 00 00 06  | ...............|
+I 10.219049 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.226700 TX m1:      6.019756 USB_IN 21 B
+I 10.230701 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 137, payload 17, header 4
+I 10.238663 TX m1: in, 21 bytes:
+I 10.241618 TX m1: 00000000  20 00 89 11 00 00 24 cd  00 00 00 00 00 00 00 06  | .....$.........|
+I 10.250209 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.257860 TX m1:      6.023756 USB_IN 21 B
+I 10.261861 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 138, payload 17, header 4
+I 10.269823 TX m1: in, 21 bytes:
+I 10.272778 TX m1: 00000000  20 00 8a 11 00 00 71 cc  00 00 00 00 00 00 00 06  | .....q.........|
+I 10.281369 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.289020 TX m1:      6.027756 USB_IN 21 B
+I 10.293021 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 139, payload 17, header 4
+I 10.300984 TX m1: in, 21 bytes:
+I 10.303938 TX m1: 00000000  20 00 8b 11 00 00 be cb  00 00 00 00 00 00 00 06  | ...............|
+I 10.312529 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.320180 TX m1:      6.031757 USB_IN 21 B
+I 10.324181 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 140, payload 17, header 4
+I 10.332144 TX m1: in, 21 bytes:
+I 10.335099 TX m1: 00000000  20 00 8c 11 00 00 11 cb  00 00 00 00 00 00 00 06  | ...............|
+I 10.343689 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.351340 TX m1:      6.035757 USB_IN 21 B
+I 10.355341 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 141, payload 17, header 4
+I 10.363304 TX m1: in, 21 bytes:
+I 10.366258 TX m1: 00000000  20 00 8d 11 00 00 69 ca  00 00 00 00 00 00 00 06  | .....i.........|
+I 10.374850 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.382500 TX m1:      6.039757 USB_IN 21 B
+I 10.386501 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 142, payload 17, header 4
+I 10.394464 TX m1: in, 21 bytes:
+I 10.397418 TX m1: 00000000  20 00 8e 11 00 00 bb c9  00 00 00 00 00 00 00 06  | ...............|
+I 10.406010 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.413661 TX m1:      6.043757 USB_IN 21 B
+I 10.417661 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 143, payload 17, header 4
+I 10.425624 TX m1: in, 21 bytes:
+I 10.428585 TX m1: 00000000  20 00 8f 11 00 00 08 c9  00 00 00 00 00 00 00 06  | ...............|
+I 10.437170 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.444821 TX m1:      6.047757 USB_IN 21 B
+I 10.448821 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 144, payload 17, header 4
+I 10.456784 TX m1: in, 21 bytes:
+I 10.459738 TX m1: 00000000  20 00 90 11 00 00 55 c8  00 00 00 00 00 00 00 06  | .....U.........|
+I 10.468330 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.475981 TX m1:      6.051757 USB_IN 21 B
+I 10.479982 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 145, payload 17, header 4
+I 10.487944 TX m1: in, 21 bytes:
+I 10.490898 TX m1: 00000000  20 00 91 11 00 00 a5 c7  00 00 00 00 00 00 00 06  | ...............|
+I 10.499490 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.507141 TX m1:      6.055757 USB_IN 21 B
+I 10.511142 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 146, payload 17, header 4
+I 10.519104 TX m1: in, 21 bytes:
+I 10.522058 TX m1: 00000000  20 00 92 11 00 00 f7 c6  00 00 00 00 00 00 00 06  | ...............|
+I 10.530650 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.538301 TX m1:      6.059757 USB_IN 21 B
+I 10.542302 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 147, payload 17, header 4
+I 10.550264 TX m1: in, 21 bytes:
+I 10.553219 TX m1: 00000000  20 00 93 11 00 00 44 c6  00 00 00 00 00 00 00 06  | .....D.........|
+I 10.561810 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.569461 TX m1:      6.063757 USB_IN 21 B
+I 10.573462 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 148, payload 17, header 4
+I 10.581424 TX m1: in, 21 bytes:
+I 10.584379 TX m1: 00000000  20 00 94 11 00 00 90 c5  00 00 00 00 00 00 00 06  | ...............|
+I 10.592970 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.600621 TX m1:      6.067757 USB_IN 21 B
+I 10.604622 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 149, payload 17, header 4
+I 10.612590 TX m1: in, 21 bytes:
+I 10.615539 TX m1: 00000000  20 00 95 11 00 00 e1 c4  00 00 00 00 00 00 00 06  | ...............|
+I 10.624130 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.631781 TX m1:      6.071757 USB_IN 21 B
+I 10.635782 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 150, payload 17, header 4
+I 10.643744 TX m1: in, 21 bytes:
+I 10.646699 TX m1: 00000000  20 00 96 11 00 00 36 c4  00 00 00 00 00 00 00 06  | .....6.........|
+I 10.655290 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.662941 TX m1:      6.075757 USB_IN 21 B
+I 10.666942 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 151, payload 17, header 4
+I 10.674904 TX m1: in, 21 bytes:
+I 10.677859 TX m1: 00000000  20 00 97 11 00 00 86 c3  00 00 00 00 00 00 00 06  | ...............|
+I 10.686450 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.694102 TX m1:      6.079758 USB_IN 21 B
+I 10.698102 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 152, payload 17, header 4
+I 10.706065 TX m1: in, 21 bytes:
+I 10.709019 TX m1: 00000000  20 00 98 11 00 00 d2 c2  00 00 00 00 00 00 00 06  | ...............|
+I 10.717611 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.725262 TX m1:      6.083758 USB_IN 21 B
+I 10.729262 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 153, payload 17, header 4
+I 10.737225 TX m1: in, 21 bytes:
+I 10.740179 TX m1: 00000000  20 00 99 11 00 00 24 c2  00 00 00 00 00 00 00 06  | .....$.........|
+I 10.748770 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.756422 TX m1:      6.087758 USB_IN 21 B
+I 10.760422 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 154, payload 17, header 4
+I 10.768385 TX m1: in, 21 bytes:
+I 10.771339 TX m1: 00000000  20 00 9a 11 00 00 75 c1  00 00 00 00 00 00 00 06  | .....u.........|
+I 10.779931 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.787588 TX m1:      6.091758 USB_IN 21 B
+I 10.791589 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 155, payload 17, header 4
+I 10.799545 TX m1: in, 21 bytes:
+I 10.802499 TX m1: 00000000  20 00 9b 11 00 00 c7 c0  00 00 00 00 00 00 00 06  | ...............|
+I 10.811091 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.818742 TX m1:      6.095758 USB_IN 21 B
+I 10.822742 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 156, payload 17, header 4
+I 10.830705 TX m1: in, 21 bytes:
+I 10.833659 TX m1: 00000000  20 00 9c 11 00 00 16 c0  00 00 00 00 00 00 00 06  | ...............|
+I 10.842251 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.849902 TX m1:      6.099758 USB_IN 21 B
+I 10.853903 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 157, payload 17, header 4
+I 10.861865 TX m1: in, 21 bytes:
+I 10.864819 TX m1: 00000000  20 00 9d 11 00 00 62 bf  00 00 00 00 00 00 00 06  | .....b.........|
+I 10.873411 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.881062 TX m1:      6.103758 USB_IN 21 B
+I 10.885063 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 158, payload 17, header 4
+I 10.893025 TX m1: in, 21 bytes:
+I 10.895979 TX m1: 00000000  20 00 9e 11 00 00 b1 be  00 00 00 00 00 00 00 06  | ...............|
+I 10.904571 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.912222 TX m1:      6.107758 USB_IN 21 B
+I 10.916223 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 159, payload 17, header 4
+I 10.924185 TX m1: in, 21 bytes:
+I 10.927139 TX m1: 00000000  20 00 9f 11 00 00 06 be  00 00 00 00 00 00 00 06  | ...............|
+I 10.935731 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.943382 TX m1:      6.111758 USB_IN 21 B
+I 10.947383 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 160, payload 17, header 4
+I 10.955345 TX m1: in, 21 bytes:
+I 10.958300 TX m1: 00000000  20 00 a0 11 00 00 5a bd  00 00 00 00 00 00 00 06  | .....Z.........|
+I 10.966891 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 10.974543 TX m1:      6.115758 USB_IN 21 B
+I 10.978543 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 161, payload 17, header 4
+I 10.986505 TX m1: in, 21 bytes:
+I 10.989460 TX m1: 00000000  20 00 a1 11 00 00 a6 bc  00 00 00 00 00 00 00 06  | ...............|
+I 10.998051 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.005703 TX m1:      6.119758 USB_IN 21 B
+I 11.009703 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 162, payload 17, header 4
+I 11.017665 TX m1: in, 21 bytes:
+I 11.020620 TX m1: 00000000  20 00 a2 11 00 00 f3 bb  00 00 00 00 00 00 00 06  | ...............|
+I 11.029211 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.036863 TX m1:      6.123758 USB_IN 21 B
+I 11.040863 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 163, payload 17, header 4
+I 11.048825 TX m1: in, 21 bytes:
+I 11.051780 TX m1: 00000000  20 00 a3 11 00 00 43 bb  00 00 00 00 00 00 00 06  | .....C.........|
+I 11.060371 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.068023 TX m1:      6.127759 USB_IN 21 B
+I 11.072023 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 164, payload 17, header 4
+I 11.079986 TX m1: in, 21 bytes:
+I 11.082940 TX m1: 00000000  20 00 a4 11 00 00 94 ba  00 00 00 00 00 00 00 06  | ...............|
+I 11.091531 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.099183 TX m1:      6.131759 USB_IN 21 B
+I 11.103183 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 165, payload 17, header 4
+I 11.111146 TX m1: in, 21 bytes:
+I 11.114100 TX m1: 00000000  20 00 a5 11 00 00 e5 b9  00 00 00 00 00 00 00 06  | ...............|
+I 11.122691 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.130343 TX m1:      6.135780 USB_IN 21 B
+I 11.134343 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 166, payload 17, header 4
+I 11.142306 TX m1: in, 21 bytes:
+I 11.145260 TX m1: 00000000  20 00 a6 11 00 00 33 b9  00 00 00 00 00 00 00 06  | .....3.........|
+I 11.153852 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.161503 TX m1:      6.139760 USB_IN 21 B
+I 11.165503 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 167, payload 17, header 4
+I 11.173466 TX m1: in, 21 bytes:
+I 11.176420 TX m1: 00000000  20 00 a7 11 00 00 81 b8  00 00 00 00 00 00 00 06  | ...............|
+I 11.185012 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.192663 TX m1:      6.143759 USB_IN 21 B
+I 11.196663 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 168, payload 17, header 4
+I 11.204626 TX m1: in, 21 bytes:
+I 11.207586 TX m1: 00000000  20 00 a8 11 00 00 d6 b7  00 00 00 00 00 00 00 06  | ...............|
+I 11.216172 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.223823 TX m1:      6.147759 USB_IN 21 B
+I 11.227823 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 169, payload 17, header 4
+I 11.235786 TX m1: in, 21 bytes:
+I 11.238740 TX m1: 00000000  20 00 a9 11 00 00 2b b7  00 00 00 00 00 00 00 06  | .....+.........|
+I 11.247332 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.254983 TX m1:      6.151759 USB_IN 21 B
+I 11.258984 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 170, payload 17, header 4
+I 11.266946 TX m1: in, 21 bytes:
+I 11.269900 TX m1: 00000000  20 00 aa 11 00 00 7b b6  00 00 00 00 00 00 00 06  | .....{.........|
+I 11.278492 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.286143 TX m1:      6.155759 USB_IN 21 B
+I 11.290144 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 171, payload 17, header 4
+I 11.298106 TX m1: in, 21 bytes:
+I 11.301060 TX m1: 00000000  20 00 ab 11 00 00 c6 b5  00 00 00 00 00 00 00 06  | ...............|
+I 11.309652 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.317303 TX m1:      6.159759 USB_IN 21 B
+I 11.321304 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 172, payload 17, header 4
+I 11.329266 TX m1: in, 21 bytes:
+I 11.332220 TX m1: 00000000  20 00 ac 11 00 00 12 b5  00 00 00 00 00 00 00 06  | ...............|
+I 11.340812 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.348463 TX m1:      6.163759 USB_IN 21 B
+I 11.352464 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 173, payload 17, header 4
+I 11.360426 TX m1: in, 21 bytes:
+I 11.363381 TX m1: 00000000  20 00 ad 11 00 00 62 b4  00 00 00 00 00 00 00 06  | .....b.........|
+I 11.371972 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.379624 TX m1:      6.167759 USB_IN 21 B
+I 11.383624 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 174, payload 17, header 4
+I 11.391592 TX m1: in, 21 bytes:
+I 11.394541 TX m1: 00000000  20 00 ae 11 00 00 b6 b3  00 00 00 00 00 00 00 06  | ...............|
+I 11.403132 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.410784 TX m1:      6.171759 USB_IN 21 B
+I 11.414784 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 175, payload 17, header 4
+I 11.422746 TX m1: in, 21 bytes:
+I 11.425701 TX m1: 00000000  20 00 af 11 00 00 02 b3  00 00 00 00 00 00 00 06  | ...............|
+I 11.434292 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.441944 TX m1:      6.175760 USB_IN 21 B
+I 11.445944 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 176, payload 17, header 4
+I 11.453906 TX m1: in, 21 bytes:
+I 11.456861 TX m1: 00000000  20 00 b0 11 00 00 4f b2  00 00 00 00 00 00 00 06  | .....O.........|
+I 11.465452 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.473104 TX m1:      6.179760 USB_IN 21 B
+I 11.477104 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 177, payload 17, header 4
+I 11.485067 TX m1: in, 21 bytes:
+I 11.488021 TX m1: 00000000  20 00 b1 11 00 00 a3 b1  00 00 00 00 00 00 00 06  | ...............|
+I 11.496612 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.504264 TX m1:      6.183760 USB_IN 21 B
+I 11.508264 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 178, payload 17, header 4
+I 11.516227 TX m1: in, 21 bytes:
+I 11.519181 TX m1: 00000000  20 00 b2 11 00 00 f9 b0  00 00 00 00 00 00 00 06  | ...............|
+I 11.527772 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.535424 TX m1:      6.187760 USB_IN 21 B
+I 11.539424 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 179, payload 17, header 4
+I 11.547387 TX m1: in, 21 bytes:
+I 11.550341 TX m1: 00000000  20 00 b3 11 00 00 4b b0  00 00 00 00 00 00 00 06  | .....K.........|
+I 11.558933 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.566590 TX m1:      6.191760 USB_IN 21 B
+I 11.570591 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 180, payload 17, header 4
+I 11.578547 TX m1: in, 21 bytes:
+I 11.581501 TX m1: 00000000  20 00 b4 11 00 00 97 af  00 00 00 00 00 00 00 06  | ...............|
+I 11.590093 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.597744 TX m1:      6.195760 USB_IN 21 B
+I 11.601744 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 181, payload 17, header 4
+I 11.609707 TX m1: in, 21 bytes:
+I 11.612661 TX m1: 00000000  20 00 b5 11 00 00 e5 ae  00 00 00 00 00 00 00 06  | ...............|
+I 11.621253 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.628904 TX m1:      6.199760 USB_IN 21 B
+I 11.632904 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 182, payload 17, header 4
+I 11.640867 TX m1: in, 21 bytes:
+I 11.643821 TX m1: 00000000  20 00 b6 11 00 00 36 ae  00 00 00 00 00 00 00 06  | .....6.........|
+I 11.652413 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.660064 TX m1:      6.203760 USB_IN 21 B
+I 11.664065 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 183, payload 17, header 4
+I 11.672027 TX m1: in, 21 bytes:
+I 11.674981 TX m1: 00000000  20 00 b7 11 00 00 88 ad  00 00 00 00 00 00 00 06  | ...............|
+I 11.683573 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.691224 TX m1:      6.207760 USB_IN 21 B
+I 11.695225 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 184, payload 17, header 4
+I 11.703187 TX m1: in, 21 bytes:
+I 11.706141 TX m1: 00000000  20 00 b8 11 00 00 d6 ac  00 00 00 00 00 00 00 06  | ...............|
+I 11.714733 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.722384 TX m1:      6.211760 USB_IN 21 B
+I 11.726385 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 185, payload 17, header 4
+I 11.734347 TX m1: in, 21 bytes:
+I 11.737301 TX m1: 00000000  20 00 b9 11 00 00 22 ac  00 00 00 00 00 00 00 06  | .....".........|
+I 11.745893 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.753544 TX m1:      6.215760 USB_IN 21 B
+I 11.757545 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 186, payload 17, header 4
+I 11.765507 TX m1: in, 21 bytes:
+I 11.768462 TX m1: 00000000  20 00 ba 11 00 00 72 ab  00 00 00 00 00 00 00 06  | .....r.........|
+I 11.777053 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.784704 TX m1:      6.219760 USB_IN 21 B
+I 11.788705 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 187, payload 17, header 4
+I 11.796667 TX m1: in, 21 bytes:
+I 11.799622 TX m1: 00000000  20 00 bb 11 00 00 c9 aa  00 00 00 00 00 00 00 06  | ...............|
+I 11.808213 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.815865 TX m1:      6.223760 USB_IN 21 B
+I 11.819865 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 188, payload 17, header 4
+I 11.827827 TX m1: in, 21 bytes:
+I 11.830782 TX m1: 00000000  20 00 bc 11 00 00 1c aa  00 00 00 00 00 00 00 06  | ...............|
+I 11.839373 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.847025 TX m1:      6.227761 USB_IN 21 B
+I 11.851025 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 189, payload 17, header 4
+I 11.858987 TX m1: in, 21 bytes:
+I 11.861942 TX m1: 00000000  20 00 bd 11 00 00 69 a9  00 00 00 00 00 00 00 06  | .....i.........|
+I 11.870533 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.878185 TX m1:      6.231761 USB_IN 21 B
+I 11.882185 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 190, payload 17, header 4
+I 11.890148 TX m1: in, 21 bytes:
+I 11.893102 TX m1: 00000000  20 00 be 11 00 00 b7 a8  00 00 00 00 00 00 00 06  | ...............|
+I 11.901693 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.909345 TX m1:      6.235761 USB_IN 21 B
+I 11.913345 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 191, payload 17, header 4
+I 11.921308 TX m1: in, 21 bytes:
+I 11.924262 TX m1: 00000000  20 00 bf 11 00 00 08 a8  00 00 00 00 00 00 00 06  | ...............|
+I 11.932853 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.940505 TX m1:      6.239761 USB_IN 21 B
+I 11.944505 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 192, payload 17, header 4
+I 11.952468 TX m1: in, 21 bytes:
+I 11.955422 TX m1: 00000000  20 00 c0 11 00 00 5b a7  00 00 00 00 00 00 00 06  | .....[.........|
+I 11.964014 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 11.971665 TX m1:      6.243761 USB_IN 21 B
+I 11.975665 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 193, payload 17, header 4
+I 11.983628 TX m1: in, 21 bytes:
+I 11.986588 TX m1: 00000000  20 00 c1 11 00 00 a8 a6  00 00 00 00 00 00 00 06  | ...............|
+I 11.995174 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.002825 TX m1:      6.247761 USB_IN 21 B
+I 12.006825 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 194, payload 17, header 4
+I 12.014788 TX m1: in, 21 bytes:
+I 12.017742 TX m1: 00000000  20 00 c2 11 00 00 f2 a5  00 00 00 00 00 00 00 06  | ...............|
+I 12.026334 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.033985 TX m1:      6.251761 USB_IN 21 B
+I 12.037986 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 195, payload 17, header 4
+I 12.045948 TX m1: in, 21 bytes:
+I 12.048902 TX m1: 00000000  20 00 c3 11 00 00 46 a5  00 00 00 00 00 00 00 06  | .....F.........|
+I 12.057494 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.065145 TX m1:      6.255761 USB_IN 21 B
+I 12.069146 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 196, payload 17, header 4
+I 12.077108 TX m1: in, 21 bytes:
+I 12.080062 TX m1: 00000000  20 00 c4 11 00 00 9c a4  00 00 00 00 00 00 00 06  | ...............|
+I 12.088654 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.096305 TX m1:      6.259761 USB_IN 21 B
+I 12.100306 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 197, payload 17, header 4
+I 12.108268 TX m1: in, 21 bytes:
+I 12.111222 TX m1: 00000000  20 00 c5 11 00 00 f3 a3  00 00 00 00 00 00 00 06  | ...............|
+I 12.119814 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.127465 TX m1:      6.263761 USB_IN 21 B
+I 12.131466 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 198, payload 17, header 4
+I 12.139428 TX m1: in, 21 bytes:
+I 12.142383 TX m1: 00000000  20 00 c6 11 00 00 41 a3  00 00 00 00 00 00 00 06  | .....A.........|
+I 12.150974 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.158626 TX m1:      6.267761 USB_IN 21 B
+I 12.162626 TX m1: in: msE (12860) task_wdt: Task watchdog got triggered. The following tasks/users did not reset the watchdog in time:
+I 12.236298 TX m1: in, 21 bytes:
+I 12.239249 TX m1: 00000000  20 00 c7 11 00 00 8e a2  00 00 00 00 00 00 00 06  | ...............|
+I 12.247839 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.255491 TX m1:      6.271762 USB_IN 21 B
+I 12.259493 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 200, payload 17, header 4
+I 12.267454 TX m1: in, 21 bytes:
+I 12.270408 TX m1: 00000000  20 00 c8 11 00 00 dd a1  00 00 00 00 00 00 00 06  | ...............|
+I 12.278999 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.286651 TX m1:      6.275762 USB_IN 21 B
+I 12.290651 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 201, payload 17, header 4
+I 12.298614 TX m1: in, 21 bytes:
+I 12.301568 TX m1: 00000000  20 00 c9 11 00 00 2f a1  00 00 00 00 00 00 00 06  | ...../.........|
+I 12.310160 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.317811 TX m1:      6.279762 USB_IN 21 B
+I 12.321811 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 202, payload 17, header 4
+I 12.329774 TX m1: in, 21 bytes:
+I 12.332728 TX m1: 00000000  20 00 ca 11 00 00 80 a0  00 00 00 00 00 00 00 06  | ...............|
+I 12.341320 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.348971 TX m1:      6.283762 USB_IN 21 B
+I 12.352971 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 203, payload 17, header 4
+I 12.360934 TX m1: in, 21 bytes:
+I 12.363888 TX m1: 00000000  20 00 cb 11 00 00 cc 9f  00 00 00 00 00 00 00 06  | ...............|
+I 12.372480 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.380131 TX m1:      6.287762 USB_IN 21 B
+I 12.384131 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 204, payload 17, header 4
+I 12.392096 TX m1: in, 21 bytes:
+I 12.395048 TX m1: 00000000  20 00 cc 11 00 00 1a 9f  00 00 00 00 00 00 00 06  | ...............|
+I 12.403640 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.411291 TX m1:      6.291762 USB_IN 21 B
+I 12.415292 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 205, payload 17, header 4
+I 12.423254 TX m1: in, 21 bytes:
+I 12.426208 TX m1: 00000000  20 00 cd 11 00 00 71 9e  00 00 00 00 00 00 00 06  | .....q.........|
+I 12.434800 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.442451 TX m1:      6.295762 USB_IN 21 B
+I 12.446452 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 206, payload 17, header 4
+I 12.454414 TX m1: in, 21 bytes:
+I 12.457368 TX m1: 00000000  20 00 ce 11 00 00 c7 9d  00 00 00 00 00 00 00 06  | ...............|
+I 12.465960 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.473611 TX m1:      6.299762 USB_IN 21 B
+I 12.477618 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 207, payload 17, header 4
+I 12.485574 TX m1: in, 21 bytes:
+I 12.488528 TX m1: 00000000  20 00 cf 11 00 00 18 9d  00 00 00 00 00 00 00 06  | ...............|
+I 12.497120 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.504771 TX m1:      6.303762 USB_IN 21 B
+I 12.508772 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 208, payload 17, header 4
+I 12.516734 TX m1: in, 21 bytes:
+I 12.519689 TX m1: 00000000  20 00 d0 11 00 00 66 9c  00 00 00 00 00 00 00 06  | .....f.........|
+I 12.528280 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.535932 TX m1:      6.307762 USB_IN 21 B
+I 12.539932 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 209, payload 17, header 4
+I 12.547894 TX m1: in, 21 bytes:
+I 12.550849 TX m1: 00000000  20 00 d1 11 00 00 b4 9b  00 00 00 00 00 00 00 06  | ...............|
+I 12.559440 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.567092 TX m1:      6.311762 USB_IN 21 B
+I 12.571092 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 210, payload 17, header 4
+I 12.579054 TX m1: in, 21 bytes:
+I 12.582009 TX m1: 00000000  20 00 d2 11 00 00 06 9b  00 00 00 00 00 00 00 06  | ...............|
+I 12.590600 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.598252 TX m1:      6.315763 USB_IN 21 B
+I 12.602252 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 211, payload 17, header 4
+I 12.610214 TX m1: in, 21 bytes:
+I 12.613169 TX m1: 00000000  20 00 d3 11 00 00 57 9a  00 00 00 00 00 00 00 06  | .....W.........|
+I 12.621760 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.629412 TX m1:      6.319763 USB_IN 21 B
+I 12.633412 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 212, payload 17, header 4
+I 12.641374 TX m1: in, 21 bytes:
+I 12.644329 TX m1: 00000000  20 00 d4 11 00 00 a4 99  00 00 00 00 00 00 00 06  | ...............|
+I 12.652920 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.660572 TX m1:      6.323763 USB_IN 21 B
+I 12.664572 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 213, payload 17, header 4
+I 12.672535 TX m1: in, 21 bytes:
+I 12.675489 TX m1: 00000000  20 00 d5 11 00 00 f2 98  00 00 00 00 00 00 00 06  | ...............|
+I 12.684080 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.691732 TX m1:      6.327763 USB_IN 21 B
+I 12.695732 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 214, payload 17, header 4
+I 12.703695 TX m1: in, 21 bytes:
+I 12.706649 TX m1: 00000000  20 00 d6 11 00 00 44 98  00 00 00 00 00 00 00 06  | .....D.........|
+I 12.715241 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.722892 TX m1:      6.331763 USB_IN 21 B
+I 12.726892 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 215, payload 17, header 4
+I 12.734855 TX m1: in, 21 bytes:
+I 12.737809 TX m1: 00000000  20 00 d7 11 00 00 98 97  00 00 00 00 00 00 00 06  | ...............|
+I 12.746401 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.754052 TX m1:      6.335763 USB_IN 21 B
+I 12.758052 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 216, payload 17, header 4
+I 12.766015 TX m1: in, 21 bytes:
+I 12.768969 TX m1: 00000000  20 00 d8 11 00 00 ea 96  00 00 00 00 00 00 00 06  | ...............|
+I 12.777561 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.785212 TX m1:      6.339763 USB_IN 21 B
+I 12.789212 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 217, payload 17, header 4
+I 12.797175 TX m1: in, 21 bytes:
+I 12.800129 TX m1: 00000000  20 00 d9 11 00 00 3d 96  00 00 00 00 00 00 00 06  | .....=.........|
+I 12.808721 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.816372 TX m1:      6.343763 USB_IN 21 B
+I 12.820373 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 218, payload 17, header 4
+I 12.828335 TX m1: in, 21 bytes:
+I 12.831289 TX m1: 00000000  20 00 da 11 00 00 89 95  00 00 00 00 00 00 00 06  | ...............|
+I 12.839881 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.847532 TX m1:      6.347763 USB_IN 21 B
+I 12.851533 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 219, payload 17, header 4
+I 12.859495 TX m1: in, 21 bytes:
+I 12.862449 TX m1: 00000000  20 00 db 11 00 00 dc 94  00 00 00 00 00 00 00 06  | ...............|
+I 12.871041 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.878692 TX m1:      6.351763 USB_IN 21 B
+I 12.882693 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 220, payload 17, header 4
+I 12.890655 TX m1: in, 21 bytes:
+I 12.893609 TX m1: 00000000  20 00 dc 11 00 00 2d 94  00 00 00 00 00 00 00 06  | .....-.........|
+I 12.902201 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.909852 TX m1:      6.355763 USB_IN 21 B
+I 12.913853 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 221, payload 17, header 4
+I 12.921815 TX m1: in, 21 bytes:
+I 12.924770 TX m1: 00000000  20 00 dd 11 00 00 7c 93  00 00 00 00 00 00 00 06  | .....|.........|
+I 12.933361 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.941013 TX m1:      6.359763 USB_IN 21 B
+I 12.945013 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 222, payload 17, header 4
+I 12.952975 TX m1: in, 21 bytes:
+I 12.955930 TX m1: 00000000  20 00 de 11 00 00 c8 92  00 00 00 00 00 00 00 06  | ...............|
+I 12.964521 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 12.972173 TX m1:      6.363763 USB_IN 21 B
+I 12.976173 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 223, payload 17, header 4
+I 12.984135 TX m1: in, 21 bytes:
+I 12.987090 TX m1: 00000000  20 00 df 11 00 00 1a 92  00 00 00 00 00 00 00 06  | ...............|
+I 12.995681 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.003333 TX m1:      6.367764 USB_IN 21 B
+I 13.007333 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 224, payload 17, header 4
+I 13.015295 TX m1: in, 21 bytes:
+I 13.018250 TX m1: 00000000  20 00 e0 11 00 00 70 91  00 00 00 00 00 00 00 06  | .....p.........|
+I 13.026841 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.034493 TX m1:      6.371764 USB_IN 21 B
+I 13.038493 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 225, payload 17, header 4
+I 13.046456 TX m1: in, 21 bytes:
+I 13.049410 TX m1: 00000000  20 00 e1 11 00 00 c5 90  00 00 00 00 00 00 00 06  | ...............|
+I 13.058001 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.065653 TX m1:      6.375764 USB_IN 21 B
+I 13.069653 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 226, payload 17, header 4
+I 13.077616 TX m1: in, 21 bytes:
+I 13.080570 TX m1: 00000000  20 00 e2 11 00 00 16 90  00 00 00 00 00 00 00 06  | ...............|
+I 13.089161 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.096813 TX m1:      6.379764 USB_IN 21 B
+I 13.100813 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 227, payload 17, header 4
+I 13.108776 TX m1: in, 21 bytes:
+I 13.111730 TX m1: 00000000  20 00 e3 11 00 00 68 8f  00 00 00 00 00 00 00 06  | .....h.........|
+I 13.120322 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.127973 TX m1:      6.383764 USB_IN 21 B
+I 13.131973 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 228, payload 17, header 4
+I 13.139936 TX m1: in, 21 bytes:
+I 13.142890 TX m1: 00000000  20 00 e4 11 00 00 c2 8e  00 00 00 00 00 00 00 06  | ...............|
+I 13.151482 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.159133 TX m1:      6.387764 USB_IN 21 B
+I 13.163133 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 229, payload 17, header 4
+I 13.171096 TX m1: in, 21 bytes:
+I 13.174050 TX m1: 00000000  20 00 e5 11 00 00 21 8e  00 00 00 00 00 00 00 06  | .....!.........|
+I 13.182642 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.190293 TX m1:      6.391764 USB_IN 21 B
+I 13.194293 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 230, payload 17, header 4
+I 13.202256 TX m1: in, 21 bytes:
+I 13.205210 TX m1: 00000000  20 00 e6 11 00 00 82 8d  00 00 00 00 00 00 00 06  | ...............|
+I 13.213802 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.221453 TX m1:      6.395764 USB_IN 21 B
+I 13.225454 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 231, payload 17, header 4
+I 13.233416 TX m1: in, 21 bytes:
+I 13.236370 TX m1: 00000000  20 00 e7 11 00 00 e5 8c  00 00 00 00 00 00 00 06  | ...............|
+I 13.244962 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.252613 TX m1:      6.399764 USB_IN 21 B
+I 13.256618 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 232, payload 17, header 4
+I 13.264582 TX m1: in, 21 bytes:
+I 13.267530 TX m1: 00000000  20 00 e8 11 00 00 4b 8c  00 00 00 00 00 00 00 06  | .....K.........|
+I 13.276122 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.283773 TX m1:      6.403764 USB_IN 21 B
+I 13.287774 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 233, payload 17, header 4
+I 13.295736 TX m1: in, 21 bytes:
+I 13.298690 TX m1: 00000000  20 00 e9 11 00 00 b9 8b  00 00 00 00 00 00 00 06  | ...............|
+I 13.307282 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.314933 TX m1:      6.407764 USB_IN 21 B
+I 13.318934 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 234, payload 17, header 4
+I 13.326896 TX m1: in, 21 bytes:
+I 13.329851 TX m1: 00000000  20 00 ea 11 00 00 30 8b  00 00 00 00 00 00 00 06  | .....0.........|
+I 13.338442 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.346094 TX m1:      6.411765 USB_IN 21 B
+I 13.350094 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 235, payload 17, header 4
+I 13.358056 TX m1: in, 21 bytes:
+I 13.361011 TX m1: 00000000  20 00 eb 11 00 00 a9 8a  00 00 00 00 00 00 00 06  | ...............|
+I 13.369602 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.377254 TX m1:      6.415765 USB_IN 21 B
+I 13.381254 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 236, payload 17, header 4
+I 13.389216 TX m1: in, 21 bytes:
+I 13.392171 TX m1: 00000000  20 00 ec 11 00 00 23 8a  00 00 00 00 00 00 00 06  | .....#.........|
+I 13.400762 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.408414 TX m1:      6.419765 USB_IN 21 B
+I 13.412414 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 237, payload 17, header 4
+I 13.420376 TX m1: in, 21 bytes:
+I 13.423331 TX m1: 00000000  20 00 ed 11 00 00 9e 89  00 00 00 00 00 00 00 06  | ...............|
+I 13.431922 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.439574 TX m1:      6.423765 USB_IN 21 B
+I 13.443574 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 238, payload 17, header 4
+I 13.451537 TX m1: in, 21 bytes:
+I 13.454491 TX m1: 00000000  20 00 ee 11 00 00 24 89  00 00 00 00 00 00 00 06  | .....$.........|
+I 13.463082 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.470734 TX m1:      6.427765 USB_IN 21 B
+I 13.474734 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 239, payload 17, header 4
+I 13.482697 TX m1: in, 21 bytes:
+I 13.485651 TX m1: 00000000  20 00 ef 11 00 00 ab 88  00 00 00 00 00 00 00 06  | ...............|
+I 13.494243 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.501894 TX m1:      6.431765 USB_IN 21 B
+I 13.505894 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 240, payload 17, header 4
+I 13.513857 TX m1: in, 21 bytes:
+I 13.516811 TX m1: 00000000  20 00 f0 11 00 00 38 88  00 00 00 00 00 00 00 06  | .....8.........|
+I 13.525403 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.533054 TX m1:      6.435765 USB_IN 21 B
+I 13.537054 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 241, payload 17, header 4
+I 13.545017 TX m1: in, 21 bytes:
+I 13.547971 TX m1: 00000000  20 00 f1 11 00 00 c9 87  00 00 00 00 00 00 00 06  | ...............|
+I 13.556563 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.564214 TX m1:      6.439765 USB_IN 21 B
+I 13.568214 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 242, payload 17, header 4
+I 13.576177 TX m1: in, 21 bytes:
+I 13.579131 TX m1: 00000000  20 00 f2 11 00 00 5e 87  00 00 00 00 00 00 00 06  | .....^.........|
+I 13.587723 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.595374 TX m1:      6.443765 USB_IN 21 B
+I 13.599374 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 243, payload 17, header 4
+I 13.607337 TX m1: in, 21 bytes:
+I 13.610291 TX m1: 00000000  20 00 f3 11 00 00 f6 86  00 00 00 00 00 00 00 06  | ...............|
+I 13.618883 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.626534 TX m1:      6.447765 USB_IN 21 B
+I 13.630535 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 244, payload 17, header 4
+I 13.638497 TX m1: in, 21 bytes:
+I 13.641451 TX m1: 00000000  20 00 f4 11 00 00 93 86  00 00 00 00 00 00 00 06  | ...............|
+I 13.650043 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.657694 TX m1:      6.451765 USB_IN 21 B
+I 13.661695 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 245, payload 17, header 4
+I 13.669657 TX m1: in, 21 bytes:
+I 13.672611 TX m1: 00000000  20 00 f5 11 00 00 35 86  00 00 00 00 00 00 00 06  | .....5.........|
+I 13.681203 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.688854 TX m1:      6.455765 USB_IN 21 B
+I 13.692855 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 246, payload 17, header 4
+I 13.700817 TX m1: in, 21 bytes:
+I 13.703771 TX m1: 00000000  20 00 f6 11 00 00 dd 85  00 00 00 00 00 00 00 06  | ...............|
+I 13.712363 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.720014 TX m1:      6.459765 USB_IN 21 B
+I 13.724015 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 247, payload 17, header 4
+I 13.731977 TX m1: in, 21 bytes:
+I 13.734932 TX m1: 00000000  20 00 f7 11 00 00 87 85  00 00 00 00 00 00 00 06  | ...............|
+I 13.743523 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.751175 TX m1:      6.463766 USB_IN 21 B
+I 13.755175 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 248, payload 17, header 4
+I 13.763137 TX m1: in, 21 bytes:
+I 13.766092 TX m1: 00000000  20 00 f8 11 00 00 39 85  00 00 00 00 00 00 00 06  | .....9.........|
+I 13.774683 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.782335 TX m1:      6.467766 USB_IN 21 B
+I 13.786335 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 249, payload 17, header 4
+I 13.794297 TX m1: in, 21 bytes:
+I 13.797252 TX m1: 00000000  20 00 f9 11 00 00 ee 84  00 00 00 00 00 00 00 06  | ...............|
+I 13.805843 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.813495 TX m1:      6.471766 USB_IN 21 B
+I 13.817495 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 250, payload 17, header 4
+I 13.825457 TX m1: in, 21 bytes:
+I 13.828412 TX m1: 00000000  20 00 fa 11 00 00 a5 84  00 00 00 00 00 00 00 06  | ...............|
+I 13.837003 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.844655 TX m1:      6.475766 USB_IN 21 B
+I 13.848655 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 251, payload 17, header 4
+I 13.856618 TX m1: in, 21 bytes:
+I 13.859572 TX m1: 00000000  20 00 fb 11 00 00 5f 84  00 00 00 00 00 00 00 06  | ....._.........|
+I 13.868163 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.875815 TX m1:      6.479766 USB_IN 21 B
+I 13.879815 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 252, payload 17, header 4
+I 13.887778 TX m1: in, 21 bytes:
+I 13.890732 TX m1: 00000000  20 00 fc 11 00 00 1b 84  00 00 00 00 00 00 00 06  | ...............|
+I 13.899323 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.906975 TX m1:      6.483766 USB_IN 21 B
+I 13.910975 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 253, payload 17, header 4
+I 13.918938 TX m1: in, 21 bytes:
+I 13.921892 TX m1: 00000000  20 00 fd 11 00 00 da 83  00 00 00 00 00 00 00 06  | ...............|
+I 13.930484 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.938135 TX m1:      6.487766 USB_IN 21 B
+I 13.942135 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 254, payload 17, header 4
+I 13.950098 TX m1: in, 21 bytes:
+I 13.953052 TX m1: 00000000  20 00 fe 11 00 00 9d 83  00 00 00 00 00 00 00 06  | ...............|
+I 13.961644 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 13.969295 TX m1:      6.491766 USB_IN 21 B
+I 13.973295 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 255, payload 17, header 4
+I 13.981258 TX m1: in, 21 bytes:
+I 13.984212 TX m1: 00000000  20 00 ff 11 00 00 63 83  00 00 00 00 00 00 00 06  | .....c.........|
+I 13.992804 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.000455 TX m1:      6.495766 USB_IN 21 B
+I 14.004453 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 1, payload 17, header 4
+I 14.012244 TX m1: in, 21 bytes:
+I 14.015199 TX m1: 00000000  20 00 01 11 00 00 2c 83  00 00 00 00 00 00 00 06  | .....,.........|
+I 14.023790 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.031442 TX m1:      6.499766 USB_IN 21 B
+I 14.035440 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 2, payload 17, header 4
+I 14.043231 TX m1: in, 21 bytes:
+I 14.046185 TX m1: 00000000  20 00 02 11 00 00 f9 82  00 00 00 00 00 00 00 06  | ...............|
+I 14.054777 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.062428 TX m1:      6.503766 USB_IN 21 B
+I 14.066426 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 3, payload 17, header 4
+I 14.074217 TX m1: in, 21 bytes:
+I 14.077172 TX m1: 00000000  20 00 03 11 00 00 ca 82  00 00 00 00 00 00 00 06  | ...............|
+I 14.085763 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.093415 TX m1:      6.507766 USB_IN 21 B
+I 14.097413 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 4, payload 17, header 4
+I 14.105204 TX m1: in, 21 bytes:
+I 14.108158 TX m1: 00000000  20 00 04 11 00 00 a2 82  00 00 00 00 00 00 00 06  | ...............|
+I 14.116750 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.124401 TX m1:      6.511767 USB_IN 21 B
+I 14.128399 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 5, payload 17, header 4
+I 14.136190 TX m1: in, 21 bytes:
+I 14.139145 TX m1: 00000000  20 00 05 11 00 00 7a 82  00 00 00 00 00 00 00 06  | .....z.........|
+I 14.147736 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.155388 TX m1:      6.515767 USB_IN 21 B
+I 14.159386 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 6, payload 17, header 4
+I 14.167177 TX m1: in, 21 bytes:
+I 14.170131 TX m1: 00000000  20 00 06 11 00 00 57 82  00 00 00 00 00 00 00 06  | .....W.........|
+I 14.178723 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.186374 TX m1:      6.519767 USB_IN 21 B
+I 14.190372 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 7, payload 17, header 4
+I 14.198163 TX m1: in, 21 bytes:
+I 14.201118 TX m1: 00000000  20 00 07 11 00 00 37 82  00 00 00 00 00 00 00 06  | .....7.........|
+I 14.209709 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.217361 TX m1:      6.523767 USB_IN 21 B
+I 14.221359 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 8, payload 17, header 4
+I 14.229150 TX m1: in, 21 bytes:
+I 14.232104 TX m1: 00000000  20 00 08 11 00 00 1b 82  00 00 00 00 00 00 00 06  | ...............|
+I 14.240696 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.248347 TX m1:      6.527767 USB_IN 21 B
+I 14.252345 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 9, payload 17, header 4
+I 14.260136 TX m1: in, 21 bytes:
+I 14.263091 TX m1: 00000000  20 00 09 11 00 00 01 82  00 00 00 00 00 00 00 06  | ...............|
+I 14.271682 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.279334 TX m1:      6.531767 USB_IN 21 B
+I 14.283333 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 10, payload 17, header 4
+I 14.291210 TX m1: in, 21 bytes:
+I 14.294164 TX m1: 00000000  20 00 0a 11 00 00 e6 81  00 00 00 00 00 00 00 06  | ...............|
+I 14.302755 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.310407 TX m1:      6.535767 USB_IN 21 B
+I 14.314406 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 11, payload 17, header 4
+I 14.322283 TX m1: in, 21 bytes:
+I 14.325237 TX m1: 00000000  20 00 0b 11 00 00 cf 81  00 00 00 00 00 00 00 06  | ...............|
+I 14.333829 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.341480 TX m1:      6.539767 USB_IN 21 B
+I 14.345480 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 12, payload 17, header 4
+I 14.353356 TX m1: in, 21 bytes:
+I 14.356310 TX m1: 00000000  20 00 0c 11 00 00 b9 81  00 00 00 00 00 00 00 06  | ...............|
+I 14.364902 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.372553 TX m1:      6.543767 USB_IN 21 B
+I 14.376553 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 13, payload 17, header 4
+I 14.384429 TX m1: in, 21 bytes:
+I 14.387384 TX m1: 00000000  20 00 0d 11 00 00 a1 81  00 00 00 00 00 00 00 06  | ...............|
+I 14.395975 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.403627 TX m1:      6.547767 USB_IN 21 B
+I 14.407626 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 14, payload 17, header 4
+I 14.415503 TX m1: in, 21 bytes:
+I 14.418457 TX m1: 00000000  20 00 0e 11 00 00 89 81  00 00 00 00 00 00 00 06  | ...............|
+I 14.427048 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.434700 TX m1:      6.551767 USB_IN 21 B
+I 14.438699 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 15, payload 17, header 4
+I 14.446582 TX m1: in, 21 bytes:
+I 14.449530 TX m1: 00000000  20 00 0f 11 00 00 71 81  00 00 00 00 00 00 00 06  | .....q.........|
+I 14.458122 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.465773 TX m1:      6.555767 USB_IN 21 B
+I 14.469773 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 16, payload 17, header 4
+I 14.477649 TX m1: in, 21 bytes:
+I 14.480604 TX m1: 00000000  20 00 10 11 00 00 5a 81  00 00 00 00 00 00 00 06  | .....Z.........|
+I 14.489195 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.496847 TX m1:      6.559767 USB_IN 21 B
+I 14.500846 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 17, payload 17, header 4
+I 14.508722 TX m1: in, 21 bytes:
+I 14.511677 TX m1: 00000000  20 00 11 11 00 00 43 81  00 00 00 00 00 00 00 06  | .....C.........|
+I 14.520268 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.527920 TX m1:      6.563768 USB_IN 21 B
+I 14.531919 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 18, payload 17, header 4
+I 14.539796 TX m1: in, 21 bytes:
+I 14.542750 TX m1: 00000000  20 00 12 11 00 00 2e 81  00 00 00 00 00 00 00 06  | ...............|
+I 14.551342 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.558993 TX m1:      6.567768 USB_IN 21 B
+I 14.562993 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 19, payload 17, header 4
+I 14.570869 TX m1: in, 21 bytes:
+I 14.573823 TX m1: 00000000  20 00 13 11 00 00 1c 81  00 00 00 00 00 00 00 06  | ...............|
+I 14.582415 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.590066 TX m1:      6.571768 USB_IN 21 B
+I 14.594066 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 20, payload 17, header 4
+I 14.601942 TX m1: in, 21 bytes:
+I 14.604897 TX m1: 00000000  20 00 14 11 00 00 0a 81  00 00 00 00 00 00 00 06  | ...............|
+I 14.613488 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.621140 TX m1:      6.575768 USB_IN 21 B
+I 14.625139 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 21, payload 17, header 4
+I 14.633016 TX m1: in, 21 bytes:
+I 14.635970 TX m1: 00000000  20 00 15 11 00 00 fa 80  00 00 00 00 00 00 00 06  | ...............|
+I 14.644561 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.652213 TX m1:      6.579768 USB_IN 21 B
+I 14.656212 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 22, payload 17, header 4
+I 14.664089 TX m1: in, 21 bytes:
+I 14.667043 TX m1: 00000000  20 00 16 11 00 00 ec 80  00 00 00 00 00 00 00 06  | ...............|
+I 14.675635 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.683286 TX m1:      6.583768 USB_IN 21 B
+I 14.687286 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 23, payload 17, header 4
+I 14.695162 TX m1: in, 21 bytes:
+I 14.698116 TX m1: 00000000  20 00 17 11 00 00 de 80  00 00 00 00 00 00 00 06  | ...............|
+I 14.706708 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.714359 TX m1:      6.587768 USB_IN 21 B
+I 14.718359 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 24, payload 17, header 4
+I 14.726235 TX m1: in, 21 bytes:
+I 14.729190 TX m1: 00000000  20 00 18 11 00 00 d4 80  00 00 00 00 00 00 00 06  | ...............|
+I 14.737781 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.745433 TX m1:      6.591768 USB_IN 21 B
+I 14.749432 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 25, payload 17, header 4
+I 14.757309 TX m1: in, 21 bytes:
+I 14.760263 TX m1: 00000000  20 00 19 11 00 00 ca 80  00 00 00 00 00 00 00 06  | ...............|
+I 14.768855 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.776506 TX m1:      6.595768 USB_IN 21 B
+I 14.780506 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 26, payload 17, header 4
+I 14.788382 TX m1: in, 21 bytes:
+I 14.791336 TX m1: 00000000  20 00 1a 11 00 00 c2 80  00 00 00 00 00 00 00 06  | ...............|
+I 14.799928 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.807586 TX m1:      6.599768 USB_IN 21 B
+I 14.811585 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 27, payload 17, header 4
+I 14.819455 TX m1: in, 21 bytes:
+I 14.822410 TX m1: 00000000  20 00 1b 11 00 00 ba 80  00 00 00 00 00 00 00 06  | ...............|
+I 14.831001 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.838653 TX m1:      6.603769 USB_IN 21 B
+I 14.842652 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 28, payload 17, header 4
+I 14.850529 TX m1: in, 21 bytes:
+I 14.853483 TX m1: 00000000  20 00 1c 11 00 00 b4 80  00 00 00 00 00 00 00 06  | ...............|
+I 14.862074 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.869726 TX m1:      6.607769 USB_IN 21 B
+I 14.873725 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 29, payload 17, header 4
+I 14.881602 TX m1: in, 21 bytes:
+I 14.884556 TX m1: 00000000  20 00 1d 11 00 00 ae 80  00 00 00 00 00 00 00 06  | ...............|
+I 14.893148 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.900799 TX m1:      6.611769 USB_IN 21 B
+I 14.904799 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 30, payload 17, header 4
+I 14.912675 TX m1: in, 21 bytes:
+I 14.915630 TX m1: 00000000  20 00 1e 11 00 00 ab 80  00 00 00 00 00 00 00 06  | ...............|
+I 14.924221 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.931872 TX m1:      6.615769 USB_IN 21 B
+I 14.935872 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 31, payload 17, header 4
+I 14.943748 TX m1: in, 21 bytes:
+I 14.946703 TX m1: 00000000  20 00 1f 11 00 00 a9 80  00 00 00 00 00 00 00 06  | ...............|
+I 14.955294 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.962946 TX m1:      6.619769 USB_IN 21 B
+I 14.966945 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 32, payload 17, header 4
+I 14.974822 TX m1: in, 21 bytes:
+I 14.977776 TX m1: 00000000  20 00 20 11 00 00 a7 80  00 00 00 00 00 00 00 06  | . .............|
+I 14.986368 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 14.994019 TX m1:      6.623769 USB_IN 21 B
+I 14.998019 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 33, payload 17, header 4
+I 15.005895 TX m1: in, 21 bytes:
+I 15.008849 TX m1: 00000000  20 00 21 11 00 00 a6 80  00 00 00 00 00 00 00 06  | .!.............|
+I 15.017441 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 15.025093 TX m1:      6.627769 USB_IN 21 B
+I 15.029092 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 34, payload 17, header 4
+I 15.036968 TX m1: in, 21 bytes:
+I 15.039923 TX m1: 00000000  20 00 22 11 00 00 a5 80  00 00 00 00 00 00 00 06  | .".............|
+I 15.048514 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 15.056166 TX m1:      6.631769 USB_IN 21 B
+I 15.060165 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 35, payload 17, header 4
+I 15.068042 TX m1: in, 21 bytes:
+I 15.070996 TX m1: 00000000  20 00 23 11 00 00 a4 80  00 00 00 00 00 00 00 06  | .#.............|
+I 15.079593 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 15.087239 TX m1:      6.651769 USB_IN 21 B
+I 15.091238 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 36, payload 17, header 4
+I 15.099115 TX m1: in, 21 bytes:
+I 15.102069 TX m1: 00000000  20 00 24 11 00 00 a2 80  00 00 00 00 00 00 00 06  | .$.............|
+I 15.110661 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 15.118312 TX m1:      6.655770 USB_IN 21 B
+I 15.122312 TX m1: in: msg 20 (class 1, number 0), flags 00, seq 37, payload 17, header 4
+I 15.130188 TX m1: in, 21 bytes:
+I 15.133142 TX m1: 00000000  20 00 25 11 00 00 a3 80  00 00 00 00 00 00 00 06  | .%.............|
+I 15.141734 TX m1: 00000010  00 84 03 ff 08                                    |.....|
+I 15.149366 TX m1: --- trace end ---
+I 18.352658 TX m1: in: 244 messages, 0 errors
+I 23.352653 TX m1: in: 244 messages, 0 errors
+I 28.352653 TX m1: in: 244 messages, 0 errors
+I 33.352653 TX m1: in: 244 messages, 0 errors
+I 38.352653 TX m1: in: 244 messages, 0 errors
+I 43.352653 TX m1: in: 244 messages, 0 errors
+I 48.352653 TX m1: in: 244 messages, 0 errors
+I 53.352653 TX m1: in: 244 messages, 0 errors
+I 58.352653 TX m1: in: 244 messages, 0 errors
+I 63.352653 TX m1: in: 244 messages, 0 errors
+I 68.352653 TX m1: in: 244 messages, 0 errors
+I 73.352653 TX m1: in: 244 messages, 0 errors
+I 78.277373 TX m1: in: 256 messages, 0 errors

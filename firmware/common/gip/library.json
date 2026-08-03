@@ -1,0 +1,16 @@
+{
+  "name": "g920-gip",
+  "version": "0.1.0",
+  "description": "GIP: заголовки сообщений, расширяемые поля длины, фрагментация",
+  "keywords": ["g920", "gip"],
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*",
+  "dependencies": {
+    "g920-util": "*"
+  },
+  "build": {
+    "srcDir": "src",
+    "includeDir": "include"
+  }
+}

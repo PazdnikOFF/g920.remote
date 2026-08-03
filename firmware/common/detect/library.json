@@ -1,0 +1,16 @@
+{
+  "name": "g920-detect",
+  "version": "0.1.0",
+  "description": "Опознание хоста: журнал событий энумерации, тайминги, вердикт",
+  "keywords": ["g920", "detect"],
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*",
+  "dependencies": {
+    "g920-util": "*"
+  },
+  "build": {
+    "srcDir": "src",
+    "includeDir": "include"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "g920-identity",
+  "version": "0.1.0",
+  "description": "Личность руля: контейнер снятых дескрипторов, кэш, инвалидация",
+  "keywords": ["g920", "identity"],
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*",
+  "dependencies": {
+    "g920-util": "*"
+  },
+  "build": { "srcDir": "src", "includeDir": "include" }
+}

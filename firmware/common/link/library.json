@@ -1,0 +1,17 @@
+{
+  "name": "g920-link",
+  "version": "0.1.0",
+  "description": "Линк TX-RX: очереди двух дисциплин доставки, обвязка ESP-NOW",
+  "keywords": ["g920", "link"],
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*",
+  "dependencies": {
+    "g920-proto": "*",
+    "g920-util": "*"
+  },
+  "build": {
+    "srcDir": "src",
+    "includeDir": "include"
+  }
+}
