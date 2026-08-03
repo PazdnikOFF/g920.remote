@@ -109,6 +109,25 @@ static g920_identity_t identity;
 static volatile bool identity_pending;
 static volatile uint16_t identity_pending_len;
 static bool have_identity;
+/*
+ * Копия **уже установленной** личности — отдельно от `identity_buffer`,
+ * потому что приходящая по радио пишется в тот же буфер и затирает старую
+ * до того, как её станет с чем сравнивать.
+ *
+ * Нужна ради одного решения: переподключаться или нет. Установка личности
+ * влечёт переподключение на шине — дескрипторы читаются один раз при
+ * энумерации, подменить их на лету нельзя. Но передатчик присылает личность
+ * заново при **каждой своей загрузке**, и она при этом та же самая, уже
+ * лежащая в NVS. Переподключение на ту же личность бесплатным не бывает:
+ * замерено 03.08.2026 — сброс передатчика под живой сессией убивал её
+ * насмерть, консоль настраивала нас заново и больше не говорила ни слова,
+ * `sent` замирало, отдача переставала проходить совсем, и само это не
+ * проходило за 45 секунд наблюдения. Тот же механизм утром сам включал
+ * выключённый бокс: переподключение — это для консоли сигнал «воткнули
+ * геймпад».
+ */
+static uint8_t installed_identity[IDENTITY_BYTES];
+static uint16_t installed_len;
 
 /*
  * Ответ на запрос метаданных — зеркало того, что делает руль.
@@ -143,6 +162,28 @@ static volatile bool metadata_send_now;
 static volatile uint32_t auth_sent;
 static volatile uint32_t auth_dropped;
 static volatile uint32_t auth_back;
+/*
+ * Отдельно от `auth_back` — **судьба отчётов ввода**, и именно она была
+ * слепым пятном: отдача консоли делается через `(void)g920_gip_device_send`,
+ * то есть отказ эндпоинта никуда не попадал. «Кадр доехал по радио» и «кадр
+ * дошёл до консоли» — разные события, и меру расхождения нужно видеть.
+ */
+static volatile uint32_t input_fwd;
+static volatile uint32_t input_lost;
+/*
+ * То же самое для **ответов руля на security**, и это счёт совсем другого
+ * веса: ввод — поток, потерянный кадр в нём сменяется следующим через
+ * миллисекунды. Ответ на security незаменим: потеряли — обмен не сойдётся,
+ * и консоль объявит отказ. Руль отвечает пачками по десятку 64-байтных
+ * сообщений подряд, эндпоинт столько подряд не берёт.
+ */
+static volatile uint32_t auth_host_ok;
+static volatile uint32_t auth_host_lost;
+/* Повтор последнего состояния раз в 25 мс: сколько его ушло и сколько
+ * отказано. Он делит эндпоинт со свежим вводом, и если свежий теряется,
+ * первый подозреваемый — этот поток. */
+static volatile uint32_t idle_fwd;
+static volatile uint32_t idle_lost;
 /* Признак живого обмена: сбрасывает таймер перезапуска сессии. */
 static volatile bool auth_alive;
 /* Консоль объявила security принятой: тишина на 0x06 после этого — норма. */
@@ -215,6 +256,46 @@ static uint32_t status_due_ms;
 static uint32_t status_since_start_ms;
 static uint32_t status_count;
 static uint8_t status_sequence;
+/*
+ * Очередь ответов руля консоли на то время, пока эндпоинт занят.
+ *
+ * Заведена по замеру, а не на всякий случай: без неё ответ на security
+ * при занятом эндпоинте **выбрасывался молча** — отдача делается через
+ * `g920_gip_device_send`, а её отказ игнорировался. На живом стенде из 88
+ * ответов руля терялось 4, и этого хватало, чтобы обмен не сошёлся:
+ * консоль объявляла `06 20 .. 02 01 02` вместо `01 00`. Отсюда и вся
+ * пестрота «то поднимается, то нет» — руль отвечает пачками по десятку
+ * 64-байтных сообщений подряд, а эндпоинт столько подряд не берёт.
+ *
+ * Почему очередь, а не повтор последнего: у security **важен порядок**.
+ * Поэтому пока в очереди что-то есть, новые ответы тоже идут в неё, а не
+ * вперёд неё — иначе крипточип получит свои сообщения вперемешку.
+ *
+ * Ввод сюда **не кладётся** намеренно: он поток, и потерянный кадр в нём
+ * через миллисекунды сменяется свежим. Держать очередь для потока значит
+ * отдавать консоли устаревшее состояние — ровно то, чего мы избегаем.
+ *
+ * Один производитель (задача линка) и один потребитель (главный цикл),
+ * поэтому хватает двух индексов без блокировки.
+ */
+/*
+ * Длина выведена из замера, а не выбрана круглой: в трёх прогонах подъёма
+ * пик очереди был 1, 0 и **15**. Пятнадцать из двадцати четырёх — запас
+ * слишком тонкий для очереди, переполнение которой означает потерю
+ * незаменимого ответа и отказ security. Тридцать два дают вдвое, и стоят
+ * 512 байт при 327 килобайтах RAM — цена, о которой нечего думать.
+ */
+#define AUTH_QUEUE_LEN 32
+static struct {
+    uint8_t len;
+    uint8_t data[64];
+} auth_queue[AUTH_QUEUE_LEN];
+static volatile uint32_t auth_q_head; /* пишет линк */
+static volatile uint32_t auth_q_tail; /* читает главный цикл */
+/* Очередь переполнилась — это уже не заминка, а потеря ответа. */
+static volatile uint32_t auth_q_overflow;
+static volatile uint32_t auth_q_max;
+
 /* Последний отчёт ввода от руля и время с его отправки консоли. */
 static uint8_t last_input[64];
 static volatile uint8_t last_input_len;
@@ -954,6 +1035,23 @@ static void on_link_frame(void *ctx, const g920_frame_t *frame,
         auth_back++;
         auth_alive = true;
         /*
+         * ⚠ Здесь **не место** будить консоль кнопкой Xbox, и это измерено.
+         *
+         * 03.08.2026 тут стояло: нажата кнопка `07 …01`, а хоста нет —
+         * значит переподключиться на шине и тем разбудить. Условие «хоста
+         * нет» проверялось через `configured`, и в этом была ошибка:
+         * пока консоль **включается**, устройство ещё не настроено, то есть
+         * для этой проверки хоста «нет». Человек держит кнопку, консоль в
+         * этот момент энумерирует донгл — и мы рвём ей шину раз в четыре
+         * секунды. Итог на живом стенде: консоль дошла до `configured`, но
+         * вход не опрашивала **ни разу** (`IN polled: no`), announce ушло
+         * больше тысячи, ответа не пришло ни одного. Руль стоял.
+         *
+         * Пробуждение само по себе не отменено, но ему нужен признак «хост
+         * спит», который нельзя спутать с «хост как раз просыпается».
+         * `configured` таким признаком не является.
+         */
+        /*
          * **Сначала отдать консоли, потом запоминать.**
          *
          * Порядок здесь не косметика. Отдача — единственное, что видит
@@ -962,7 +1060,43 @@ static void on_link_frame(void *ctx, const g920_frame_t *frame,
          * ими критический путь незачем: запоминание нужно только для
          * повтора через 25 мс, и оно спокойно ждёт своей очереди.
          */
-        (void)g920_gip_device_send(frame->payload, frame->length);
+        if (frame->type == G920_FRAME_INPUT) {
+            /* Ввод — поток: не влез, значит его сменит следующий отчёт. */
+            if (g920_gip_device_send(frame->payload, frame->length)) {
+                input_fwd++;
+            } else {
+                input_lost++;
+            }
+        } else {
+            /*
+             * Ответ руля. Пока очередь пуста — прямая отдача, то есть без
+             * лишнего такта задержки. Как только она непуста, вперёд неё
+             * лезть нельзя: порядок для security обязателен.
+             */
+            const uint32_t head = auth_q_head;
+            const uint32_t tail = auth_q_tail;
+            const bool queued = head != tail;
+
+            if (!queued
+                && g920_gip_device_send(frame->payload, frame->length)) {
+                auth_host_ok++;
+            } else if (frame->length <= sizeof(auth_queue[0].data)
+                       && (uint32_t)(head - tail) < AUTH_QUEUE_LEN) {
+                const uint32_t slot = head % AUTH_QUEUE_LEN;
+
+                memcpy(auth_queue[slot].data, frame->payload, frame->length);
+                auth_queue[slot].len = (uint8_t)frame->length;
+                auth_q_head = head + 1;
+                if ((uint32_t)(head + 1 - tail) > auth_q_max) {
+                    auth_q_max = (uint32_t)(head + 1 - tail);
+                }
+            } else {
+                /* Очередь полна либо сообщение длиннее ожидаемого — это
+                 * настоящая потеря, и её видно отдельно от заминки. */
+                auth_host_lost++;
+                auth_q_overflow++;
+            }
+        }
         /*
          * Последний отчёт запоминается — до вердикта судьи не запоминался
          * нигде: `last_input` и `last_input_len` были объявлены и не
@@ -1084,6 +1218,21 @@ static bool load_identity(void)
     return true;
 }
 
+/*
+ * Запомнить, какими байтами устройство представлено консоли сейчас.
+ * Зовётся рядом с каждой установкой личности — иначе следующая такая же
+ * личность не будет опознана как такая же и зря дёрнет шину.
+ */
+static void remember_installed(uint16_t length)
+{
+    if (length > sizeof(installed_identity)) {
+        installed_len = 0; /* не поместилось — считаем, что не знаем */
+        return;
+    }
+    memcpy(installed_identity, identity_buffer, length);
+    installed_len = length;
+}
+
 static void take_identity(void)
 {
     g920_identity_status_t parsed;
@@ -1103,6 +1252,21 @@ static void take_identity(void)
         return;
     }
 
+    /*
+     * Та же личность — **ничего не делаем**. Ни записи в NVS, ни, главное,
+     * переподключения на шине: устройство уже представлено консоли ровно
+     * этими дескрипторами, и повторять представление нечем и незачем.
+     *
+     * Передатчик шлёт личность при каждой своей загрузке, так что этот путь
+     * — обычный, а не исключительный.
+     */
+    if (installed_len == length
+        && memcmp(installed_identity, identity_buffer, length) == 0) {
+        have_identity = true;
+        G920_LOGI(TAG, "identity: same as installed — bus left alone");
+        return;
+    }
+
     G920_LOGI(TAG, "identity: %04x:%04x rev %04x, %u sections, %u bytes",
               (unsigned)identity.fingerprint.vendor_id,
               (unsigned)identity.fingerprint.product_id,
@@ -1114,6 +1278,7 @@ static void take_identity(void)
     if (stored == G920_STORE_OK) {
         have_identity = true;
         G920_LOGI(TAG, "identity: saved to nvs");
+        remember_installed(length);
         g920_gip_device_set_identity(&identity);
     } else {
         G920_LOGE(TAG, "identity: store failed (%s)",
@@ -1200,6 +1365,7 @@ void app_main(void)
     /* До поднятия USB: дескрипторы читаются один раз при энумерации, и
      * личность, установленная заранее, избавляет от переподключения. */
     if (have_identity) {
+        remember_installed(g920_identity_size(&identity));
         g920_gip_device_set_identity(&identity);
     }
 
@@ -1298,12 +1464,35 @@ void app_main(void)
             (void)g920_link_send(G920_FRAME_ALIVE, alive_seq++, 0, NULL, 0);
         }
 
+        /*
+         * Отложенные ответы руля — **вперёд всего остального**, что мы
+         * кладём в тот же эндпоинт. Консоль ждёт именно их, и каждый такт
+         * ожидания она может засчитать в свой таймаут security.
+         *
+         * Отдаём столько, сколько эндпоинт возьмёт за такт, и на первом же
+         * отказе останавливаемся: следующий пойдёт через 2 мс.
+         */
+        while (auth_q_tail != auth_q_head) {
+            const uint32_t slot = auth_q_tail % AUTH_QUEUE_LEN;
+
+            if (!g920_gip_device_send(auth_queue[slot].data,
+                                      auth_queue[slot].len)) {
+                break;
+            }
+            auth_q_tail++;
+            auth_host_ok++;
+        }
+
         /* Пауза в потоке ввода — повторяем последний отчёт руля. */
         since_input_ms += TICK_MS;
         if (last_input_len > 0 && since_input_ms >= IDLE_REPORT_MS
             && g920_gip_device_configured()) {
             since_input_ms = 0;
-            (void)g920_gip_device_send(last_input, last_input_len);
+            if (g920_gip_device_send(last_input, last_input_len)) {
+                idle_fwd++;
+            } else {
+                idle_lost++;
+            }
         }
 
         if (metadata_send_now) {
@@ -1400,6 +1589,35 @@ void app_main(void)
                       (unsigned)g920_link_reliable_retries(),
                       (unsigned)g920_link_reliable_gave_up(),
                       (unsigned)g920_link_reliable_pending());
+            {
+                /*
+                 * Что приёмник линка **отсеял, не дойдя до приложения**.
+                 *
+                 * Счётчики были в линке с M3, но донгл их не печатал ни
+                 * разу — и это стоило целого вечера: колбэк зовётся только
+                 * для доставленных кадров, поэтому отвергнутая кнопка Xbox
+                 * выглядела как «кнопка не пришла», и я четыре раза подряд
+                 * искал причину не там. Вердикт по каждому кадру линк знает,
+                 * приложение его получало и выбрасывало.
+                 */
+                g920_link_rx_counters_t rx_c;
+
+                g920_link_rx_counters(&rx_c, false);
+                G920_LOGI(M2, "link rx: delivered %u, dup %u, stale %u, "
+                              "foreign %u, sessions %u, gaps %u",
+                          (unsigned)rx_c.delivered, (unsigned)rx_c.duplicates,
+                          (unsigned)rx_c.stale, (unsigned)rx_c.foreign,
+                          (unsigned)rx_c.sessions, (unsigned)rx_c.gaps);
+            }
+            G920_LOGI(M2, "input to host: fresh %u ok / %u lost, "
+                          "idle repeat %u ok / %u lost",
+                      (unsigned)input_fwd, (unsigned)input_lost,
+                      (unsigned)idle_fwd, (unsigned)idle_lost);
+            G920_LOGI(M2, "wheel answers to host: %u ok / %u lost | "
+                          "queue peak %u of %u, overflow %u",
+                      (unsigned)auth_host_ok, (unsigned)auth_host_lost,
+                      (unsigned)auth_q_max, (unsigned)AUTH_QUEUE_LEN,
+                      (unsigned)auth_q_overflow);
             G920_LOGI(M2, "ffb: sent %u, refused %u | status: sent %u, start %s",
                       (unsigned)ffb_sent, (unsigned)ffb_refused,
                       (unsigned)status_count, start_seen ? "yes" : "no");
