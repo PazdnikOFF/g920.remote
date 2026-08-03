@@ -858,6 +858,10 @@ static bool s_forces_off;
  * (раз в 49 суток), а миллисекунды для окна в 300 мс — точность с запасом.
  */
 static volatile uint32_t s_last_link_ms;
+/* Наш вклад в задержку сил: от кадра из радио до сдачи рулю. */
+static volatile uint32_t s_ffb_lat_sum;
+static volatile uint32_t s_ffb_lat_n;
+static volatile uint32_t s_ffb_lat_max;
 static uint8_t s_loop_seq;
 
 static void queue_bytes(const uint8_t *data, size_t len, const char *what);
@@ -1081,9 +1085,30 @@ static void link_frame(void *ctx, const g920_frame_t *frame,
      * останется с ней. Это M10.
      */
     if (frame->type == G920_FRAME_FFB) {
+        /*
+         * Замер собственного вклада в задержку сил: от прихода кадра из
+         * радио до сдачи пакета рулю.
+         *
+         * Нужен, чтобы про наш тракт можно было говорить числом, а не
+         * мнением. Человек за рулём 03.08.2026: «обратная связь срабатывает
+         * раньше события». Раньше консоли мы отдать не можем — тракт только
+         * добавляет, — но сколько именно добавляет, до сих пор никто не
+         * мерил.
+         */
+        uint32_t at_us = (uint32_t)g920_timestamp_us();
+
         s_ffb_seen = true;
         queue_bytes(frame->payload, frame->length, "ffb");
         try_send_next();
+        {
+            uint32_t took = (uint32_t)g920_timestamp_us() - at_us;
+
+            s_ffb_lat_sum += took;
+            s_ffb_lat_n++;
+            if (took > s_ffb_lat_max) {
+                s_ffb_lat_max = took;
+            }
+        }
         return;
     }
 
@@ -2503,6 +2528,12 @@ void app_main(void)
                           (unsigned)g920_link_reliable_gave_up(),
                           (unsigned)g920_link_reliable_pending(),
                           (unsigned)g920_link_reliable_send_failed());
+                if (s_ffb_lat_n > 0) {
+                    G920_LOGI(M1, "ffb latency: avg %u us, max %u us, n %u",
+                              (unsigned)(s_ffb_lat_sum / s_ffb_lat_n),
+                              (unsigned)s_ffb_lat_max,
+                              (unsigned)s_ffb_lat_n);
+                }
                 {
                     char list[128];
                     int off = 0;
