@@ -60,6 +60,8 @@
 #include "g920/hexdump.h"
 #include "g920/identity.h"
 #include "g920/link.h"
+#include "esp_log.h"
+
 #include "g920/log.h"
 #include "g920/store.h"
 #include "g920/timestamp.h"
@@ -1178,7 +1180,25 @@ static void send_identity(void)
  * Политика KEEP_OLDEST: в полном дампе ценно начало, и потерянный хвост
  * честнее затёртого знакомства. Потери видны счётчиком refused.
  */
-#define TRACE_BYTES (256 * 1024)
+/*
+ * Трасса трафика — **инструмент отладки, и на проде её нет вовсе**.
+ *
+ * Она пишет в PSRAM каждый пакет, пришедший с руля, то есть memcpy в
+ * горячем пути двести с лишним раз в секунду, плюс четверть мегабайта
+ * PSRAM под кольцо. Пока за ней кто-то смотрит, это честная цена; когда
+ * смотреть некому — чистая трата, а горячий путь в этом проекте уже дважды
+ * ломал обмен (сорванное знакомство в M1, watchdog в M8).
+ *
+ * `G920_TRACE_BYTES` не задан — кольцо не заводится, `trace_put`
+ * компилируется в пустоту, `g920_trace_write` в образ не попадает.
+ * Отдельный флаг от `G920_LOG_*` намеренно: лог и трасса трафика — разные
+ * вещи, и выключать их поодиночке надо уметь.
+ */
+#ifndef G920_TRACE_BYTES
+#define G920_TRACE_BYTES 0
+#endif
+
+#define TRACE_BYTES (G920_TRACE_BYTES)
 /* Тишина, после которой трасса считается снятой и печатается. */
 #define TRACE_QUIET_MS 500
 
@@ -1189,6 +1209,14 @@ static bool s_trace_dumped;
 
 static void trace_put(g920_trace_kind_t kind, const uint8_t *data, size_t len)
 {
+    if (TRACE_BYTES == 0) {
+        /* Условие константное: ветка целиком уходит из образа, но остаётся
+         * проверяемой компилятором — как и у макросов лога. */
+        (void)kind;
+        (void)data;
+        (void)len;
+        return;
+    }
     if (!s_trace_ready) {
         return;
     }
@@ -2072,6 +2100,29 @@ void app_main(void)
     }
     G920_LOGI(TAG, "fw %s, role TX, mode usb-host (m1 probe)", version);
 
+#if G920_LOG_BUILD_LEVEL < G920_LOG_LEVEL_ERROR
+    /*
+     * Свой лог выключен сборкой — значит и чужой не нужен.
+     *
+     * Макросы `G920_LOG*` убирают **наши** вызовы, а `boot:`, `wifi:`,
+     * `usb_host:` и прочее печатает сам ESP-IDF, мимо них, через свой
+     * уровень. На проде это десятки строк в UART, которого никто не
+     * слушает, и они идут через тот же горячий поток.
+     *
+     * Гасится здесь, а не в `sdkconfig`: уровень ESP-IDF задаётся на весь
+     * проект, а профилей у проекта восемь. Накладку `SDKCONFIG_DEFAULTS`
+     * через `board_build.cmake_extra_args` я проверил — PlatformIO её не
+     * применяет, сгенерированный `sdkconfig` оставался на уровне INFO.
+     *
+     * ⚠ Что этим **не** гасится: баннер загрузчика и строки `boot:` /
+     * `esp_image:` / `cpu_start:` — они печатаются до `app_main`, то есть
+     * во время запуска, а не после него. Чтобы убрать и их, нужен
+     * `CONFIG_BOOTLOADER_LOG_LEVEL_NONE` в `sdkconfig.defaults`, и это
+     * решение на весь проект, а не на профиль.
+     */
+    esp_log_level_set("*", ESP_LOG_NONE);
+#endif
+
 #ifdef G920_LOG_PSRAM_BYTES
     /*
      * Первой строкой в UART уходит версия — по ней человек с переходником
@@ -2095,7 +2146,8 @@ void app_main(void)
      * потери в обмене — то есть как дефект руля или радио.
      */
     s_trace_ready =
-        g920_trace_init_psram(&s_trace, TRACE_BYTES, G920_TRACE_KEEP_OLDEST);
+        TRACE_BYTES != 0
+        && g920_trace_init_psram(&s_trace, TRACE_BYTES, G920_TRACE_KEEP_OLDEST);
     if (s_trace_ready) {
         G920_LOGI(TAG, "trace: %u KB in psram", (unsigned)(TRACE_BYTES / 1024));
     } else {

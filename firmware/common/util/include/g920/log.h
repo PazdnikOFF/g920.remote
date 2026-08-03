@@ -130,7 +130,13 @@ void g920_log_hexdump(g920_log_level_t level, const char *tag,
 #define G920_LOG_BUILD_LEVEL G920_LOG_LEVEL_INFO
 #endif
 
-#define G920_LOG_ENABLED(level) ((int)(level) <= (int)(G920_LOG_BUILD_LEVEL))
+/*
+ * Без приведений типа намеренно: обе стороны — целочисленные макросы, и в
+ * таком виде условие годится и для `#if` препроцессора. С `(int)` внутри
+ * `#if` компилятор говорит «missing binary operator before token "("» —
+ * проверено.
+ */
+#define G920_LOG_ENABLED(level) ((level) <= (G920_LOG_BUILD_LEVEL))
 
 #define G920_LOG_AT(level, call)                                              \
     do {                                                                      \
