@@ -140,6 +140,15 @@ static volatile uint64_t s_first_in_us;
 #define USB_DM_GPIO 19
 #define USB_DP_GPIO 20
 
+/*
+ * ⚠ Вся диагностика ниже собирается только с `-DG920_PRESTACK_PROBES`.
+ *
+ * Она крутит пины 19/20 как GPIO, а после этого USB-PHY не видит
+ * статически подключённое устройство (разбор — у выбора пути в app_main).
+ * В рабочей прошивке её нет не ради экономии, а чтобы дорога к стеку
+ * физически не проходила через то, что его ломает.
+ */
+#ifdef G920_PRESTACK_PROBES
 static int read_pin(int gpio, bool pull_up)
 {
     gpio_config_t cfg = {
@@ -284,6 +293,7 @@ static void probe_line(const char *name, int gpio, int neighbour)
     int high_readback;
     int neighbour_high;
     int low_readback;
+    int neighbour_low;
 
     if (gpio_config(&drive) != ESP_OK || gpio_config(&listen) != ESP_OK) {
         G920_LOGE(M1, "probe %s: gpio config failed", name);
@@ -298,20 +308,36 @@ static void probe_line(const char *name, int gpio, int neighbour)
     (void)gpio_set_level(gpio, 0);
     vTaskDelay(pdMS_TO_TICKS(2));
     low_readback = gpio_get_level(gpio);
+    neighbour_low = gpio_get_level(neighbour);
 
     gpio_reset_pin((gpio_num_t)gpio);
     gpio_reset_pin((gpio_num_t)neighbour);
 
-    G920_LOGI(M1, "probe %s: driven high -> %d, driven low -> %d, neighbour %d",
-              name, high_readback, low_readback, neighbour_high);
+    G920_LOGI(M1,
+              "probe %s: driven high -> %d, driven low -> %d, neighbour %d/%d",
+              name, high_readback, low_readback, neighbour_high,
+              neighbour_low);
 
+    /*
+     * Перемычка **следует** за ведомой линией: сосед единица при нашей
+     * единице и ноль при нашем нуле. Сосед, стоящий единицей в обеих
+     * фазах, — не перемычка, а чужая подтяжка: у запитанного руля D+
+     * поднят его собственными 1.5 кОм, и они сильнее нашей слушающей
+     * подтяжки вниз. Первая версия читала соседа только в верхней фазе и
+     * на каждом запуске с живым рулём кричала «линии соединены» — про
+     * исправный стенд.
+     */
     if (high_readback == 0) {
         G920_LOGE(M1, "probe %s: line is held at ground — short or a dead "
                       "transceiver on the far end",
                   name);
-    } else if (neighbour_high == 1) {
+    } else if (neighbour_high == 1 && neighbour_low == 0) {
         G920_LOGE(M1, "probe %s: the other data line follows it — D+ and D- "
                       "are tied together somewhere (a charger does this)",
+                  name);
+    } else if (neighbour_high == 1) {
+        G920_LOGI(M1, "probe %s: the other line is pulled up on its own — a "
+                      "powered device holds it",
                   name);
     } else {
         G920_LOGI(M1, "probe %s: line is free — nothing loads it", name);
@@ -374,6 +400,7 @@ static void probe_lines(void)
  * Подтяжка вниз включается только на время замера — пять миллисекунд раз в
  * две секунды.
  */
+#ifndef G920_VBUS_GPIO /* зовётся только из wait_for_pullup */
 static void release_lines(void)
 {
     gpio_config_t cfg = {
@@ -386,6 +413,7 @@ static void release_lines(void)
 
     (void)gpio_config(&cfg);
 }
+#endif
 
 #ifdef G920_HOST_BEACON
 static void beacon_drive(int gpio, int level, uint32_t ms)
@@ -405,6 +433,7 @@ static void beacon_drive(int gpio, int level, uint32_t ms)
     gpio_reset_pin((gpio_num_t)gpio);
 }
 #endif /* G920_HOST_BEACON */
+#endif /* G920_PRESTACK_PROBES */
 
 /*
  * Ждёт, пока на D+ появится подтяжка устройства, и только потом отдаёт пины
@@ -435,13 +464,74 @@ static void beacon_drive(int gpio, int level, uint32_t ms)
  */
 /* Период опроса задаёт маяк: чтение идёт в его паузе. */
 #define PULLUP_NOTE_MS 60000
+/* Шаг мигания в паузе между замерами: линии всё это время отпущены. */
+#define LED_SLICE_MS 250
+/*
+ * Пауза снятого VBUS. Не сотни миллисекунд, и это замер, а не
+ * перестраховка: 22.08.2026 подтяжка руля переживала и 700 мс снятого
+ * VBUS, и сброс платы. Руль тянет с VBUS микроамперы — заряд узла сидит
+ * там секундами, и отключение, которого руль не заметил, не отключение.
+ * Балластный резистор с VBUS на землю у розетки сделает разряд мгновенным —
+ * тогда паузу можно будет вернуть к сотням миллисекунд.
+ */
+#define VBUS_OFF_MS 4000
+#ifdef G920_VBUS_GPIO
+/* Сам ключ описан ниже, у replug_wheel; нужен он и раньше знакомства. */
+static void vbus_set(bool on);
+#endif
 
+#if defined(G920_VBUS_GPIO) && defined(G920_PRESTACK_PROBES)
+/*
+ * Слить VBUS перед подъёмом стека — и измерить, как долго он сливается.
+ *
+ * Ключ держит розетку обесточенной с самого сброса, но узел VBUS — это
+ * ёмкость, из которой руль тянет микроамперы: заряд сидит там секундами.
+ * 22.08.2026 подтяжка руля пережила и сброс платы, и 700 мс снятого
+ * VBUS — руль «отключения» просто не видел. Поэтому здесь ждётся не время,
+ * а факт: D+ отпущен — значит руль действительно остался без питания
+ * розетки, и его следующее появление будет настоящим фронтом подключения.
+ * Измеренное время печатается: это готовый ответ, нужен ли балластный
+ * резистор на VBUS и какой.
+ */
+static void drain_vbus(void)
+{
+    uint32_t off_ms = 0;
+    int dp;
+
+    vbus_set(false);
+    dp = read_pin(USB_DP_GPIO, false);
+    while (dp != 0 && off_ms < 20000u) {
+        vTaskDelay(pdMS_TO_TICKS(100));
+        off_ms += 100;
+        dp = read_pin(USB_DP_GPIO, false);
+    }
+    if (dp == 0) {
+        G920_LOGI(M1, "vbus drained: D+ released %u ms into the off window",
+                  (unsigned)off_ms);
+        /* Хвост: подтяжка падает раньше, чем VBUS дотекает до нуля. */
+        vTaskDelay(pdMS_TO_TICKS(500));
+    } else {
+        G920_LOGW(M1, "D+ is still pulled up %u ms into vbus off — the "
+                      "switch is not actually cutting power to the socket "
+                      "(wiring, or a second 5V path)",
+                  (unsigned)off_ms);
+    }
+    /* Отпускаем пины: дальше ими распоряжается PHY. */
+    gpio_reset_pin(USB_DM_GPIO);
+    gpio_reset_pin(USB_DP_GPIO);
+}
+#endif
+
+#if !defined(G920_VBUS_GPIO) && defined(G920_PRESTACK_PROBES)
 static void wait_for_pullup(void)
 {
     uint32_t waited_ms = 0;
     uint32_t since_note_ms = PULLUP_NOTE_MS;
     int last_dp = -2;
     int last_dm = -2;
+#ifndef G920_HOST_BEACON
+    bool blink = false;
+#endif
 
     for (;;) {
         /* Со слабой подтяжкой вниз: единица здесь значит, что снаружи
@@ -496,6 +586,21 @@ static void wait_for_pullup(void)
                       read_pin(USB_DP_GPIO, true),
                       verdict(dp, read_pin(USB_DP_GPIO, true)), dm,
                       read_pin(USB_DM_GPIO, true));
+            /*
+             * Подозреваемые названы поимённо и в порядке частоты, потому что
+             * читать этот лог будут ровно тогда, когда подтяжки нет, а
+             * догадываться придётся о железе.
+             *
+             * Общая земля стоит в списке не случайно и не третьей: 04.08.2026
+             * стенд оживал от **касания земли type-c**, воткнутого в мак, —
+             * то есть у D+/D− не было опоры, и всё, что видела прошивка,
+             * было измерением относительно ничего. Отсюда же и весь
+             * предыдущий морок: «пока не подключишь мак, руль не
+             * калибруется» — мак давал не питание и не сброс, а землю.
+             */
+            G920_LOGW(M1, "no pull-up: check 5V on pin 1 of the socket, then "
+                          "the common ground (board, external 5V and socket "
+                          "must share one), then the D+ wire itself");
 #ifdef G920_HOST_BEACON
             G920_LOGI(M1,
                       "beacon: 3.3V on D+ for %u s, then on D- for %u s, then "
@@ -516,7 +621,24 @@ static void wait_for_pullup(void)
         since_note_ms += 2 * BEACON_DRIVE_MS + BEACON_IDLE_MS;
 #else
         release_lines();
-        vTaskDelay(pdMS_TO_TICKS(QUIET_POLL_MS));
+        /*
+         * Синий мигает всё это время — и это единственный канал наружу,
+         * который тут вообще есть.
+         *
+         * Отказ, о котором речь, случается **когда никто не смотрит**: без
+         * мака в передатчике нет и консоли, а лог уходит в UART, который
+         * никуда не приходит. Индикатор различает три стадии, и различает их
+         * без единого провода: синий — стек ещё не поднят, ждём подтяжку на
+         * D+; жёлтый — стек поднят, устройства на шине нет; зелёный — руль
+         * открыт. До этой правки первая стадия не показывала ничего, и
+         * «плата не дошла до шины» выглядело так же, как «плата мертва».
+         */
+        for (uint32_t slice = 0; slice < QUIET_POLL_MS / LED_SLICE_MS;
+             slice++) {
+            blink = !blink;
+            g920_board_led_set(blink ? G920_IND_BOOT : G920_IND_OFF);
+            vTaskDelay(pdMS_TO_TICKS(LED_SLICE_MS));
+        }
         waited_ms += QUIET_POLL_MS;
         since_note_ms += QUIET_POLL_MS;
 #endif
@@ -526,6 +648,7 @@ static void wait_for_pullup(void)
     gpio_reset_pin(USB_DM_GPIO);
     gpio_reset_pin(USB_DP_GPIO);
 }
+#endif /* !G920_VBUS_GPIO && G920_PRESTACK_PROBES */
 
 /* --- вывод ---------------------------------------------------------------- */
 
@@ -718,6 +841,15 @@ static volatile uint32_t s_out_dropped;
 
 /* Был ли пир на прошлом такте — ловим появление, а не наличие. */
 static bool s_peer_seen;
+/* Переподключали ли руль по факту поднявшейся связки. Один раз за загрузку. */
+static bool s_link_replug_done;
+
+/*
+ * Руль жив? Два независимых свидетельства, и достаточно любого: наше
+ * знакомство дошло до active — или отчёты ввода идут прямо сейчас, кто бы
+ * их ни вызвал. Второе важнее первого: рулём правит и консоль тоже.
+ */
+static bool wheel_is_alive(uint32_t now_ms);
 
 /* Свой счёт номеров для типов, которые шлём рулю и мы, и консоль. */
 static uint8_t s_seq_set_state;
@@ -730,6 +862,23 @@ static void queue_bytes(const uint8_t *data, size_t len, const char *what)
     if (len == 0 || len > EP_BUF_MAX) {
         s_out_dropped++;
         G920_LOGE(M1, "out: %s is %u bytes, does not fit", what, (unsigned)len);
+        return;
+    }
+    /*
+     * Руля на шине нет — копить нечего и некому отдавать.
+     *
+     * Без этого сообщения консоли набиваются в очередь до переполнения, и
+     * дальше каждое рождает строку `out queue full` в журнале: на живом
+     * стенде 03.08.2026 это шло по пять строк в секунду и делало журнал
+     * нечитаемым ровно тогда, когда он нужнее всего — при разборе «почему
+     * руля нет». Отказ считается, но печатается редко.
+     */
+    if (s_device == NULL) {
+        s_out_dropped++;
+        if ((s_out_dropped % 200u) == 1u) {
+            G920_LOGW(M1, "no wheel on the bus — dropping %s (%u so far)",
+                      what, (unsigned)s_out_dropped);
+        }
         return;
     }
     if (next == s_out_tail) {
@@ -830,6 +979,24 @@ static uint16_t s_hello_len;
 
 /* Сколько сообщений какого номера пришло от руля. */
 static volatile uint32_t s_wheel_msgs[64];
+
+/*
+ * Когда руль в последний раз прислал отчёт ввода.
+ *
+ * Это **единственный признак «руль жив», не зависящий от нашего разговора с
+ * ним**, и он понадобился дорогой ценой. Рулём может править консоль через
+ * донгл: тогда наш собственный `gip_host` так и остаётся в `arrival` — Hello
+ * он не видел, — а руль при этом включён, откалиброван и работает. Судить о
+ * руле по своему состоянию знакомства в этом случае значит объявить
+ * исправное устройство мёртвым и начать его чинить. Ровно это и вышло
+ * 04.08.2026: руль, подключённый к боксу и работающий, переподключался по
+ * кругу и калибровался снова и снова.
+ *
+ * Отчёты ввода идут с частотой 250 Гц и не зависят ни от чьего знакомства:
+ * есть они — устройство включено, и трогать его нельзя ничем.
+ */
+static volatile uint32_t s_last_input_ms;
+#define WHEEL_ALIVE_MS 2000
 
 /*
  * Буфер сообщений руля, ждущих отправки в линк.
@@ -1056,6 +1223,60 @@ static const uint8_t POWER_ON[] = { 0x05, 0x20, 0x02, 0x0F, 0x06, 0x62, 0x45,
 static const uint8_t POWER_ON_SINGLE[] = { 0x05, 0x20, 0x03, 0x01, 0x00 };
 
 static bool s_wheel_ready;
+
+/*
+ * Знакомство с рулём **не имеет права кончаться тупиком**, а имело их два.
+ *
+ * Оба видны прямо в `common/gip/gip_host.c` и оба выглядят одинаково
+ * снаружи: руль на шине, опрос идёт, счётчики растут — а включения нет, то
+ * есть нет калибровочного проворота и нет сил. Ровно эта жалоба и звучит:
+ * «пока не подключишь мак, руль не калибруется и не работает».
+ *
+ *   1. **Arrival навсегда.** Пока не пришёл Hello, `g920_gip_host_tick`
+ *      не делает ничего: у состояния Arrival нет ни таймаута, ни повтора.
+ *      Hello руль шлёт один раз, и если он ушёл мимо нас — мы захватили
+ *      интерфейс позже, чем руль представился, или сообщение потерялось —
+ *      второй раз его никто не пришлёт. Ждать нечего, а мы ждём вечно.
+ *
+ *   2. **Metadata навсегда.** Запрос метаданных повторяется четыре раза
+ *      (`G920_GIP_METADATA_RETRY_MAX`, из спеки), после чего тик молча
+ *      возвращает ноль. Спека на этом месте велит хосту **пометить
+ *      устройство на удаление**, то есть начать сначала; у нас же после
+ *      четвёртой попытки не происходит больше ничего и никогда. Два
+ *      секунды тишины на холодном старте — а руль после подачи питания
+ *      готов не мгновенно — и мост стоит мёртвым до перезагрузки руками.
+ *
+ * Отсюда лестница. Сперва просим руль начать сначала — `Set Device State:
+ * Reset` возвращает устройство в Arrival, откуда оно снова шлёт Hello, и
+ * своё знакомство мы тоже начинаем с чистого листа (иначе счёт запросов
+ * метаданных уже упёрся в предел). Если руль на просьбу не отзывается —
+ * свежая энумерация: она заведомо возвращает его в Arrival, потому что это
+ * сброс шины, а не сообщение, которое можно проигнорировать.
+ *
+ * Лестница **не кончается**, как и поиск устройства на шине: сдавшийся
+ * мост оставляет человека с мёртвым рулём, а один круг стоит восьми секунд
+ * и ничего не ломает. Печатается только начало — дальше редко.
+ */
+/*
+ * Порог считается по чужим срокам, а не назначается на глаз: вмешиваться
+ * можно только там, где `gip_host` уже истратил всё своё. Он отводит на
+ * метаданные четыре запроса с шагом 500 мс (последний уходит на 1500-й
+ * миллисекунде и ждёт ответа до 2000-й), а собранным метаданным — ещё
+ * 400 мс на completion-фрагмент. Итого 2.4 с, и всё это время знакомство
+ * **идёт**, а не стоит. 3 секунды — первый момент, когда молчание уже точно
+ * означает тупик.
+ */
+#define HANDSHAKE_STALL_MS 3000
+#define HANDSHAKE_NUDGES_MAX 3
+/* Сколько кругов идём бодро, прежде чем сбавить до одного раза в пять
+ * минут: каждый круг — это калибровочный проворот, то есть износ. */
+#define HANDSHAKE_ROUNDS_BRISK 3
+#define HANDSHAKE_STALL_SLOW_MS 300000
+
+static g920_gip_host_state_t s_handshake_state;
+static uint32_t s_handshake_at_ms;
+static uint32_t s_handshake_nudges;
+static uint32_t s_handshake_rounds;
 
 /*
  * Отправка личности на RX — вторая половина M4.
@@ -1594,6 +1815,9 @@ static void on_in_done(usb_transfer_t *transfer)
              * пропущенного — следующий придёт через 4 мс.
              */
             if (msg.message_type == 0x20u) {
+                /* Отметка живости руля — до всякой пересылки: она нужна
+                 * даже тогда, когда отдать отчёт некуда. */
+                s_last_input_ms = (uint32_t)(g920_timestamp_us() / 1000u);
                 /*
                  * Номер кадра — **свой**, а не GIP-овский номер руля.
                  *
@@ -1949,6 +2173,10 @@ static bool claim_and_listen(void)
     s_wheel_ready = false;
     s_out_head = 0;
     s_out_tail = 0;
+    /* Часы застревания идут от захвата: до него ждать было нечего. */
+    s_handshake_state = s_host.state;
+    s_handshake_at_ms = (uint32_t)(g920_timestamp_us() / 1000u);
+    s_handshake_nudges = 0;
 
     if (usb_host_transfer_submit(s_in) != ESP_OK) {
         G920_LOGE(M1, "in submit failed");
@@ -1984,6 +2212,11 @@ static bool claim_and_listen(void)
  * не в этой особенности, и повторять её бесконечно значит прятать другую
  * причину за шумом.
  */
+/*
+ * Сколько первых попыток печатать подробно. **Не предел попыток** — их
+ * больше нет: руль может появиться позже нас, и мост обязан ждать его
+ * столько, сколько нужно.
+ */
 #define REPOWER_ATTEMPTS_MAX 3
 
 static uint32_t s_repower_attempts;
@@ -1994,12 +2227,38 @@ static void kick_root_port(void)
     esp_err_t on;
 
     s_repower_attempts++;
-    G920_LOGW(M1, "no device after the stack came up — re-powering the root "
-                  "port (attempt %u of %u)",
-              (unsigned)s_repower_attempts, (unsigned)REPOWER_ATTEMPTS_MAX);
+    /* Печатаем первые попытки и дальше редко: попытки теперь бесконечны,
+     * и строка на каждую сделала бы журнал нечитаемым. */
+    if (s_repower_attempts <= REPOWER_ATTEMPTS_MAX
+        || (s_repower_attempts % 20u) == 0u) {
+        G920_LOGW(M1, "no device on the bus — re-powering the root port "
+                      "(attempt %u)",
+                  (unsigned)s_repower_attempts);
+    }
 
     off = usb_host_lib_set_root_port_power(false);
+#ifdef G920_VBUS_GPIO
+    /*
+     * Питание розетки гасится вместе с портом — но не на каждой попытке.
+     *
+     * Без цикла VBUS руль остаётся под своими 5 В, отключения не видит и
+     * из залипания не выходит — измерено (9 сообщений против 241, разбор
+     * у replug_wheel). Но и на каждой попытке нельзя: после снятия VBUS
+     * G920 поднимает свой USB ~6.2 с (лог 22.08.2026), а попытки идут
+     * каждые ~5 с — цикл в каждой не давал бы рулю добежать до подтяжки
+     * никогда. Каждая третья: две попытки руль спокойно доезжает, третья
+     * выбивает залипание, если доехать было некому.
+     */
+    if ((s_repower_attempts % 3u) == 0u) {
+        vbus_set(false);
+        vTaskDelay(pdMS_TO_TICKS(VBUS_OFF_MS));
+        vbus_set(true);
+    } else {
+        vTaskDelay(pdMS_TO_TICKS(300));
+    }
+#else
     vTaskDelay(pdMS_TO_TICKS(300));
+#endif
     on = usb_host_lib_set_root_port_power(true);
 
     /*
@@ -2019,6 +2278,140 @@ static void kick_root_port(void)
     }
     G920_LOGI(M1, "root port power: off %s, on %s", esp_err_to_name(off),
               esp_err_to_name(on));
+}
+
+/*
+ * Переподключение руля — «вынуть и воткнуть» без человека.
+ *
+ * Две ступени, и разница между ними принципиальная.
+ *
+ * **Без ключа на VBUS** всё, что мы можем, — погасить корневой порт. Руль
+ * при этом остаётся под своими 5 В и **отключения не видит**: пропадает
+ * опрос, через 3 мс тишины он уходит в suspend, а на возврате питания порта
+ * получает сброс шины. Адрес и конфигурацию он теряет, то есть формально
+ * начинает сначала, — но 03.08.2026 измерено, что живой G920 после такого
+ * не оживает (9 сообщений против 241 после полного сброса платы).
+ *
+ * **С ключом на VBUS** это настоящее переподключение: 5 В с розетки
+ * снимаются, руль видит уход хоста, гасит подтяжку 1.5 кОм и складывает
+ * свою USB-часть целиком. Возврат питания для него неотличим от того, что
+ * человек воткнул кабель. Именно этого руль и слушается — и именно поэтому
+ * VBUS теперь наш: он приходит с развязанного модуля, а не из руля.
+ *
+ * Ключ подключается флагом сборки `-DG920_VBUS_GPIO=<пин>`; не задан —
+ * работает первая ступень, и прошивка честно говорит об этом в лог.
+ *
+ * `VBUS_OFF_MS` объявлен выше, у ожидания подтяжки: пауза одна на всех.
+ */
+#ifdef G920_VBUS_GPIO
+static void vbus_set(bool on)
+{
+    gpio_config_t cfg = {
+        .pin_bit_mask = 1ULL << (G920_VBUS_GPIO),
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+
+    (void)gpio_config(&cfg);
+    /* Единица — питание есть: ключ включается уровнем, а не его
+     * отсутствием, чтобы обесточенный пин при сбросе платы не подавал
+     * VBUS сам собой. */
+    (void)gpio_set_level((gpio_num_t)(G920_VBUS_GPIO), on ? 1 : 0);
+}
+#endif
+
+static bool wheel_is_alive(uint32_t now_ms)
+{
+    if (s_host.state == G920_GIP_HOST_ACTIVE) {
+        return true;
+    }
+    return s_last_input_ms != 0
+           && (uint32_t)(now_ms - s_last_input_ms) < WHEEL_ALIVE_MS;
+}
+
+static void replug_wheel(const char *why)
+{
+    /*
+     * Порядок обязателен и тот же, что при переподнятии по просьбе донгла:
+     * сперва отпустить интерфейс и закрыть устройство, потом трогать
+     * питание. Погасить под открытым устройством значит оставить стеку
+     * ссылки на то, чего уже нет.
+     */
+    release_interface();
+    if (s_device != NULL) {
+        (void)usb_host_device_close(s_client, s_device);
+        s_device = NULL;
+    }
+#ifdef G920_VBUS_GPIO
+    G920_LOGW(M1, "%s — unplugging the wheel: vbus off for %u ms", why,
+              (unsigned)VBUS_OFF_MS);
+    vbus_set(false);
+    vTaskDelay(pdMS_TO_TICKS(VBUS_OFF_MS));
+    vbus_set(true);
+    /*
+     * Дальше стек справится сам: с точки зрения шины это обычное горячее
+     * подключение, а его ESP-IDF обрабатывает штатно. Передёргивать порт
+     * следом не нужно и вредно — это второй сброс поверх первого.
+     */
+#else
+    G920_LOGW(M1, "%s — re-powering the root port (no vbus switch built: "
+                  "the wheel keeps its 5V and may ignore this)",
+              why);
+    kick_root_port();
+#endif
+}
+
+/*
+ * Последнее средство: перезагрузить **себя**.
+ *
+ * Это не выдумка от отчаяния, а то самое, что человек делает руками, и
+ * измеренное лучшее из доступного.
+ *
+ * Измерено 03.08.2026 и записано тут же, в разборе переподнятия руля:
+ * передёргивание корневого порта шину поднимает, но руль после него не
+ * оживает — 9 сообщений и тишина против 241 за 14 секунд после полного
+ * сброса. При сбросе заново поднимается **весь стек хоста и сам PHY**, а не
+ * только питание порта, и руль видит настоящий сброс шины.
+ *
+ * А снаружи это выглядит так: пока мак не воткнут в передатчик, руль не
+ * калибруется; воткнул — заработало. Мак ничего не чинит. Он дёргает схему
+ * автосброса платы, то есть **перезагружает передатчик** — ровно то, что
+ * делает эта функция. Мост, который умеет это сам, не требует человека у
+ * стола и не требует мака вовсе.
+ *
+ * Ограничитель обязателен: перезагрузка, не решившая задачу, повторённая
+ * бесконечно, — это петля, в которой мост не живёт и минуты. Счётчик лежит
+ * в RTC-памяти: она переживает `esp_restart` и не переживает снятие питания,
+ * то есть считает ровно «за это включение». На холодном старте она не
+ * инициализирована ничем, поэтому сбрасывается по причине сброса.
+ *
+ * Исчерпав лимит, мост **не сдаётся**, а продолжает передёргивать порт: три
+ * перезагрузки не помогли — значит дело не в них, и петля из них ничего не
+ * добавит.
+ */
+#define SELF_RESTART_MAX 3
+
+static RTC_NOINIT_ATTR uint32_t s_self_restarts;
+static uint32_t s_self_restart_notes;
+
+static void restart_self(const char *why)
+{
+    if (s_self_restarts >= SELF_RESTART_MAX) {
+        if ((s_self_restart_notes++ % 20u) == 0u) {
+            G920_LOGE(M1,
+                      "%s — %u self-restarts since power-on did not help, "
+                      "staying up and working the bus instead",
+                      why, (unsigned)s_self_restarts);
+        }
+        return;
+    }
+    s_self_restarts++;
+    G920_LOGE(M1, "%s — restarting the transmitter (%u of %u since power-on)",
+              why, (unsigned)s_self_restarts, (unsigned)SELF_RESTART_MAX);
+    vTaskDelay(pdMS_TO_TICKS(50)); /* дать строке уйти в UART */
+    esp_restart();
 }
 
 /*
@@ -2294,6 +2687,18 @@ void app_main(void)
     }
     G920_LOGI(TAG, "fw %s, role TX, mode usb-host (m1 probe)", version);
 
+    /*
+     * Счётчик собственных перезагрузок живёт в RTC-памяти и ничем не
+     * инициализируется — значит на холодном старте в нём мусор. Обнуляем по
+     * причине сброса: всё, кроме программного, — это новое включение.
+     */
+    if (esp_reset_reason() != ESP_RST_SW) {
+        s_self_restarts = 0;
+    } else if (s_self_restarts > 0) {
+        G920_LOGW(TAG, "this is self-restart %u of %u since power-on",
+                  (unsigned)s_self_restarts, (unsigned)SELF_RESTART_MAX);
+    }
+
 #if G920_LOG_BUILD_LEVEL < G920_LOG_LEVEL_ERROR
     /*
      * Свой лог выключен сборкой — значит и чужой не нужен.
@@ -2367,10 +2772,45 @@ void app_main(void)
         G920_LOGI(TAG, "link up, looking for the dongle");
     }
 
-    /* До установки стека: пока пины ещё наши. */
+
+    /*
+     * ⚠ Пины GPIO19/20 до стека НЕ трогать. Совсем.
+     *
+     * Предстековая диагностика — wire check, пробы, ожидание подтяжки —
+     * крутила эти пины как GPIO, и после неё пады доставались USB-PHY в
+     * состоянии, в котором стек **не видел статически подключённое
+     * устройство**: подтяжка руля на месте, а `devices 0` навсегда
+     * (лог 22.08.2026). Горячее подключение при этом ловилось — потому
+     * стенд и «работал от ноута» (руль приходил фронтом при живом стеке)
+     * и «от касания корпуса» (глитч рождал фронт). Стоило это открытие
+     * недель охоты за землёй, шумом и питанием: G920 держит подтяжку от
+     * своего 24 В и на VBUS-циклы не реагирует, так что единственный
+     * рабочий путь — стек поднимается на нетронутых падах и находит руль
+     * по уровню, как любой хост находит воткнутое до загрузки устройство.
+     *
+     * Диагностика осталась под `-DG920_PRESTACK_PROBES` — для стола, где
+     * человек с тестером ищет обрыв провода. Это отладочный профиль; в
+     * нём руль обязан прийти фронтом (при ключе VBUS сливается и
+     * подаётся после стека), и лечится это как раньше — касанием.
+     */
+#ifdef G920_PRESTACK_PROBES
+#ifdef G920_VBUS_GPIO
+    vbus_set(false);
+    G920_LOGI(M1, "vbus held off for the prestack probes");
+#endif
     check_wires();
     probe_lines();
+#ifdef G920_VBUS_GPIO
+    drain_vbus();
+#else
     wait_for_pullup();
+#endif
+#else
+#ifdef G920_VBUS_GPIO
+    vbus_set(true);
+    G920_LOGI(M1, "vbus switch on gpio%d: on", (int)(G920_VBUS_GPIO));
+#endif
+#endif
 
     if (usb_host_install(&host_config) != ESP_OK) {
         G920_LOGE(TAG, "usb host install failed");
@@ -2396,6 +2836,15 @@ void app_main(void)
 
     G920_LOGI(M1, "host up, waiting for a device on GPIO19/20");
     G920_LOGI(M1, "vbus must come from an external 5V source, not the board");
+
+#ifdef G920_VBUS_GPIO
+    /*
+     * В рабочем пути VBUS уже подан, и это но-оп. В отладочном
+     * (`G920_PRESTACK_PROBES`) — первое включение после проб: стек уже
+     * слушает, и появление руля станет фронтом подключения.
+     */
+    vbus_set(true);
+#endif
 
     for (;;) {
         usb_host_client_handle_events(s_client, pdMS_TO_TICKS(TICK_MS));
@@ -2569,6 +3018,49 @@ void app_main(void)
                 vTaskDelay(pdMS_TO_TICKS(50));
                 esp_restart();
             }
+
+            /*
+             * Связка поднялась — переподключить руль **один раз**.
+             *
+             * Зачем именно в этот момент. Руль энумерируется первым, пока
+             * стенд только просыпается: 24 В внутри руля ещё гуляют, радио
+             * поднимается, преобразователь выходит на режим. Знакомство,
+             * состоявшееся в этих условиях, живым не бывает — и это ровно
+             * то, что человек чинил рукой, касаясь земли или втыкая мак.
+             * Связь с донглом — последнее, что встаёт в этой цепочке, и
+             * значит лучший из доступных признаков «стенд готов, можно
+             * знакомиться начисто».
+             *
+             * Один раз за загрузку: переподключение стоит калибровочного
+             * проворота, и повторять его на каждое появление пира значило
+             * бы крутить руль без нужды. Жалоба «после включения руль
+             * калибруется 2 раза» родилась ровно из такой щедрости.
+             *
+             * Работающий руль не трогаем: если знакомство дошло до active,
+             * чинить нечего, а проворот человек увидит.
+             */
+            if (peer && !s_link_replug_done && now_ms >= RELAUNCH_COOLDOWN_MS) {
+                s_link_replug_done = true;
+                if (s_device == NULL) {
+                    /*
+                     * Руля на шине ещё нет — и переподключать нечего, и
+                     * нельзя. 22.08.2026 лог поймал этот replug с поличным:
+                     * он срабатывал через 30 мс после того, как руль
+                     * наконец выставил подтяжку (G920 нужно ~6 с после
+                     * VBUS), и снимал питание прямо под энумерацией — руль
+                     * не вставал вовсе. Знакомство, которое начнётся позже
+                     * связки, идёт в уже стабильном стенде: чинить его не
+                     * от чего, replug лечит только знакомство, начатое до.
+                     */
+                    G920_LOGI(M1, "link with the dongle is up before the "
+                                  "wheel — letting it arrive in peace");
+                } else if (wheel_is_alive(now_ms)) {
+                    G920_LOGI(M1, "link with the dongle is up and the wheel is "
+                                  "already alive — leaving it alone");
+                } else {
+                    replug_wheel("link with the dongle is up");
+                }
+            }
             s_peer_seen = peer;
         }
 
@@ -2684,6 +3176,129 @@ void app_main(void)
                 s_wheel_ready = false;
             }
 
+            /*
+             * Знакомство встало — вывести его из тупика (см. лестницу над
+             * `HANDSHAKE_STALL_MS`).
+             *
+             * Часы идут от **смены состояния**, а не от захвата: пока
+             * знакомство движется, застревания нет, а стоит оно ровно там,
+             * где кончились собственные средства `gip_host` — в Arrival без
+             * Hello и в Metadata после четвёртого запроса.
+             */
+            {
+                uint32_t now_ms = (uint32_t)(g920_timestamp_us() / 1000u);
+
+                if (s_host.state != s_handshake_state) {
+                    s_handshake_state = s_host.state;
+                    s_handshake_at_ms = now_ms;
+                    s_handshake_nudges = 0;
+                    s_handshake_rounds = 0;
+                }
+                /*
+                 * ⚠ Живой руль не чинят. Отчёты ввода идут — значит он
+                 * включён и работает, кто бы его ни включил; наше знакомство
+                 * при этом может стоять в `arrival` навсегда, и это не
+                 * неисправность, а разделение труда с консолью.
+                 *
+                 * Часы застревания при этом **взводятся заново**: если поток
+                 * ввода когда-нибудь оборвётся, отсчёт пойдёт от обрыва, а
+                 * не от давно прошедшей смены состояния.
+                 */
+                if (wheel_is_alive(now_ms)) {
+                    s_handshake_at_ms = now_ms;
+                    s_handshake_nudges = 0;
+                }
+                /*
+                 * Отчаявшись — сбавить шаг, а не долбить.
+                 *
+                 * Три круга не помогли — значит дело не в знакомстве, а
+                 * каждый круг стоит рулю калибровочного проворота, то есть
+                 * механики. Дальше пробуем раз в пять минут: мост не
+                 * сдаётся, но и не изнашивает то, что чинит.
+                 */
+                else if (s_host.state != G920_GIP_HOST_ACTIVE
+                    && (uint32_t)(now_ms - s_handshake_at_ms)
+                           >= ((s_handshake_rounds < HANDSHAKE_ROUNDS_BRISK)
+                                   ? HANDSHAKE_STALL_MS
+                                   : HANDSHAKE_STALL_SLOW_MS)) {
+                    /* Печатаем первый круг подробно, дальше редко: круги
+                     * бесконечны, и строка на каждый сделала бы журнал
+                     * нечитаемым ровно тогда, когда по нему разбирают,
+                     * почему руль не включился. */
+                    const bool loud = (s_handshake_rounds == 0);
+
+                    s_handshake_at_ms = now_ms;
+                    s_handshake_nudges++;
+                    if (s_handshake_nudges <= HANDSHAKE_NUDGES_MAX) {
+                        /* Тот же `Set Device State: Reset` из спеки, что
+                         * шлётся по просьбе донгла: устройство возвращается
+                         * в Arrival и представляется заново. */
+                        static const uint8_t reset[] = { 0x05, 0x20, 0x01,
+                                                         0x01, 0x07 };
+
+                        if (loud) {
+                            G920_LOGW(M1,
+                                      "handshake stuck in %s for %u ms "
+                                      "(hellos %u, metadata asked %u) — asking "
+                                      "the wheel to start over (%u of %u)",
+                                      g920_gip_host_state_name(s_host.state),
+                                      (unsigned)HANDSHAKE_STALL_MS,
+                                      (unsigned)s_host.hellos,
+                                      (unsigned)s_host.metadata_requests,
+                                      (unsigned)s_handshake_nudges,
+                                      (unsigned)HANDSHAKE_NUDGES_MAX);
+                        }
+                        /*
+                         * И **своё** знакомство с чистого листа: счёт
+                         * запросов метаданных уже упёрся в предел спеки, и
+                         * без сброса тик не пошлёт ни одного нового запроса,
+                         * даже когда руль снова представится.
+                         */
+                        g920_gip_host_init(&s_host, s_metadata,
+                                           sizeof(s_metadata));
+                        s_handshake_state = s_host.state;
+                        s_metadata_logged = false;
+                        s_wheel_ready = false;
+                        queue_bytes(reset, sizeof(reset),
+                                    "set device state: reset (handshake stuck)");
+                        try_send_next();
+                    } else {
+                        /*
+                         * Просьбу руль не услышал — остаётся сброс шины.
+                         * Он возвращает устройство в Arrival заведомо:
+                         * энумерацию проигнорировать нельзя, в отличие от
+                         * сообщения.
+                         *
+                         * Порядок обязателен и тот же, что при переподнятии
+                         * по просьбе донгла: сперва отпустить интерфейс и
+                         * закрыть устройство, потом трогать питание порта.
+                         */
+                        s_handshake_nudges = 0;
+                        s_handshake_rounds++;
+                        G920_LOGW(M1,
+                                  "wheel ignored %u nudges in %s — "
+                                  "re-enumerating it (round %u)",
+                                  (unsigned)HANDSHAKE_NUDGES_MAX,
+                                  g920_gip_host_state_name(s_host.state),
+                                  (unsigned)s_handshake_rounds);
+                        release_interface();
+                        if (s_device != NULL) {
+                            (void)usb_host_device_close(s_client, s_device);
+                            s_device = NULL;
+                        }
+                        /*
+                         * Второй круг — значит и энумерация не помогла.
+                         * Дальше только полный сброс: он один поднимает
+                         * стек и PHY заново (замер 03.08.2026).
+                         */
+                        if (s_handshake_rounds >= 2) {
+                            restart_self("wheel never reached active");
+                        }
+                        kick_root_port();
+                    }
+                }
+            }
+
             /* Метаданные собраны — включаем руль по-настоящему. */
             if (s_host.metadata_ready && !s_wheel_ready) {
                 s_wheel_ready = true;
@@ -2755,10 +3370,10 @@ void app_main(void)
                      * воткнуть кабель.
                      */
                     if (listed != ESP_OK || found == 0) {
-                        if (s_repower_attempts < REPOWER_ATTEMPTS_MAX) {
-                            G920_LOGW(M1, "device stuck in enumeration");
-                            kick_root_port();
-                        }
+                        /* Тоже без предела: застрявшая энумерация сама не
+                         * рассосётся, а сдавшийся мост оставляет руль
+                         * обесточенным до перезагрузки руками. */
+                        kick_root_port();
                     } else if (found > 0) {
                         G920_LOGW(M1, "device %u is on the bus but no event "
                                       "came — opening it directly",
@@ -2766,12 +3381,72 @@ void app_main(void)
                         s_pending_addr = addrs[0];
                         s_pending_new = true;
                     }
-                } else if (s_repower_attempts < REPOWER_ATTEMPTS_MAX) {
+                } else {
+                    /*
+                     * ⚠ Пробуем **бесконечно**, а не три раза.
+                     *
+                     * Здесь стоял предел в три попытки, после которого
+                     * передатчик писал «не помогло» и переставал пытаться
+                     * навсегда. Это прямой дефект: руль может появиться
+                     * позже нас. При холодном включении он готовится дольше,
+                     * чем грузится плата, и три попытки успевают истратиться
+                     * впустую — дальше мост стоит с обесточенным портом и
+                     * ждёт события, которого уже некому породить.
+                     *
+                     * Так это и проявлялось у человека 03.08.2026: руль
+                     * поднимался только если плата стартовала **с
+                     * подключённым переходником** — тот задерживает загрузку
+                     * схемой автосброса, и руль успевал. Без переходника
+                     * `waiting: devices 0` держалось бесконечно.
+                     *
+                     * Мост, сдавшийся навсегда, хуже моста, который
+                     * продолжает пробовать: попытка стоит передёргивания
+                     * порта раз в несколько секунд и ничего не ломает, а
+                     * отказ стоит неработающего руля до перезагрузки руками.
+                     *
+                     * Печатаем редко — иначе журнал становится нечитаемым
+                     * ровно тогда, когда по нему разбирают «почему руля нет».
+                     */
                     kick_root_port();
-                } else if (s_repower_attempts == REPOWER_ATTEMPTS_MAX) {
-                    s_repower_attempts++;
-                    G920_LOGE(M1, "re-powering did not help — the device on "
-                                  "the bus is not enumerating at all");
+                }
+                /*
+                 * Порт передёрнут трижды, а руля на шине так и нет — этим
+                 * средством больше ничего не добьёшься. Перезагружаемся:
+                 * поднимется весь стек хоста и сам PHY, а не только питание
+                 * порта. Ограничитель и обоснование — у `restart_self`.
+                 */
+                /*
+                 * Порог перезагрузки — 7, а не 3, и это не щедрость.
+                 * Каждая третья попытка передёргивает VBUS (см.
+                 * kick_root_port), и рулю после этого нужно время дойти до
+                 * подтяжки и энумерации. Лог 22.08.2026 поймал рестарт,
+                 * прилетевший через миг после цикла VBUS третьей попытки —
+                 * руль уже возвращался, а мост его не дождался. Семь
+                 * попыток — это два полных круга с циклами VBUS (3-я и
+                 * 6-я) и время на детект после каждого.
+                 */
+                if (s_repower_attempts >= 7u) {
+                    restart_self("no wheel on the bus after re-powering the "
+                                 "port");
+                }
+            } else if (!s_claimed) {
+                /*
+                 * Устройство открыто, а интерфейс не взят — и это тоже было
+                 * тупиком навсегда.
+                 *
+                 * Захват пробуется один раз, при разборе события; отказ
+                 * печатался строкой «listening did not start», и на этом всё
+                 * кончалось: события больше не будет, а без интерфейса нет
+                 * ни опроса, ни отправки. Снаружи это ровно то же, что и
+                 * застрявшее знакомство, — руль на шине, и он мёртв.
+                 */
+                G920_LOGW(M1, "device is open but the interface is not "
+                              "claimed — trying again");
+                if (!claim_and_listen()) {
+                    release_interface();
+                    (void)usb_host_device_close(s_client, s_device);
+                    s_device = NULL;
+                    kick_root_port();
                 }
             } else if (s_claimed && s_in_msgs == 0) {
                 /*
@@ -2832,6 +3507,19 @@ void app_main(void)
                     list[(off > 0) ? off : 0] = '\0';
                     G920_LOGI(M1, "to wheel: %s", list);
                 }
+                /*
+                 * Состояние знакомства в отчёте — потому что без него
+                 * «руль не включился» и «руль не ответил» выглядят в логе
+                 * одинаково, а чинятся в разных местах.
+                 */
+                G920_LOGI(M1,
+                          "handshake: %s, hellos %u, metadata asked %u, "
+                          "ready %s, powered on %s",
+                          g920_gip_host_state_name(s_host.state),
+                          (unsigned)s_host.hellos,
+                          (unsigned)s_host.metadata_requests,
+                          s_host.metadata_ready ? "yes" : "no",
+                          s_wheel_ready ? "yes" : "no");
                 G920_LOGI(M1,
                           "in: %u msgs, %u errors | from wheel: 02=%u 03=%u "
                           "04=%u 06=%u 20=%u 21=%u",
