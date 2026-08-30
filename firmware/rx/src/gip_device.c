@@ -628,6 +628,15 @@ void g920_gip_device_wake_console(void)
     tud_connect();
 }
 
+void g920_gip_device_detach(void)
+{
+    G920_LOGW(TAG, "detaching from the bus");
+    tud_disconnect();
+    /* Достаточно, чтобы хост увидел исчезновение подтяжки и закрыл своё
+     * представление об устройстве: дальше нас всё равно не станет. */
+    vTaskDelay(pdMS_TO_TICKS(50));
+}
+
 void g920_gip_device_restart_session(void)
 {
     G920_LOGW(TAG, "wheel restarted — restarting the console session");

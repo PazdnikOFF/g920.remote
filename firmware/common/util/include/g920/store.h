@@ -78,7 +78,8 @@ typedef enum {
     G920_STORE_KIND_PEER = 1, /* MAC пира линка, M3 */
     G920_STORE_KIND_IDENTITY = 2, /* личность руля, M4 */
     G920_STORE_KIND_VERDICT = 3, /* вердикт детектора хоста, M6 */
-    G920_STORE_KIND_EPOCH = 4 /* счётчик загрузок = эпоха сессии линка, M3 */
+    G920_STORE_KIND_EPOCH = 4, /* счётчик загрузок = эпоха сессии линка, M3 */
+    G920_STORE_KIND_UI = 5 /* настройки экрана донгла: ступень подсветки */
 } g920_store_kind_t;
 
 typedef struct {

@@ -838,6 +838,15 @@ static out_packet_t s_out_queue[OUT_QUEUE_LEN];
 static volatile uint8_t s_out_head;
 static volatile uint8_t s_out_tail;
 static volatile uint32_t s_out_dropped;
+/*
+ * Очередь к рулю живёт в двух задачах: наполняют её и колбэк линка (задача
+ * Wi-Fi — силы, security), и главный цикл (ACK'и знакомства), разгружают
+ * оба плюс завершение отправки. На двух ядрах S3 это настоящая гонка, а не
+ * теоретическая: два производителя без замка пишут один слот, а два вызова
+ * `try_send_next` сдают один и тот же transfer дважды. Спинлок, потому что
+ * контексты — разные ядра, и запрета прерываний мало.
+ */
+static portMUX_TYPE s_out_lock = portMUX_INITIALIZER_UNLOCKED;
 
 /* Был ли пир на прошлом такте — ловим появление, а не наличие. */
 static bool s_peer_seen;
@@ -857,7 +866,8 @@ static uint8_t s_seq_initial_reports;
 
 static void queue_bytes(const uint8_t *data, size_t len, const char *what)
 {
-    uint8_t next = (uint8_t)((s_out_head + 1) % OUT_QUEUE_LEN);
+    uint8_t next;
+    bool full = false;
 
     if (len == 0 || len > EP_BUF_MAX) {
         s_out_dropped++;
@@ -881,11 +891,14 @@ static void queue_bytes(const uint8_t *data, size_t len, const char *what)
         }
         return;
     }
+    /* Индексы, слот и счётчики номеров — только под замком; печать —
+     * только снаружи: строка в UART под спинлоком остановила бы второе
+     * ядро на миллисекунды. */
+    portENTER_CRITICAL_SAFE(&s_out_lock);
+    next = (uint8_t)((s_out_head + 1) % OUT_QUEUE_LEN);
     if (next == s_out_tail) {
-        s_out_dropped++;
-        G920_LOGE(M1, "out queue full, dropped %s", what);
-        return;
-    }
+        full = true;
+    } else {
     memcpy(s_out_queue[s_out_head].data, data, len);
     s_out_queue[s_out_head].length = (uint8_t)len;
     s_out_queue[s_out_head].what = what;
@@ -929,6 +942,13 @@ static void queue_bytes(const uint8_t *data, size_t len, const char *what)
         }
     }
     s_out_head = next;
+    }
+    portEXIT_CRITICAL_SAFE(&s_out_lock);
+
+    if (full) {
+        s_out_dropped++;
+        G920_LOGE(M1, "out queue full, dropped %s", what);
+    }
 }
 
 static void queue_packet(const g920_gip_host_packet_t *packet)
@@ -1655,14 +1675,32 @@ static void dump_trace(void)
  */
 static void try_send_next(void)
 {
-    const out_packet_t *packet;
+    const out_packet_t *packet = NULL;
 
-    if (s_out_busy || s_out_tail == s_out_head) {
+    /*
+     * Труба берётся под замком: зовут отсюда две задачи на двух ядрах, и
+     * без атомарного «свободна → занята» оба вызова проходили проверку и
+     * сдавали один и тот же transfer дважды. Флаг занятости с этого места
+     * принадлежит вызывающему: `host_send` его не трогает, а отпускают его
+     * либо завершение отправки (`on_out_done`), либо отказ ниже.
+     */
+    portENTER_CRITICAL_SAFE(&s_out_lock);
+    if (!s_out_busy && s_out_tail != s_out_head) {
+        s_out_busy = true;
+        packet = &s_out_queue[s_out_tail];
+    }
+    portEXIT_CRITICAL_SAFE(&s_out_lock);
+    if (packet == NULL) {
         return;
     }
-    packet = &s_out_queue[s_out_tail];
     if (host_send(packet->what, packet->data, packet->length)) {
+        portENTER_CRITICAL_SAFE(&s_out_lock);
         s_out_tail = (uint8_t)((s_out_tail + 1) % OUT_QUEUE_LEN);
+        portEXIT_CRITICAL_SAFE(&s_out_lock);
+    } else {
+        portENTER_CRITICAL_SAFE(&s_out_lock);
+        s_out_busy = false;
+        portEXIT_CRITICAL_SAFE(&s_out_lock);
     }
 }
 
@@ -1967,11 +2005,12 @@ static void on_out_done(usb_transfer_t *transfer)
  */
 static bool host_send(const char *what, const uint8_t *data, size_t len)
 {
+    /*
+     * ⚠ Флагом занятости владеет вызывающий (`try_send_next` берёт его под
+     * замком до вызова). Здесь его не проверять и не ставить: вторая точка
+     * принятия решения — это и была гонка двух задач на одном transfer.
+     */
     if (s_out == NULL || s_device == NULL || len == 0 || len > EP_BUF_MAX) {
-        return false;
-    }
-    if (s_out_busy) {
-        G920_LOGW(M1, "out busy, %s dropped", what);
         return false;
     }
 
@@ -1981,10 +2020,8 @@ static bool host_send(const char *what, const uint8_t *data, size_t len)
     s_out->bEndpointAddress = s_ep_out;
     s_out->callback = on_out_done;
     s_out->context = NULL;
-    s_out_busy = true;
 
     if (usb_host_transfer_submit(s_out) != ESP_OK) {
-        s_out_busy = false;
         G920_LOGE(M1, "out submit failed (%s)", what);
         return false;
     }

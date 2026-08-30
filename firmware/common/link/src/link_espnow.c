@@ -57,6 +57,8 @@ static g920_link_rx_t s_rx_state;
  * см. комментарий на входе `on_recv`. */
 static volatile uint32_t s_recv_raw;
 static volatile uint32_t s_recv_unparsed;
+/* Уровень последнего принятого кадра, dBm. 0 — ещё ничего не слышали. */
+static volatile int8_t s_rssi;
 static volatile uint32_t s_rejected_seen;
 static uint32_t s_rejected_reported;
 /*
@@ -302,6 +304,14 @@ G920_HOT static void on_recv(const esp_now_recv_info_t *info,
     s_recv_raw++;
     if (info == NULL || data == NULL || len <= 0) {
         return;
+    }
+    /*
+     * Уровень — до разбора и без всяких условий: он свойство эфира, а не
+     * кадра, и мерить его только на «правильных» кадрах значит не увидеть
+     * ровно тот случай, когда связь разваливается.
+     */
+    if (info->rx_ctrl != NULL) {
+        s_rssi = (int8_t)info->rx_ctrl->rssi;
     }
     if (g920_frame_parse(&frame, data, (size_t)len) != G920_PROTO_OK) {
         s_recv_unparsed++;
@@ -742,6 +752,11 @@ uint32_t g920_link_reliable_send_failed(void)
 uint8_t g920_link_epoch(void)
 {
     return s_epoch;
+}
+
+int8_t g920_link_rssi(void)
+{
+    return s_rssi;
 }
 
 uint32_t g920_link_reliable_gave_up(void)

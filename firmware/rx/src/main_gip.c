@@ -32,6 +32,7 @@
 #include "freertos/task.h"
 
 #include "gip_device.h"
+#include "ui.h"
 
 #include "g920/board.h"
 #include "g920/gip.h"
@@ -404,6 +405,15 @@ static uint8_t next_input_seq(void)
 static uint8_t last_input[64];
 static volatile uint8_t last_input_len;
 static volatile uint32_t since_input_ms;
+/*
+ * Замок на последний отчёт и счёт номеров. Свежий ввод пишет колбэк линка
+ * (задача Wi-Fi), повтор раз в 25 мс читает главный цикл — на S3 это два
+ * ядра. Без замка повтор мог отправить консоли **рваный** отчёт: половину
+ * старого, половину только что пришедшего, — а общий счётчик номеров выдать
+ * дубль. В самом отправляемом буфере хранится сырьё руля; номер ставится в
+ * локальную копию каждым отправителем под этим же замком.
+ */
+static portMUX_TYPE s_input_lock = portMUX_INITIALIZER_UNLOCKED;
 
 /* Как часто повторять последний отчёт, если руль молчит. Столько же
  * отводит joypad-os своим холостым отчётам во время аутентификации. */
@@ -1312,12 +1322,21 @@ static void on_link_frame(void *ctx, const g920_frame_t *frame,
              * на критическом пути — десятки наносекунд.
              */
             if (frame->length > 0 && frame->length <= sizeof(last_input)) {
-                memcpy(last_input, frame->payload, frame->length);
-                last_input_len = (uint8_t)frame->length;
-                if (frame->length > G920_GIP_SEQ_OFFSET) {
-                    last_input[G920_GIP_SEQ_OFFSET] = next_input_seq();
-                }
+                uint8_t out[sizeof(last_input)];
+                uint8_t out_len = (uint8_t)frame->length;
+
+                /* Запомнить и снять копию — под замком; номер — в копию, а
+                 * не в хранимое сырьё (см. s_input_lock). Отправка — уже
+                 * снаружи: под спинлоком TinyUSB звать нельзя. */
+                portENTER_CRITICAL_SAFE(&s_input_lock);
+                memcpy(last_input, frame->payload, out_len);
+                last_input_len = out_len;
                 since_input_ms = 0; /* свежий отчёт отодвигает повтор */
+                memcpy(out, frame->payload, out_len);
+                if (out_len > G920_GIP_SEQ_OFFSET) {
+                    out[G920_GIP_SEQ_OFFSET] = next_input_seq();
+                }
+                portEXIT_CRITICAL_SAFE(&s_input_lock);
                 /*
                  * Первые отчёты печатаются целиком — ровно теми байтами,
                  * которые получает консоль. Заведено потому, что весь вечер
@@ -1329,9 +1348,9 @@ static void on_link_frame(void *ctx, const g920_frame_t *frame,
                  */
                 if (input_dumped < 3u) {
                     input_dumped++;
-                    G920_LOGI_HEXDUMP(M2, last_input, last_input_len);
+                    G920_LOGI_HEXDUMP(M2, out, out_len);
                 }
-                if (g920_gip_device_send(last_input, last_input_len)) {
+                if (g920_gip_device_send(out, out_len)) {
                     input_fwd++;
                 } else {
                     input_lost++;
@@ -1637,6 +1656,13 @@ void app_main(void)
     led = g920_board_led_init();
     G920_LOGI(TAG, "led %s %s", g920_board_led_kind(), led ? "ok" : "absent");
 
+    /*
+     * Экран и кнопка — сразу после хранилища: ступень подсветки лежит в
+     * NVS, а показать «поднимаюсь» человеку нужно раньше, чем встанет
+     * связь. Экрана нет — молча работаем как прежде.
+     */
+    G920_LOGI(TAG, "display %s", g920_ui_init() ? "ok" : "absent");
+
     g920_hostlog_init(&hostlog, hostlog_storage, HOSTLOG_CAPACITY);
 
     if (g920_link_init(on_link_frame, NULL) != G920_LINK_OK) {
@@ -1902,15 +1928,25 @@ void app_main(void)
         since_input_ms += TICK_MS;
         if (last_input_len > 0 && since_input_ms >= IDLE_REPORT_MS
             && g920_gip_device_configured()) {
+            uint8_t out[sizeof(last_input)];
+            uint8_t out_len;
+
+            /* Копия и номер — под замком, отправка снаружи: свежий кадр из
+             * задачи Wi-Fi иначе переписывал буфер прямо под повтором, и
+             * консоли уезжал отчёт из двух половин (см. s_input_lock). */
+            portENTER_CRITICAL_SAFE(&s_input_lock);
             since_input_ms = 0;
+            out_len = last_input_len;
+            memcpy(out, last_input, out_len);
             /* Повтор — это **новый пакет**, и номер у него обязан быть
              * новым: спека требует инкремента на каждую отправку. Именно
              * повторение номера делало наш поток для консоли чередой
              * дубликатов. */
-            if (last_input_len > G920_GIP_SEQ_OFFSET) {
-                last_input[G920_GIP_SEQ_OFFSET] = next_input_seq();
+            if (out_len > G920_GIP_SEQ_OFFSET) {
+                out[G920_GIP_SEQ_OFFSET] = next_input_seq();
             }
-            if (g920_gip_device_send(last_input, last_input_len)) {
+            portEXIT_CRITICAL_SAFE(&s_input_lock);
+            if (g920_gip_device_send(out, out_len)) {
                 idle_fwd++;
             } else {
                 idle_lost++;
@@ -2029,6 +2065,59 @@ void app_main(void)
 
             g920_board_led_set(seen ? (on ? G920_IND_OK : G920_IND_OFF)
                                     : (on ? G920_IND_DETECT : G920_IND_OFF));
+        }
+
+        /*
+         * Экран и кнопка — каждый проход.
+         *
+         * Каждый, потому что кнопку надо опрашивать часто, иначе короткое
+         * нажатие теряется; а перерисовка внутри ограничена своим
+         * расписанием и тремя строками за раз (см. ui.c). Снимок состояния
+         * собирается тут же: это чтение уже посчитанных счётчиков, и
+         * дешевле передать их разом, чем тянуть в экран знание о том, где
+         * в этой прошивке что лежит.
+         */
+        {
+            g920_ui_state_t ui;
+            g920_link_rx_counters_t rx_c;
+            uint32_t now_ms = (uint32_t)(g920_timestamp_us() / 1000u);
+
+            g920_link_rx_counters(&rx_c, false);
+            memset(&ui, 0, sizeof(ui));
+            ui.link_peer = g920_link_has_peer();
+            ui.rssi = g920_link_rssi();
+            ui.wheel_ready = wheel_ready;
+            ui.have_identity = have_identity;
+            if (have_identity) {
+                ui.vendor_id = identity.fingerprint.vendor_id;
+                ui.product_id = identity.fingerprint.product_id;
+            }
+            ui.usb_configured = g920_gip_device_configured();
+            ui.usb_suspended = g920_gip_device_suspended();
+            ui.auth_done = auth_done;
+            ui.start_seen = start_seen;
+            ui.input_fwd = input_fwd;
+            ui.input_lost = input_lost;
+            ui.ffb_sent = ffb_sent;
+            ui.auth_back = auth_back;
+            ui.rx_gaps = rx_c.gaps;
+            ui.rx_dup = rx_c.duplicates;
+            ui.rx_stale = rx_c.stale;
+            ui.retries = g920_link_reliable_retries();
+            ui.gave_up = g920_link_reliable_gave_up();
+
+            if (g920_ui_tick(&ui, now_ms) == G920_UI_FLASH) {
+                /*
+                 * Порядок обязателен: сперва сказать человеку, что
+                 * происходит, потом честно уйти с шины, и только потом
+                 * перезагружаться. Обратной дороги отсюда нет — плата
+                 * останется ждать `esptool`, пока её не передёрнут по
+                 * питанию.
+                 */
+                g920_ui_show_flash_mode();
+                g920_gip_device_detach();
+                g920_board_enter_download_mode();
+            }
         }
 
         if (since_report_ms >= REPORT_EVERY_MS) {

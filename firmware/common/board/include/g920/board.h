@@ -35,6 +35,14 @@ void g920_board_led_set(g920_indication_t state);
 /* Имя типа индикатора для лога: "ws2812", "apa102", "gpio", "none". */
 const char *g920_board_led_kind(void);
 
+/*
+ * Уйти в режим загрузки ПЗУ и ждать `esptool`.
+ *
+ * Не возвращается. Нужна плате с единственным USB-разъёмом, занятым ролью
+ * устройства: подробности и оговорки — в `src/download.c`.
+ */
+void g920_board_enter_download_mode(void);
+
 #ifdef __cplusplus
 }
 #endif
