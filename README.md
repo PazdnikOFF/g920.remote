@@ -1,12 +1,13 @@
 # Wireless adapter for the Logitech G920
 
-Two ESP32-S3 boards that put a radio link in the middle of a G920's USB
-cable. One sits at the wheel and speaks USB **Host** to it; the other plugs
-into the console or PC and pretends to **be** the wheel. Force feedback
-crosses the link in the other direction, so the wheel still fights back.
+**This replaces the G920's USB cable with an ESP-NOW radio link.**
 
-The wheel is never opened or modified. Everything goes through its stock
-USB-A cable.
+Two ESP32-S3 boards do the work. One stays with the wheel and reads it over
+USB. The other plugs into the console or PC, where it looks like a real
+G920. Force feedback travels back over the same link, so the wheel still
+pushes against your hands.
+
+You never open or modify the wheel. It connects with its own USB cable.
 
 ```
    Logitech G920 ──USB──▶ [ TX: ESP32-S3 ]  ))) ESP-NOW (((  [ RX: dongle ] ──USB──▶ Xbox / PC
@@ -15,21 +16,21 @@ USB-A cable.
 
 ## Status
 
-**It works.** The console accepts the adapter as a genuine wheel, the
-security handshake passes, and the wheel is playable over the radio.
+**It works.** The console accepts it as a real wheel, the Xbox security
+check passes, and you can play with the wheel over the radio.
 
 | Piece | State |
 |---|---|
-| Wheel enumeration, metadata, force feedback | done |
-| Radio transport (ESP-NOW) | done — 250 Hz with zero loss, ~1.2 ms one way |
+| Reading the wheel: connection, metadata, force feedback | done |
+| The radio link itself | done — 250 updates/s with no losses, ~1.2 ms one way |
 | Cloning the wheel's identity onto the dongle | done |
-| Xbox security passthrough | done — console accepts the wheel |
+| Xbox security check (passed through to the wheel) | done |
 | Dongle with screen and button | written, **not yet tested on real hardware** |
-| Watchdog / fail-safe (drop forces on link loss) | not done |
+| Fail-safe: release the forces if the link breaks | not done |
 
-Measured latency budget: our own code is ~0.1 % of the path. The rest is
-USB polling (1–4 ms each side) and the radio (~1.2 ms). See
-[`docs/LATENCY.md`](docs/LATENCY.md).
+Delay: our own code adds almost nothing — about 0.1 % of the total. Nearly
+all of it is USB polling (1–4 ms on each side) and the radio (~1.2 ms).
+Details in [`docs/LATENCY.md`](docs/LATENCY.md).
 
 ## Hardware
 
@@ -38,9 +39,9 @@ USB polling (1–4 ms each side) and the radio (~1.2 ms). See
 | **TX** — at the wheel | ESP32-S3 (Supermini / DevKitC-1) | USB Host, small enough to tape to the wheel |
 | **RX** — at the console | Pocket-Dongle-S3 / LilyGo T-Dongle-S3 | USB-stick form factor, screen, plugs straight into the console |
 
-**One board can only have one role.** The ESP32-S3 has a single USB-OTG
-controller — Host or Device, never both, and it cannot switch at runtime.
-That is silicon, not a software choice.
+**One board can only do one job.** The ESP32-S3 has a single USB controller:
+it can be a host or a device, never both, and it cannot switch while
+running. That is how the chip is built — no amount of code gets around it.
 
 ### Wiring: TX to the wheel
 
@@ -64,11 +65,11 @@ wire to the ESP32-S3:
         1 kΩ bleeder from pin 1 to pin 4, right at the socket
 ```
 
-**D+ and D− pins are fixed by the silicon.** GPIO19 is D−, GPIO20 is D+.
-They cannot be moved — there is no mux, it is the USB PHY itself.
+**The D+ and D− pins cannot be changed.** GPIO19 is D−, GPIO20 is D+. They
+run straight into the chip's USB hardware, so no other pins will work.
 
-Wire colours inside USB cables (red/white/green/black) are a convention,
-not a guarantee. **Ring them out with a meter.**
+Wire colours inside USB cables (red/white/green/black) are only a
+convention, not a guarantee. **Check them with a multimeter.**
 
 ### Wiring: power
 
@@ -87,24 +88,25 @@ to the wheel come from that same 24 V through an isolated DC-DC converter:
 
 Three things that are easy to get wrong:
 
-- **The transmitter supplies VBUS, not the wheel.** A self-powered USB
-  device will not start enumerating until it sees 5 V on VBUS — it is
-  waiting to be told a host plugged in.
-- **Do not feed VBUS from the board's own `5V` pin.** On most dev boards
-  that pin sits behind a Schottky diode on the supply rail; back-feeding it
-  drives the on-board regulator from its output.
-- **The USB ground must be common.** D+/D− are measured against pin 4. An
-  isolated DC-DC does *not* remove that requirement: the wheel ties its own
-  USB ground to its 24 V ground internally, so the isolation is bridged
-  through the wheel regardless. Either accept a common ground, or use a
-  real USB isolator (ADuM4160) on the data lines — a DC-DC alone cannot do
+- **The 5 V on VBUS comes from the adapter, not from the wheel.** A device
+  with its own power supply stays silent until it sees 5 V on VBUS — that
+  is how it knows something was plugged into it.
+- **Do not take that 5 V from the board's own `5V` pin.** On most dev boards
+  that pin sits behind a diode, and feeding power back into it pushes
+  current into the board's regulator from the wrong side.
+- **Both sides must share a ground.** D+ and D− are measured against pin 4,
+  so the wheel and the board need the same reference point. An isolated
+  DC-DC converter does not change this: inside the wheel, the USB ground is
+  already tied to the 24 V ground, so the isolation is bypassed through the
+  wheel anyway. Either accept the shared ground, or add a real USB isolator
+  (ADuM4160) on the data lines — an isolated power supply alone cannot do
   it.
 
 ### The VBUS switch
 
-The firmware owns VBUS so it can power-cycle the wheel by itself
-(`-DG920_VBUS_GPIO=21`). A high-side switch built from an optocoupler
-driving a PNP transistor:
+The firmware switches this 5 V itself, so it can power-cycle the wheel with
+nobody touching anything (`-DG920_VBUS_GPIO=21`). The switch is an
+optocoupler driving a PNP transistor:
 
 ```
               +5 V ──┬──────────────────── E ┐
@@ -123,14 +125,15 @@ driving a PNP transistor:
 GPIO21 high → the PNP conducts → the wheel gets a clean 5 V.
 GPIO21 low or the board still booting → the wheel is unpowered.
 
-Two notes paid for the hard way:
+Two things we learned the hard way:
 
-- **An optocoupler alone will not do.** Used as the pass element it drops
-  over a volt (measured: 3.4–3.9 V out of 5 V) and the wheel never crosses
-  its VBUS threshold. It has to drive a transistor, not the load.
-- **The bleeder is not optional.** The wheel draws microamps from VBUS, so
-  without a resistor to discharge the node, "off" is not off — the node
-  floats near 5 V for tens of seconds.
+- **An optocoupler on its own is not enough.** If the current flows through
+  the optocoupler itself, it loses more than a volt (measured: 3.4–3.9 V
+  instead of 5 V), and the wheel never sees enough voltage to wake up. Its
+  job is to switch the transistor, not to carry the load.
+- **Do not skip the 1 kΩ resistor.** The wheel draws only microamps from
+  VBUS, so with nothing to drain the line, switching off does not actually
+  turn it off: the voltage sits near 5 V for tens of seconds.
 
 ### RX: the dongle
 
@@ -157,11 +160,12 @@ pio run -d firmware/rx -e rx-prod       -t upload   # silent
 pio test -d firmware/native
 ```
 
-Flashing the dongle is awkward on purpose: it has one USB port and the
-firmware takes it over as a device. Either **hold the button for 3 s** to
-have the running firmware reboot into the ROM bootloader, or **hold the
-button while plugging it in** — the latter is handled by the ROM and works
-even when the firmware does not boot.
+Flashing the dongle takes one extra step, and there is no way around it:
+the board has a single USB port, and the firmware is using it to act as the
+wheel. Either **hold the button for 3 seconds** and the running firmware
+will reboot into the bootloader, or **hold the button while plugging it
+in** — that one is handled by the chip's ROM and works even when the
+firmware does not start at all.
 
 ## Layout
 
@@ -177,22 +181,24 @@ The shared code is genuinely shared — one copy, pulled into both firmwares
 and into the host test build, so protocol logic is covered by tests that
 need no hardware.
 
-## Lessons that cost the most time
+## Mistakes that cost us the most time
 
-- **Do not touch GPIO19/20 before the USB stack starts.** Pre-stack
-  diagnostics that drove those pins as ordinary GPIOs left the PHY unable
-  to see a *statically connected* device: the wheel's pull-up was sitting
-  right there and the stack reported an empty bus forever. Hot-plugging
-  still worked, which is why "it only starts if I touch the connector" and
-  "it works when powered from the laptop" both looked like grounding
-  problems for weeks. They were not.
-- **Two owners of one sequence-number pool is always a bug.** It bit three
-  times: the console and the transmitter both numbering messages to the
-  wheel, the tunnel and the reliable queue sharing a frame type, and the
-  idle repeater re-sending a report with the same GIP sequence ID.
-- **Logging in the hot path controls timing.** A 64-byte hexdump at 115200
-  baud takes ~45 ms. It broke the wheel handshake once and tripped a
-  watchdog another time. Production profiles compile logging out entirely.
+- **Do not touch GPIO19/20 before the USB stack starts.** We had diagnostic
+  code that drove those pins as ordinary GPIOs during boot. Afterwards the
+  USB hardware could no longer see a device that was *already plugged in*:
+  the wheel was sitting right there holding its data line high, and the
+  stack still reported an empty bus, forever. Plugging the wheel in later
+  still worked — which is why "it only starts if I touch the connector" and
+  "it works when I power it from the laptop" looked like grounding problems
+  for weeks. They were not.
+- **Never let two parts of the code number messages from the same pool.**
+  This caused three separate bugs: the console and the transmitter both
+  numbering messages to the wheel, the tunnel and the retry queue sharing a
+  frame type, and the idle repeater resending a report with an old number.
+- **Logging inside time-critical code changes the timing.** Printing 64
+  bytes as hex over a 115200-baud serial port takes about 45 ms. That was
+  enough to break the wheel's handshake once and to trip a watchdog another
+  time. The production builds leave logging out completely.
 
 ## License
 
